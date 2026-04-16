@@ -19,7 +19,7 @@ export default async function BusinessPendingPage() {
     <section className="space-y-4 rounded-xl border bg-white p-5">
       <h1 className="text-2xl font-semibold">Business Verification</h1>
       <p className="text-sm text-slate-600">
-        Good day, {user.businessName ?? user.name}. Submit your BIR TIN or Mayor&apos;s Permit for admin review.
+        Good day, {user.businessName ?? user.name}. Submit your BIR TIN or Mayor&apos;s Business Permit for admin review.
       </p>
 
       <form action="/api/business/verify" method="post" encType="multipart/form-data" className="space-y-3">

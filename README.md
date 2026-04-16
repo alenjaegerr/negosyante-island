@@ -70,6 +70,8 @@ npm run dev
 
 Password for all: `password123`
 
+> ⚠️ Demo credentials are for local development/testing only. Do not use seeded users or passwords in production.
+
 - `admin@negosyante.test` (admin)
 - `user@negosyante.test` (normal user)
 - `biz@negosyante.test` (verified business)
