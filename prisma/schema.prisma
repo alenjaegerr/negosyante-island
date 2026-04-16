@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  business_pending
+  business_verified
+  admin
+}
+
+enum VerificationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum DocumentType {
+  bir_tin
+  mayor_permit
+}
+
+model User {
+  id                    String                @id @default(cuid())
+  name                  String
+  email                 String                @unique
+  passwordHash          String
+  role                  Role                  @default(user)
+  businessName          String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  posts                 Post[]
+  verificationRequests  VerificationRequest[] @relation("BusinessRequests")
+  reviewedRequests      VerificationRequest[] @relation("ReviewedBy")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  tags      String[]
+  likes     Int      @default(0)
+  comments  Int      @default(0)
+  shares    Int      @default(0)
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([createdAt])
+}
+
+model VerificationRequest {
+  id            String             @id @default(cuid())
+  businessName  String
+  documentType  DocumentType
+  documentUrl   String
+  status        VerificationStatus @default(pending)
+  createdAt     DateTime           @default(now())
+  reviewedAt    DateTime?
+  rejectionNote String?
+  userId        String
+  reviewerId    String?
+  user          User               @relation("BusinessRequests", fields: [userId], references: [id])
+  reviewer      User?              @relation("ReviewedBy", fields: [reviewerId], references: [id])
+
+  @@index([status])
+}
+
+model Trend {
+  id                String   @id @default(cuid())
+  keyword           String   @unique
+  engagementPercent Float
+  views             Int
+  growthPercent     Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
