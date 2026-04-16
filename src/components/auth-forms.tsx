@@ -89,7 +89,7 @@ export function SignupForm() {
       <h2 className="text-xl font-semibold">Create your account</h2>
       <input className="w-full rounded border p-2" required placeholder="Full name" value={state.name} onChange={(e) => setState((p) => ({ ...p, name: e.target.value }))} />
       <input className="w-full rounded border p-2" type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
-      <input className="w-full rounded border p-2" type="password" required minLength={8} placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
+      <input className="w-full rounded border p-2" type="password" required minLength={8} pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}" title="Use at least 8 characters including uppercase, lowercase, and number." placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
       <select className="w-full rounded border p-2" value={state.accountType} onChange={(e) => setState((p) => ({ ...p, accountType: e.target.value as SignupState["accountType"] }))}>
         <option value="user">Normal user</option>
         <option value="business_pending">Business account (for verification)</option>

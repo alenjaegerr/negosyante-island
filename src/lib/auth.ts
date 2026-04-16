@@ -6,7 +6,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const AUTH_COOKIE = "negosyante_token";
-const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? "change-me-in-env");
+const jwtSecret =
+  process.env.JWT_SECRET && process.env.JWT_SECRET.trim().length > 0
+    ? process.env.JWT_SECRET
+    : process.env.NODE_ENV === "production"
+      ? ""
+      : "dev-only-secret";
+const secret = new TextEncoder().encode(jwtSecret);
+
+if (process.env.NODE_ENV === "production" && !jwtSecret) {
+  throw new Error("JWT_SECRET is required in production");
+}
 
 export type AuthPayload = {
   sub: string;

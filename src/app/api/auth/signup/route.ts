@@ -14,6 +14,13 @@ export async function POST(request: Request) {
   if (password.length < 8) {
     return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
   }
+  const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  if (!strongPasswordPattern.test(password)) {
+    return NextResponse.json(
+      { error: "Password must include uppercase, lowercase, and a number" },
+      { status: 400 },
+    );
+  }
 
   if (accountType === Role.business_pending && !businessName) {
     return NextResponse.json({ error: "Business name is required for business accounts" }, { status: 400 });

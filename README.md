@@ -29,7 +29,7 @@ A Next.js + Prisma starter for **Negosyante Island**, a social + internet cultur
 - Styling: Tailwind CSS
 - Database: PostgreSQL via Prisma ORM
 - Auth: JWT + HttpOnly cookie
-- Uploads: saved to `public/uploads`
+- Uploads: saved to `data/uploads` and served through an authenticated API route
 
 ## Quick Start
 

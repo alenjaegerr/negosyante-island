@@ -11,6 +11,9 @@ export async function POST(
 
   const { id } = await context.params;
   const { type } = await request.json();
+  if (!["like", "comment", "share", "view"].includes(type)) {
+    return NextResponse.json({ error: "Invalid interaction type" }, { status: 400 });
+  }
 
   const post = await prisma.post.update({
     where: { id },

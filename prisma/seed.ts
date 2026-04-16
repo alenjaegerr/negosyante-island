@@ -1,9 +1,15 @@
 import { PrismaClient, Role } from "@prisma/client";
 import { hashSync } from "bcryptjs";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Do not run seed in production");
+  }
+
   await prisma.post.deleteMany();
   await prisma.verificationRequest.deleteMany();
   await prisma.trend.deleteMany();
@@ -77,7 +83,7 @@ async function main() {
       userId: pendingBusiness.id,
       businessName: pendingBusiness.businessName ?? "Rico Streetwear",
       documentType: "mayor_permit",
-      documentUrl: "/uploads/sample-permit.png",
+      documentUrl: seedDocumentName,
       status: "pending",
     },
   });
@@ -101,3 +107,7 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+  const uploadsDir = path.join(process.cwd(), "data", "uploads");
+  await mkdir(uploadsDir, { recursive: true });
+  const seedDocumentName = "seed-sample-permit.pdf";
+  await writeFile(path.join(uploadsDir, seedDocumentName), Buffer.from("%PDF-1.1\n%seed file\n"));

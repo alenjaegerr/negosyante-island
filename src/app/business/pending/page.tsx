@@ -35,7 +35,7 @@ export default async function BusinessPendingPage() {
       {latestRequest ? (
         <div className="rounded border bg-slate-50 p-3 text-sm">
           <p>Status: <strong className="uppercase">{latestRequest.status}</strong></p>
-          <p>Document: <a className="text-sky-700 underline" href={latestRequest.documentUrl}>{latestRequest.documentUrl}</a></p>
+          <p>Document: <a className="text-sky-700 underline" href={`/api/business/documents/${latestRequest.id}`}>View uploaded document</a></p>
           {latestRequest.rejectionNote ? <p>Rejection note: {latestRequest.rejectionNote}</p> : null}
         </div>
       ) : null}

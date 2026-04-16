@@ -5,6 +5,9 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".pdf", ".webp"]);
+
 export async function POST(request: Request) {
   const user = await getCurrentUser();
 
@@ -21,11 +24,20 @@ export async function POST(request: Request) {
     redirect("/business/pending");
   }
 
+  if (file.size > MAX_FILE_SIZE) {
+    redirect("/business/pending");
+  }
+
+  const ext = path.extname(file.name).toLowerCase();
+  if (!ALLOWED_EXTENSIONS.has(ext)) {
+    redirect("/business/pending");
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  const safeFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+  const safeFilename = `${Date.now()}-${user.id}-${Math.random().toString(36).slice(2)}${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  const uploadDir = path.join(process.cwd(), "data", "uploads");
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, safeFilename), buffer);
 
@@ -39,7 +51,7 @@ export async function POST(request: Request) {
       userId: user.id,
       businessName,
       documentType,
-      documentUrl: `/uploads/${safeFilename}`,
+      documentUrl: safeFilename,
     },
   });
 
