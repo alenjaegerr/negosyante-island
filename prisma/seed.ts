@@ -10,6 +10,11 @@ async function main() {
     throw new Error("Do not run seed in production");
   }
 
+  const uploadsDir = path.join(process.cwd(), "data", "uploads");
+  await mkdir(uploadsDir, { recursive: true });
+  const seedDocumentName = "seed-sample-permit.pdf";
+  await writeFile(path.join(uploadsDir, seedDocumentName), Buffer.from("%PDF-1.1\n%seed file\n"));
+
   await prisma.post.deleteMany();
   await prisma.verificationRequest.deleteMany();
   await prisma.trend.deleteMany();
@@ -107,7 +112,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-  const uploadsDir = path.join(process.cwd(), "data", "uploads");
-  await mkdir(uploadsDir, { recursive: true });
-  const seedDocumentName = "seed-sample-permit.pdf";
-  await writeFile(path.join(uploadsDir, seedDocumentName), Buffer.from("%PDF-1.1\n%seed file\n"));
