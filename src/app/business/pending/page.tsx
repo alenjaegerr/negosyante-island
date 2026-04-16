@@ -3,9 +3,16 @@ import { Role } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export default async function BusinessPendingPage() {
+type PendingPageProps = {
+  searchParams: Promise<{
+    error?: string;
+  }>;
+};
+
+export default async function BusinessPendingPage({ searchParams }: PendingPageProps) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const { error } = await searchParams;
 
   if (user.role === Role.business_verified) redirect("/business/dashboard");
   if (user.role !== Role.business_pending) redirect("/feed");
@@ -31,6 +38,13 @@ export default async function BusinessPendingPage() {
         <input className="w-full rounded border p-2" name="document" required type="file" accept="image/*,.pdf" />
         <button type="submit" className="rounded bg-sky-600 px-4 py-2 text-white">Submit Verification</button>
       </form>
+
+      {error === "file_too_large" ? (
+        <p className="text-sm text-rose-700">Upload failed: file must be 5MB or less.</p>
+      ) : null}
+      {error === "invalid_file_type" ? (
+        <p className="text-sm text-rose-700">Upload failed: allowed file types are PNG, JPG, JPEG, WEBP, and PDF.</p>
+      ) : null}
 
       {latestRequest ? (
         <div className="rounded border bg-slate-50 p-3 text-sm">

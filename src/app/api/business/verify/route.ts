@@ -19,18 +19,21 @@ export async function POST(request: Request) {
   const businessName = String(formData.get("businessName") ?? "");
   const documentType = String(formData.get("documentType") ?? "");
   const file = formData.get("document");
+  const isDocumentTypeValid =
+    documentType === DocumentType.bir_tin || documentType === DocumentType.mayor_permit;
+  const isFileValid = file instanceof File;
 
-  if (!businessName || (documentType !== DocumentType.bir_tin && documentType !== DocumentType.mayor_permit) || !(file instanceof File)) {
-    redirect("/business/pending");
+  if (!businessName || !isDocumentTypeValid || !isFileValid) {
+    redirect("/business/pending?error=invalid_submission");
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    redirect("/business/pending");
+    redirect("/business/pending?error=file_too_large");
   }
 
   const ext = path.extname(file.name).toLowerCase();
   if (!ALLOWED_EXTENSIONS.has(ext)) {
-    redirect("/business/pending");
+    redirect("/business/pending?error=invalid_file_type");
   }
 
   const bytes = await file.arrayBuffer();

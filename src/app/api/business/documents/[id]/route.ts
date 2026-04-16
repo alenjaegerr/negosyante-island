@@ -14,6 +14,11 @@ function getContentType(filename: string) {
   return "application/octet-stream";
 }
 
+function getSafeDownloadName(filename: string) {
+  const ext = path.extname(filename).toLowerCase();
+  return `verification-document${ext}`;
+}
+
 export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> },
@@ -44,7 +49,7 @@ export async function GET(
     return new NextResponse(file, {
       headers: {
         "Content-Type": getContentType(verificationRequest.documentUrl),
-        "Content-Disposition": `inline; filename=\"${verificationRequest.documentUrl}\"`,
+        "Content-Disposition": `inline; filename=\"${getSafeDownloadName(verificationRequest.documentUrl)}\"`,
         "Cache-Control": "private, no-store",
       },
     });
