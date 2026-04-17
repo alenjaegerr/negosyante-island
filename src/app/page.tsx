@@ -28,7 +28,7 @@ export default async function Home() {
 
       <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="w-full lg:max-w-[64%]">
-          <h1 className="font-flex-bold text-[44px] leading-[0.94] tracking-tight text-black sm:text-6xl md:text-[80px]">
+          <h1 className="font-flex-bold text-[44px] leading-[0.94] tracking-tight text-[var(--ni-text-strong)] sm:text-6xl md:text-[80px]">
             TRENDING <span className="align-middle">🔥</span>
           </h1>
         </div>

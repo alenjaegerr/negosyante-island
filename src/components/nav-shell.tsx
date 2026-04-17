@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 type NavShellProps = {
@@ -13,11 +13,8 @@ type NavShellProps = {
 
 export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "dark";
-    const storedTheme = window.localStorage.getItem("ni-theme");
-    return storedTheme === "light" || storedTheme === "dark" ? storedTheme : "dark";
-  });
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [isThemeReady, setIsThemeReady] = useState(false);
 
   const latestHref =
     role === "admin"
@@ -47,14 +44,29 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    window.localStorage.setItem("ni-theme", theme);
-  }, [theme]);
+  useLayoutEffect(() => {
+    const storedTheme = window.localStorage.getItem("ni-theme");
+    const documentTheme = document.documentElement.getAttribute("data-theme");
+    const nextTheme =
+      storedTheme === "light" || storedTheme === "dark"
+        ? storedTheme
+        : documentTheme === "light" || documentTheme === "dark"
+          ? documentTheme
+          : "light";
+
+    setTheme(nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    window.localStorage.setItem("ni-theme", nextTheme);
+    setIsThemeReady(true);
+  }, []);
 
   function toggleTheme() {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
+    setTheme((currentTheme) => {
+      const nextTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      window.localStorage.setItem("ni-theme", nextTheme);
+      return nextTheme;
+    });
   }
 
   const links = [
@@ -91,14 +103,15 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
           <button
             type="button"
             onClick={toggleTheme}
-            className="font-reddit tracking-figma-tight rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[9px] font-extrabold text-[var(--ni-text-strong)] sm:text-[15px]"
+            aria-disabled={!isThemeReady}
+            className="font-reddit tracking-figma-tight cursor-pointer rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[9px] font-extrabold text-[var(--ni-text-strong)] transition-colors hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)] sm:text-[15px]"
           >
             THEME: {theme === "dark" ? "DARK MODE 🌙" : "LIGHT MODE ☀️"}
           </button>
           {!isAuthenticated ? (
             <Link
               href="/login"
-              className="font-reddit tracking-figma-tight rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] sm:px-3 sm:text-base"
+              className="font-reddit tracking-figma-tight rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] transition-colors hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)] sm:px-3 sm:text-base"
             >
               BUSINESS LOGIN/SIGNUP 💼
             </Link>
@@ -121,10 +134,15 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
             <button
               type="button"
               onClick={() => setIsOpen(true)}
-              className="font-roboto-mono tracking-figma-tight inline-flex items-center gap-2 border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-2 py-1.5 text-[10px] text-[var(--ni-text-strong)] sm:px-3 sm:py-2 sm:text-base"
+              className="font-roboto-mono tracking-figma-tight inline-flex items-center gap-2 border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-2 py-1.5 text-[10px] text-[var(--ni-text-strong)] transition-colors duration-200 hover:border-[color:var(--ni-brand)] hover:bg-[var(--ni-accent-soft)] hover:text-[var(--ni-brand)] sm:px-3 sm:py-2 sm:text-base"
+              aria-pressed={isOpen}
             >
               NAVIGATE
-              <span className="text-base leading-none">☰</span>
+              <span
+                className={`text-base leading-none transition-transform duration-300 ${isOpen ? "rotate-90 scale-110 text-[var(--ni-brand)]" : "rotate-0"}`}
+              >
+                ☰
+              </span>
             </button>
             <nav className="font-reddit tracking-figma-tight hidden items-center gap-4 text-[13px] font-extrabold text-[var(--ni-text-strong)] md:flex">
               {links.map((item) => (
