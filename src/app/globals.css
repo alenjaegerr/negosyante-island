@@ -1,5 +1,37 @@
 @import "tailwindcss";
 
+:root {
+  --ni-bg: #f8faff;
+  --ni-brand: #0069a8;
+  --ni-brand-cta: #0084d1;
+  --ni-text: #314159;
+  --ni-text-strong: #0f172b;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-flex), Arial, Helvetica, sans-serif;
+  background-color: var(--ni-bg);
+  color: var(--ni-text-strong);
+}
+
+.font-roboto-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.font-reddit {
+  font-family: var(--font-reddit), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.font-flex-bold {
+  font-family: var(--font-flex), Arial, Helvetica, sans-serif;
+  font-weight: 700;
+}
+
+.font-flex-extrabold {
+  font-family: var(--font-flex), Arial, Helvetica, sans-serif;
+  font-weight: 800;
+}
+
+.tracking-figma-tight {
+  letter-spacing: -0.025em;
 }

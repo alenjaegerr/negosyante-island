@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type LoginState = { email: string; password: string; error: string | null; loading: boolean };
 
@@ -55,6 +55,7 @@ export function LoginForm() {
 
 export function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [state, setState] = useState<SignupState>({
     name: "",
     email: "",
@@ -65,6 +66,10 @@ export function SignupForm() {
     loading: false,
   });
 
+  const requestedType = searchParams.get("accountType");
+  const forceBusiness = requestedType === "business_pending";
+  const selectedAccountType: SignupState["accountType"] = forceBusiness ? "business_pending" : state.accountType;
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -72,7 +77,7 @@ export function SignupForm() {
     const response = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(state),
+      body: JSON.stringify({ ...state, accountType: selectedAccountType }),
     });
 
     if (!response.ok) {
@@ -90,11 +95,21 @@ export function SignupForm() {
       <input className="w-full rounded border p-2" required placeholder="Full name" value={state.name} onChange={(e) => setState((p) => ({ ...p, name: e.target.value }))} />
       <input className="w-full rounded border p-2" type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
       <input className="w-full rounded border p-2" type="password" required minLength={8} pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}" title="Use at least 8 characters including uppercase, lowercase, and number." placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
-      <select className="w-full rounded border p-2" value={state.accountType} onChange={(e) => setState((p) => ({ ...p, accountType: e.target.value as SignupState["accountType"] }))}>
+      <select
+        className="w-full rounded border p-2"
+        value={selectedAccountType}
+        onChange={(e) => setState((p) => ({ ...p, accountType: e.target.value as SignupState["accountType"] }))}
+        disabled={forceBusiness}
+      >
         <option value="user">Normal user</option>
         <option value="business_pending">Business account (for verification)</option>
       </select>
-      {state.accountType === "business_pending" ? (
+      {forceBusiness ? (
+        <p className="rounded border border-amber-300 bg-amber-50 px-2 py-1 text-xs text-amber-900">
+          Business-owner inquiries require a verified business account. Complete signup as business, then proceed to verification.
+        </p>
+      ) : null}
+      {selectedAccountType === "business_pending" ? (
         <input className="w-full rounded border p-2" required placeholder="Business name" value={state.businessName} onChange={(e) => setState((p) => ({ ...p, businessName: e.target.value }))} />
       ) : null}
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}

@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 
 function getRedirectPath(role: Role) {
   if (role === Role.admin) return "/admin";
-  if (role === Role.business_pending) return "/business/pending";
-  if (role === Role.business_verified) return "/business/dashboard";
+  if (role === Role.business_pending) return "/business/home";
+  if (role === Role.business_verified) return "/business/home";
   return "/feed";
 }
 
