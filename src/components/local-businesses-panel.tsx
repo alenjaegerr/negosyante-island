@@ -99,7 +99,7 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
             <div className="mt-2.5 flex items-center justify-between gap-2">
               <Link
                 href={`/business/${business.slug}`}
-                className="rounded border border-cyan-700 px-2 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/10"
+                className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-xs font-semibold text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)] hover:bg-[var(--ni-accent-soft)]"
               >
                 View Profile
               </Link>

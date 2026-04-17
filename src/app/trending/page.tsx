@@ -11,14 +11,14 @@ export default async function TrendingPage() {
 
   return (
     <section className="space-y-4">
-      <div className="rounded-xl bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-semibold">Trending Feed + Negosyante Insight</h1>
-        <p className="mt-1 text-sm text-slate-600">
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-5 shadow-sm">
+        <h1 className="text-2xl font-semibold text-[var(--ni-text-strong)]">Trending Feed + Negosyante Insight</h1>
+        <p className="mt-1 text-sm text-[var(--ni-text)]">
           Culture feed stories grouped in platform boxes with expandable details.
         </p>
       </div>
 
-      <div className="rounded-3xl border border-transparent bg-white/20 p-2">
+      <div className="rounded-3xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/65 p-2">
         <TrendingFeedGrid posts={posts} />
       </div>
     </section>

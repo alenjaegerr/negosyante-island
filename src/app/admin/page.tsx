@@ -388,7 +388,7 @@ export default async function AdminPage({
                 <option value="admin">admin</option>
               </select>
               <input name="businessName" defaultValue={account.businessName ?? ""} placeholder="Business name (if business role)" className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" />
-              <button type="submit" className="rounded bg-zinc-900 px-3 py-1.5 text-sm font-semibold text-white">Update</button>
+              <button type="submit" className="rounded bg-[var(--ni-brand)] px-3 py-1.5 text-sm font-semibold text-[var(--ni-surface-1)]">Update</button>
             </form>
           ))}
         </div>

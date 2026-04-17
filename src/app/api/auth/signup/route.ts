@@ -5,21 +5,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, email, password, accountType, businessName } = body;
+  const { name, email, password, confirmPassword, accountType, businessName } = body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !confirmPassword) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  if (password.length < 8) {
-    return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
-  }
-  const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  if (!strongPasswordPattern.test(password)) {
-    return NextResponse.json(
-      { error: "Password must include uppercase, lowercase, and a number" },
-      { status: 400 },
-    );
+  if (password !== confirmPassword) {
+    return NextResponse.json({ error: "Passwords do not match" }, { status: 400 });
   }
 
   if (accountType === Role.business_pending && !businessName) {

@@ -72,12 +72,12 @@ export function BusinessAvatar({ slug, initials, online, canUpload }: BusinessAv
         </div>
       )}
       <span
-        className={`absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-white ${online ? "bg-emerald-500" : "bg-zinc-400"}`}
+        className={`absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-[var(--ni-surface-1)] ${online ? "bg-emerald-500" : "bg-zinc-400"}`}
         aria-hidden
       />
       {canUpload ? (
         <div>
-          <label className="mt-2 block cursor-pointer rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700">
+          <label className="mt-2 block cursor-pointer rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[11px] font-semibold text-[var(--ni-text)]">
             Upload photo
             <input className="hidden" type="file" accept="image/*" onChange={onUpload} />
           </label>

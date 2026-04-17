@@ -13,7 +13,7 @@ type TrendingFeedGridProps = {
 
 const categoryStyleMap: Record<TrendCategory, { box: string; border: string; label: string }> = {
   tiktok: {
-    box: "bg-slate-950/95 text-slate-100",
+    box: "bg-[var(--ni-surface-3)] text-[var(--ni-text-strong)]",
     border: "border-cyan-400",
     label: "Tiktok",
   },
@@ -54,7 +54,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
 
   if (!posts.length) {
     return (
-      <article className="rounded border border-dashed border-slate-700 bg-slate-900/70 p-6 text-center text-sm text-slate-300">
+      <article className="rounded border border-dashed border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-6 text-center text-sm text-[var(--ni-text)]">
         No trending stories yet. Your super admin can publish from the dashboard.
       </article>
     );
@@ -77,7 +77,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
             className={`rounded border-2 p-3.5 shadow-sm transition sm:p-4 ${style.box} ${style.border}`}
           >
             <div className="mb-3 flex items-center justify-between gap-2">
-              <span className="rounded border border-white/35 bg-white/20 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide">
+              <span className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/35 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide">
                 {style.label}
               </span>
               <span className="text-xs opacity-85">{new Date(post.createdAt).toLocaleDateString()}</span>
@@ -97,19 +97,19 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
                 <button
                   type="button"
                   onClick={() => setExpanded((prev) => ({ ...prev, [post.id]: !isExpanded }))}
-                  className="min-h-8 rounded border border-white/35 bg-white/20 px-3 py-1.5 text-xs font-semibold hover:bg-white/30"
+                  className="min-h-8 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/35 px-3 py-1.5 text-xs font-semibold hover:bg-[var(--ni-surface-1)]/45"
                 >
                   {isExpanded ? "Collapse" : "Read More"}
                 </button>
               ) : (
-                <span className="min-h-8 rounded border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold opacity-80">
+                <span className="min-h-8 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/25 px-3 py-1.5 text-xs font-semibold opacity-80">
                   Full text shown
                 </span>
               )}
               {post.isInsightReady ? (
                 <Link
                   href={`/trending/${post.id}/insight`}
-                  className="min-h-8 rounded border border-white/50 px-3 py-1.5 text-xs font-semibold hover:bg-white/15"
+                  className="min-h-8 rounded border border-[color:var(--ni-border)] px-3 py-1.5 text-xs font-semibold hover:bg-[var(--ni-surface-1)]/25"
                 >
                   Negosyante Insight
                 </Link>
@@ -117,7 +117,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
             </div>
 
             {media ? (
-              <div className={`relative mt-2.5 overflow-hidden rounded border border-white/25 bg-black/20 ${media.aspectClass}`}>
+              <div className={`relative mt-2.5 overflow-hidden rounded border border-[color:var(--ni-border)] bg-black/20 ${media.aspectClass}`}>
                 <iframe
                   src={media.embedUrl}
                   title={`${post.title} - ${media.label}`}
@@ -127,11 +127,11 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
                 />
               </div>
             ) : post.videoUrl ? (
-              <div className="mt-2.5 rounded border border-white/25 bg-black/20 p-3 text-xs">
+              <div className="mt-2.5 rounded border border-[color:var(--ni-border)] bg-black/20 p-3 text-xs">
                 Video link saved, but this platform could not be embedded. Open it from the original source.
               </div>
             ) : post.imageUrl ? (
-              <div className="relative mt-2.5 h-40 overflow-hidden rounded border border-white/25 bg-black/15 sm:h-44">
+              <div className="relative mt-2.5 h-40 overflow-hidden rounded border border-[color:var(--ni-border)] bg-black/15 sm:h-44">
                 <Image
                   src={post.imageUrl}
                   alt={post.title}
