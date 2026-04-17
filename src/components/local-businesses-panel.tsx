@@ -32,7 +32,7 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
   return (
     <aside className="mt-4 rounded border-2 border-cyan-500/60 bg-[var(--ni-surface-1)]/95 p-2.5 md:mt-0 md:min-h-[720px] md:p-3">
       <h3 className="font-reddit text-sm font-extrabold tracking-figma-tight text-[var(--ni-text-strong)] md:text-base">
-        LOCAL BUSINESSES ON NEGOSYANTE ISLAND
+        LOCAL BUSINESSES ENGAGING ON NEGOSYANTE ISLAND
       </h3>
       <p className="mt-1 text-xs text-[var(--ni-text)]">Tap any card to open profile, or jump straight to feed.</p>
 
