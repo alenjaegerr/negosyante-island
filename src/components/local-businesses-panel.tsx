@@ -30,76 +30,76 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
   }, [businesses, query, statusFilter]);
 
   return (
-    <aside className="mt-6 rounded border-2 border-cyan-500/70 bg-cyan-50/35 p-3 md:mt-0 md:min-h-[720px]">
-      <h3 className="font-reddit text-sm font-extrabold tracking-figma-tight text-black md:text-base">
+    <aside className="mt-4 rounded border-2 border-cyan-500/60 bg-[var(--ni-surface-1)]/95 p-2.5 md:mt-0 md:min-h-[720px] md:p-3">
+      <h3 className="font-reddit text-sm font-extrabold tracking-figma-tight text-[var(--ni-text-strong)] md:text-base">
         LOCAL BUSINESSES ON NEGOSYANTE ISLAND
       </h3>
-      <p className="mt-1 text-xs text-slate-700">Tap any card to open profile, or jump straight to feed.</p>
+      <p className="mt-1 text-xs text-[var(--ni-text)]">Tap any card to open profile, or jump straight to feed.</p>
 
       <div className="mt-3 space-y-2">
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search business, category, location"
-          className="w-full rounded border border-cyan-700/30 bg-white px-2 py-1.5 text-xs text-slate-800 outline-none ring-cyan-500/40 placeholder:text-slate-500 focus:ring"
+          className="w-full rounded border border-cyan-500/40 bg-[var(--ni-surface-2)] px-2 py-1.5 text-xs text-[var(--ni-text-strong)] outline-none ring-cyan-500/40 placeholder:text-[var(--ni-muted)] focus:ring"
         />
         <div className="grid grid-cols-3 gap-1">
           <button
             type="button"
             onClick={() => setStatusFilter("all")}
-            className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusFilter === "all" ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-700/40 bg-white text-cyan-900"}`}
+            className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusFilter === "all" ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-700/40 bg-[var(--ni-surface-2)] text-[var(--ni-brand)]"}`}
           >
             All
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter("online")}
-            className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusFilter === "online" ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-700/40 bg-white text-cyan-900"}`}
+            className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusFilter === "online" ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-700/40 bg-[var(--ni-surface-2)] text-[var(--ni-brand)]"}`}
           >
             Online
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter("offline")}
-            className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusFilter === "offline" ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-700/40 bg-white text-cyan-900"}`}
+            className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusFilter === "offline" ? "border-cyan-700 bg-cyan-700 text-white" : "border-cyan-700/40 bg-[var(--ni-surface-2)] text-[var(--ni-brand)]"}`}
           >
             Offline
           </button>
         </div>
       </div>
 
-      <div className="mt-3 space-y-3">
+      <div className="mt-3 space-y-2.5">
         {filtered.map((business) => (
-          <article key={business.slug} className="rounded border border-cyan-700/40 bg-white p-3 shadow-sm">
+          <article key={business.slug} className="rounded border border-cyan-700/40 bg-[var(--ni-surface-2)] p-2.5 shadow-sm">
             <Link href={`/business/${business.slug}`} className="group block">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
-                  <div className="font-reddit flex h-12 w-12 items-center justify-center rounded-full border-2 border-cyan-700 bg-cyan-100 text-sm font-extrabold text-cyan-900">
+                  <div className="font-reddit flex h-11 w-11 items-center justify-center rounded-full border-2 border-cyan-700 bg-cyan-100 text-sm font-extrabold text-cyan-900">
                     {business.initials}
                   </div>
                   <span
-                    className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border border-white ${business.online ? "bg-emerald-500" : "bg-zinc-400"}`}
+                    className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border border-[var(--ni-surface-1)] ${business.online ? "bg-emerald-500" : "bg-zinc-500"}`}
                     aria-hidden
                   />
                 </div>
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <p className="font-flex-bold truncate text-sm text-slate-900 group-hover:text-cyan-700">{business.name}</p>
+                    <p className="font-flex-bold truncate text-sm text-[var(--ni-text-strong)] group-hover:text-[var(--ni-brand)]">{business.name}</p>
                     {business.verified ? <span className="text-xs" title="Verified business">✅</span> : null}
                   </div>
-                  <p className="text-xs text-slate-600">{business.category} • {business.location}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-slate-700">{business.online ? "Online now" : "Offline"}</p>
+                  <p className="text-xs text-[var(--ni-muted)]">{business.category} • {business.location}</p>
+                  <p className="mt-0.5 text-xs font-semibold text-[var(--ni-text)]">{business.online ? "Online now" : "Offline"}</p>
                 </div>
               </div>
 
-              <p className="mt-2 text-xs text-slate-700">{business.tagline}</p>
+              <p className="mt-1.5 text-xs text-[var(--ni-text)]">{business.tagline}</p>
             </Link>
 
-            <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="mt-2.5 flex items-center justify-between gap-2">
               <Link
                 href={`/business/${business.slug}`}
-                className="rounded border border-cyan-700 px-2 py-1 text-xs font-semibold text-cyan-800 hover:bg-cyan-50"
+                className="rounded border border-cyan-700 px-2 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/10"
               >
                 View Profile
               </Link>
@@ -114,7 +114,7 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
         ))}
 
         {filtered.length === 0 ? (
-          <p className="rounded border border-dashed border-cyan-700/40 bg-white p-3 text-xs text-slate-600">
+          <p className="rounded border border-dashed border-cyan-700/40 bg-[var(--ni-surface-2)] p-3 text-xs text-[var(--ni-text)]">
             No businesses match your search yet.
           </p>
         ) : null}

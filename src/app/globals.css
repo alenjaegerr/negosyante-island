@@ -6,6 +6,34 @@
   --ni-brand-cta: #0084d1;
   --ni-text: #314159;
   --ni-text-strong: #0f172b;
+  --ni-surface-1: #ffffff;
+  --ni-surface-2: #eff6ff;
+  --ni-surface-3: #e2e8f0;
+  --ni-border: rgba(15, 23, 42, 0.18);
+  --ni-muted: #64748b;
+  --ni-accent-soft: rgba(0, 132, 209, 0.12);
+}
+
+html[data-theme="dark"] {
+  --ni-bg: #020617;
+  --ni-brand: #22d3ee;
+  --ni-brand-cta: #06b6d4;
+  --ni-text: #cbd5e1;
+  --ni-text-strong: #f8fafc;
+  --ni-surface-1: #0f172a;
+  --ni-surface-2: #1e293b;
+  --ni-surface-3: #334155;
+  --ni-border: rgba(148, 163, 184, 0.35);
+  --ni-muted: #94a3b8;
+  --ni-accent-soft: rgba(34, 211, 238, 0.16);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {

@@ -30,5 +30,23 @@ export async function POST(request: Request) {
     },
   });
 
+  const recipients = await prisma.user.findMany({
+    where: { id: { not: user.id } },
+    select: { id: true },
+    take: 500,
+  });
+
+  if (recipients.length > 0) {
+    await prisma.notification.createMany({
+      data: recipients.map((recipient) => ({
+        userId: recipient.id,
+        type: "culture_feed",
+        title: "New Negosyante culture feed update",
+        body: `${user.businessName ?? user.name} posted a new culture feed update.`,
+        href: "/feed",
+      })),
+    });
+  }
+
   return NextResponse.json({ post }, { status: 201 });
 }

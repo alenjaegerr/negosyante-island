@@ -24,9 +24,9 @@ export function CreatePostForm() {
   }
 
   return (
-    <form onSubmit={createPost} className="space-y-2 rounded-xl border bg-white p-4">
-      <textarea className="w-full rounded border p-2" placeholder="Share what is trending on the island..." value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
-      <button className="rounded bg-sky-600 px-4 py-2 text-white" type="submit">Post</button>
+    <form onSubmit={createPost} className="space-y-2 rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
+      <textarea className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Share what is trending on the island..." value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
+      <button className="rounded bg-[var(--ni-brand-cta)] px-4 py-2 text-white" type="submit">Post</button>
     </form>
   );
 }

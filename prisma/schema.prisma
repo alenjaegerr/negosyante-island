@@ -25,6 +25,16 @@ enum DocumentType {
   mayor_permit
 }
 
+enum TrendCategory {
+  tiktok
+  the_internet
+  youtube
+  facebook
+  reddit
+  x
+  instagram
+}
+
 model User {
   id                    String                @id @default(cuid())
   name                  String
@@ -32,11 +42,17 @@ model User {
   passwordHash          String
   role                  Role                  @default(user)
   businessName          String?
+  avatarUrl             String?
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   posts                 Post[]
   verificationRequests  VerificationRequest[] @relation("BusinessRequests")
   reviewedRequests      VerificationRequest[] @relation("ReviewedBy")
+  businessFollows       BusinessFollow[]
+  businessMessages      BusinessMessage[]
+  businessFeedLikes     BusinessFeedLike[]
+  businessFeedComments  BusinessFeedComment[]
+  notifications         Notification[]
 }
 
 model Post {
@@ -80,4 +96,87 @@ model Trend {
   growthPercent     Float
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model TrendingPost {
+  id             String        @id @default(cuid())
+  title          String
+  category       TrendCategory
+  snippet        String
+  content        String
+  imageUrl       String?
+  videoUrl       String?
+  videoLoopSeconds Int         @default(5)
+  isDraft        Boolean       @default(false)
+  isInsightReady Boolean       @default(true)
+  insightTitle   String?
+  insightBody    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([category, createdAt])
+}
+
+model BusinessFollow {
+  id           String   @id @default(cuid())
+  businessSlug String
+  createdAt    DateTime @default(now())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, businessSlug])
+  @@index([businessSlug])
+}
+
+model BusinessMessage {
+  id            String   @id @default(cuid())
+  businessSlug  String
+  senderName    String
+  senderAge     Int
+  actionOption  String
+  note          String
+  createdAt     DateTime @default(now())
+  senderUserId  String?
+  senderUser    User?    @relation(fields: [senderUserId], references: [id])
+
+  @@index([businessSlug])
+}
+
+model BusinessFeedLike {
+  id           String   @id @default(cuid())
+  businessSlug String
+  postId       String
+  createdAt    DateTime @default(now())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, businessSlug, postId])
+  @@index([businessSlug, postId])
+}
+
+model BusinessFeedComment {
+  id           String   @id @default(cuid())
+  businessSlug String
+  postId       String
+  content      String
+  authorName   String
+  createdAt    DateTime @default(now())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+
+  @@index([businessSlug, postId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  body      String
+  href      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead, createdAt])
 }

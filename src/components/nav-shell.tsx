@@ -13,6 +13,20 @@ type NavShellProps = {
 
 export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "dark";
+    const storedTheme = window.localStorage.getItem("ni-theme");
+    return storedTheme === "light" || storedTheme === "dark" ? storedTheme : "dark";
+  });
+
+  const latestHref =
+    role === "admin"
+      ? "/admin"
+      : role === "business_pending" || role === "business_verified"
+        ? "/business/dashboard"
+        : "/feed";
+
+  const internetHref = isAuthenticated ? "/trending" : "/login";
 
   const modeLabel =
     role === "business_pending" || role === "business_verified"
@@ -33,9 +47,19 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem("ni-theme", theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+  }
+
   const links = [
-    { href: "/feed", label: "Latest" },
-    { href: "/trending", label: "The Internet" },
+    { href: latestHref, label: "Latest" },
+    { href: internetHref, label: "The Internet" },
     { href: "#", label: "Contact Us" },
   ];
 
@@ -50,6 +74,7 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
   const authLinks = isAuthenticated
     ? [
         ...links,
+        { href: "/notifications", label: "Notifications" },
         ...roleLinks,
         { href: "/feed", label: "My Feed" },
       ]
@@ -61,38 +86,42 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
 
   return (
     <>
-      <header className="border-b border-black/10 bg-[var(--ni-bg)]">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-3 py-2 sm:px-4">
-          <div className="font-reddit tracking-figma-tight rounded border border-black/20 bg-lime-50 px-2 py-1 text-[10px] font-extrabold sm:text-[15px]">
-            THEME: LIGHT MODE 💡☀️
-          </div>
+      <header className="border-b border-[color:var(--ni-border)] bg-[var(--ni-bg)]">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-2 py-2 sm:px-4">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="font-reddit tracking-figma-tight rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[9px] font-extrabold text-[var(--ni-text-strong)] sm:text-[15px]"
+          >
+            THEME: {theme === "dark" ? "DARK MODE 🌙" : "LIGHT MODE ☀️"}
+          </button>
           {!isAuthenticated ? (
             <Link
               href="/login"
-              className="font-reddit tracking-figma-tight rounded border border-black/25 bg-lime-50 px-2 py-1 text-[11px] font-extrabold sm:px-3 sm:text-base"
+              className="font-reddit tracking-figma-tight rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] sm:px-3 sm:text-base"
             >
               BUSINESS LOGIN/SIGNUP 💼
             </Link>
           ) : (
-            <div className="font-reddit tracking-figma-tight flex items-center gap-2 rounded border border-black/25 bg-lime-50 px-2 py-1 text-[11px] font-extrabold sm:px-3 sm:text-sm">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-black/25 bg-cyan-100 text-[10px] text-cyan-900">
+            <div className="font-reddit tracking-figma-tight flex items-center gap-2 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] sm:px-3 sm:text-sm">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-cyan-300/50 bg-[var(--ni-accent-soft)] text-[10px] text-[var(--ni-brand)]">
                 {initials}
               </span>
-              <span className="max-w-[140px] truncate sm:max-w-[220px]">{modeLabel}</span>
+              <span className="max-w-[120px] truncate sm:max-w-[220px]">{modeLabel}</span>
             </div>
           )}
         </div>
 
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-3 py-3 sm:px-4">
-          <Link href={isAuthenticated ? "/feed" : "/"} aria-label="Go to home" className="shrink-0">
+        <div className="mx-auto flex w-full max-w-6xl items-start justify-between gap-2 px-2 py-2 sm:items-center sm:gap-4 sm:px-4 sm:py-3">
+          <Link href={isAuthenticated ? "/feed" : "/"} aria-label="Go to home" className="min-w-0 max-w-[72%] shrink">
             <BrandLogo compact />
           </Link>
 
-          <div className="flex flex-col items-end gap-3">
+          <div className="ml-auto flex shrink-0 flex-col items-end gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setIsOpen(true)}
-              className="font-roboto-mono tracking-figma-tight inline-flex items-center gap-2 border border-black/30 bg-zinc-200 px-3 py-2 text-[10px] sm:text-base"
+              className="font-roboto-mono tracking-figma-tight inline-flex items-center gap-2 border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-2 py-1.5 text-[10px] text-[var(--ni-text-strong)] sm:px-3 sm:py-2 sm:text-base"
             >
               NAVIGATE
               <span className="text-base leading-none">☰</span>
@@ -114,15 +143,15 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
       />
 
       <aside
-        className={`fixed right-0 top-0 z-50 h-full w-[88%] max-w-sm border-l border-cyan-500 bg-[var(--ni-bg)] p-5 shadow-2xl transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed right-0 top-0 z-50 h-full w-[88%] max-w-sm border-l border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-5 shadow-2xl transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"}`}
         aria-hidden={!isOpen}
       >
         <div className="flex items-center justify-between">
-          <p className="font-roboto-mono text-sm tracking-figma-tight">NAVIGATION</p>
+          <p className="font-roboto-mono text-sm tracking-figma-tight text-[var(--ni-text-strong)]">NAVIGATION</p>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="font-reddit rounded border border-black/20 px-2 py-1 text-sm font-extrabold"
+            className="font-reddit rounded border border-[color:var(--ni-border)] px-2 py-1 text-sm font-extrabold text-[var(--ni-text-strong)]"
           >
             Close
           </button>
@@ -134,26 +163,26 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
               key={`${item.href}-${item.label}`}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className="font-reddit tracking-figma-tight block rounded border border-black/15 bg-white px-3 py-2 text-sm font-extrabold hover:border-cyan-500"
+              className="font-reddit tracking-figma-tight block rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-sm font-extrabold text-[var(--ni-text-strong)] hover:border-[var(--ni-brand)]"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="mt-6 border-t border-black/10 pt-4">
+        <div className="mt-6 border-t border-[color:var(--ni-border)] pt-4">
           {isAuthenticated ? (
             <form action="/api/auth/logout" method="post">
-              <button type="submit" className="w-full rounded border border-black/20 bg-black px-3 py-2 text-sm text-white">
+              <button type="submit" className="w-full rounded border border-[color:var(--ni-brand)] bg-[var(--ni-accent-soft)] px-3 py-2 text-sm text-[var(--ni-brand)]">
                 Logout
               </button>
             </form>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              <Link href="/login" onClick={() => setIsOpen(false)} className="rounded border border-black/20 bg-white px-3 py-2 text-center text-sm">
+              <Link href="/login" onClick={() => setIsOpen(false)} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-center text-sm text-[var(--ni-text-strong)]">
                 Login
               </Link>
-              <Link href="/signup" onClick={() => setIsOpen(false)} className="rounded border border-black/20 bg-white px-3 py-2 text-center text-sm">
+              <Link href="/signup" onClick={() => setIsOpen(false)} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-center text-sm text-[var(--ni-text-strong)]">
                 Signup
               </Link>
             </div>

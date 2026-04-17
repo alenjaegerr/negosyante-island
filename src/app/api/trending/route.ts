@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const [trends, topTags] = await Promise.all([
+  const [trends, topTags, trendingPosts] = await Promise.all([
     prisma.trend.findMany({
       orderBy: { engagementPercent: "desc" },
       take: 10,
@@ -11,6 +11,11 @@ export async function GET() {
       select: { tags: true },
       take: 200,
       orderBy: { createdAt: "desc" },
+    }),
+    prisma.trendingPost.findMany({
+      where: { isDraft: false },
+      orderBy: { createdAt: "desc" },
+      take: 24,
     }),
   ]);
 
@@ -26,5 +31,5 @@ export async function GET() {
     .slice(0, 5)
     .map(([keyword, count]) => ({ keyword, count }));
 
-  return NextResponse.json({ trends, topKeywords });
+  return NextResponse.json({ trends, topKeywords, trendingPosts });
 }

@@ -32,9 +32,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${robotoFlex.variable} ${robotoMono.variable} ${redditMono.variable} h-full antialiased`}>
-      <body className="min-h-full bg-slate-50 text-slate-900">
+      <body className="min-h-full bg-[var(--ni-bg)] text-[var(--ni-text-strong)] transition-colors duration-200">
         <NavBar />
-        <main className="mx-auto w-full max-w-6xl p-4">{children}</main>
+        <main className="mx-auto w-full max-w-6xl px-2 py-3 sm:p-4">{children}</main>
         <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
       </body>
     </html>

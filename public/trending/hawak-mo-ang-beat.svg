@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B0F16"/>
+      <stop offset="1" stop-color="#1A2230"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="220" cy="180" r="110" fill="#06B6D4" fill-opacity="0.25"/>
+  <circle cx="950" cy="500" r="160" fill="#22D3EE" fill-opacity="0.18"/>
+  <rect x="120" y="120" width="960" height="435" rx="12" fill="#020617" fill-opacity="0.45" stroke="#22D3EE" stroke-width="3"/>
+  <text x="160" y="250" fill="#E2E8F0" font-size="64" font-family="Roboto Mono, monospace" font-weight="700">Hawak mo ang beat</text>
+  <text x="160" y="320" fill="#67E8F9" font-size="40" font-family="Roboto Mono, monospace" font-weight="600">TikTok #tiktokph</text>
+  <text x="160" y="390" fill="#CBD5E1" font-size="30" font-family="Roboto Mono, monospace">Dance challenge heat map in PH feed</text>
+</svg>

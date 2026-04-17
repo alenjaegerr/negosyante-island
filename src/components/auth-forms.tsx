@@ -41,12 +41,12 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border p-6 bg-white">
-      <h2 className="text-xl font-semibold">Welcome back</h2>
-      <input className="w-full rounded border p-2" type="email" placeholder="Email" required value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
-      <input className="w-full rounded border p-2" type="password" placeholder="Password" required value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
+    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-6 text-[var(--ni-text-strong)]">
+      <h2 className="text-xl font-semibold text-[var(--ni-text-strong)]">Welcome back</h2>
+      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="email" placeholder="Email" required value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
+      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="password" placeholder="Password" required value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
-      <button disabled={state.loading} className="w-full rounded bg-sky-600 p-2 text-white disabled:opacity-60" type="submit">
+      <button disabled={state.loading} className="w-full rounded bg-[var(--ni-brand-cta)] p-2 text-white disabled:opacity-60" type="submit">
         {state.loading ? "Signing in..." : "Sign in"}
       </button>
     </form>
@@ -90,13 +90,13 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border p-6 bg-white">
-      <h2 className="text-xl font-semibold">Create your account</h2>
-      <input className="w-full rounded border p-2" required placeholder="Full name" value={state.name} onChange={(e) => setState((p) => ({ ...p, name: e.target.value }))} />
-      <input className="w-full rounded border p-2" type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
-      <input className="w-full rounded border p-2" type="password" required minLength={8} pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}" title="Use at least 8 characters including uppercase, lowercase, and number." placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
+    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-6 text-[var(--ni-text-strong)]">
+      <h2 className="text-xl font-semibold text-[var(--ni-text-strong)]">Create your account</h2>
+      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" required placeholder="Full name" value={state.name} onChange={(e) => setState((p) => ({ ...p, name: e.target.value }))} />
+      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
+      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="password" required minLength={8} pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}" title="Use at least 8 characters including uppercase, lowercase, and number." placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
       <select
-        className="w-full rounded border p-2"
+        className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)]"
         value={selectedAccountType}
         onChange={(e) => setState((p) => ({ ...p, accountType: e.target.value as SignupState["accountType"] }))}
         disabled={forceBusiness}
@@ -110,7 +110,7 @@ export function SignupForm() {
         </p>
       ) : null}
       {selectedAccountType === "business_pending" ? (
-        <input className="w-full rounded border p-2" required placeholder="Business name" value={state.businessName} onChange={(e) => setState((p) => ({ ...p, businessName: e.target.value }))} />
+        <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" required placeholder="Business name" value={state.businessName} onChange={(e) => setState((p) => ({ ...p, businessName: e.target.value }))} />
       ) : null}
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
       <button disabled={state.loading} className="w-full rounded bg-emerald-600 p-2 text-white disabled:opacity-60" type="submit">

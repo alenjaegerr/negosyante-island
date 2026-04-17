@@ -28,10 +28,10 @@ export function PostActions({ post }: { post: Post }) {
 
   return (
     <div className="mt-3 flex flex-wrap gap-2 text-sm">
-      <button className="rounded bg-rose-100 px-2 py-1" onClick={() => interact("like")}>❤️ {counts.likes}</button>
-      <button className="rounded bg-blue-100 px-2 py-1" onClick={() => interact("comment")}>💬 {counts.comments}</button>
-      <button className="rounded bg-emerald-100 px-2 py-1" onClick={() => interact("share")}>🔁 {counts.shares}</button>
-      <button className="rounded bg-amber-100 px-2 py-1" onClick={() => interact("view")}>👁️ {counts.views}</button>
+      <button className="rounded border border-rose-400/40 bg-rose-500/15 px-2 py-1 text-rose-100" onClick={() => interact("like")}>❤️ {counts.likes}</button>
+      <button className="rounded border border-blue-400/40 bg-blue-500/15 px-2 py-1 text-blue-100" onClick={() => interact("comment")}>💬 {counts.comments}</button>
+      <button className="rounded border border-emerald-400/40 bg-emerald-500/15 px-2 py-1 text-emerald-100" onClick={() => interact("share")}>🔁 {counts.shares}</button>
+      <button className="rounded border border-amber-400/40 bg-amber-500/15 px-2 py-1 text-amber-100" onClick={() => interact("view")}>👁️ {counts.views}</button>
     </div>
   );
 }

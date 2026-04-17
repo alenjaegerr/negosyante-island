@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 
 type BusinessAvatarProps = {
@@ -12,26 +12,48 @@ type BusinessAvatarProps = {
 };
 
 export function BusinessAvatar({ slug, initials, online, canUpload }: BusinessAvatarProps) {
-  const imageKey = `ni-business-avatar-${slug}`;
-  const [imageSrc, setImageSrc] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return window.localStorage.getItem(imageKey);
-  });
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  function onUpload(event: ChangeEvent<HTMLInputElement>) {
+  useEffect(() => {
+    let ignore = false;
+    if (!canUpload) return;
+
+    async function loadAvatar() {
+      const response = await fetch("/api/me/avatar");
+      if (!response.ok) return;
+      const data = await response.json();
+      if (ignore) return;
+      setImageSrc(data.avatarUrl ?? null);
+    }
+
+    loadAvatar();
+    return () => {
+      ignore = true;
+    };
+  }, [canUpload, slug]);
+
+  async function onUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const value = typeof reader.result === "string" ? reader.result : null;
-      if (!value) return;
-      setImageSrc(value);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(imageKey, value);
-      }
-    };
-    reader.readAsDataURL(file);
+    setUploadError(null);
+    const formData = new FormData();
+    formData.set("avatar", file);
+
+    const response = await fetch("/api/me/avatar", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ error: "Upload failed" }));
+      setUploadError(data.error ?? "Upload failed");
+      return;
+    }
+
+    const data = await response.json();
+    setImageSrc(data.avatarUrl ?? null);
   }
 
   return (
@@ -54,10 +76,13 @@ export function BusinessAvatar({ slug, initials, online, canUpload }: BusinessAv
         aria-hidden
       />
       {canUpload ? (
-        <label className="mt-2 block cursor-pointer rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700">
-          Upload photo
-          <input className="hidden" type="file" accept="image/*" onChange={onUpload} />
-        </label>
+        <div>
+          <label className="mt-2 block cursor-pointer rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700">
+            Upload photo
+            <input className="hidden" type="file" accept="image/*" onChange={onUpload} />
+          </label>
+          {uploadError ? <p className="mt-1 text-[11px] text-rose-700">{uploadError}</p> : null}
+        </div>
       ) : null}
     </div>
   );

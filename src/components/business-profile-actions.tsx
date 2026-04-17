@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type BusinessProfileActionsProps = {
   slug: string;
@@ -25,13 +25,12 @@ export function BusinessProfileActions({
   contactOptions,
   viewerRole,
 }: BusinessProfileActionsProps) {
-  const followStorageKey = `ni-follow-${slug}`;
-  const [isFollowing, setIsFollowing] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem(followStorageKey) === "1";
-  });
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followers, setFollowers] = useState(baseFollowers);
+  const [loadingFollow, setLoadingFollow] = useState(false);
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<MessageFormState>({
     name: "",
     age: "",
@@ -39,20 +38,74 @@ export function BusinessProfileActions({
     note: "",
   });
 
-  function toggleFollow() {
-    const next = !isFollowing;
-    setIsFollowing(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(followStorageKey, next ? "1" : "0");
+  useEffect(() => {
+    let ignore = false;
+    async function loadFollowState() {
+      const response = await fetch(`/api/business/${slug}/follow`);
+      if (!response.ok) return;
+      const data = await response.json();
+      if (ignore) return;
+      setIsFollowing(Boolean(data.isFollowing));
+      setFollowers(Number(data.followers ?? baseFollowers));
     }
+
+    loadFollowState();
+    return () => {
+      ignore = true;
+    };
+  }, [slug, baseFollowers]);
+
+  function toggleFollow() {
+    if (viewerRole === "guest") {
+      window.location.href = "/login";
+      return;
+    }
+
+    setLoadingFollow(true);
+    setError(null);
+
+    fetch(`/api/business/${slug}/follow`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: isFollowing ? "unfollow" : "follow" }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Unable to update follow status");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setIsFollowing(Boolean(data.isFollowing));
+        setFollowers(Number(data.followers ?? followers));
+      })
+      .catch((reason: unknown) => {
+        setError(reason instanceof Error ? reason.message : "Unable to update follow status");
+      })
+      .finally(() => {
+        setLoadingFollow(false);
+      });
   }
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
-  }
+    setSubmitted(false);
+    setError(null);
 
-  const displayedFollowers = useMemo(() => baseFollowers + (isFollowing ? 1 : 0), [baseFollowers, isFollowing]);
+    const response = await fetch(`/api/business/${slug}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    if (!response.ok) {
+      setError("Unable to send message right now.");
+      return;
+    }
+
+    setSubmitted(true);
+    setForm((prev) => ({ ...prev, note: "" }));
+  }
 
   const businessInquiryGate =
     viewerRole === "business_verified"
@@ -75,9 +128,10 @@ export function BusinessProfileActions({
         <button
           type="button"
           onClick={toggleFollow}
+          disabled={loadingFollow}
           className={`rounded px-3 py-1.5 text-sm font-semibold ${isFollowing ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-800"}`}
         >
-          {isFollowing ? "Following" : "Follow"}
+          {loadingFollow ? "Updating..." : isFollowing ? "Following" : "Follow"}
         </button>
 
         <button
@@ -91,7 +145,7 @@ export function BusinessProfileActions({
           Send Message
         </button>
 
-        <span className="text-sm text-slate-600">{displayedFollowers.toLocaleString()} followers</span>
+        <span className="text-sm text-slate-600">{followers.toLocaleString()} followers</span>
       </div>
 
       <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm">
@@ -157,6 +211,8 @@ export function BusinessProfileActions({
               Sent. {businessName} received your {form.option.toLowerCase()} request.
             </p>
           ) : null}
+
+          {error ? <p className="text-xs text-rose-700">{error}</p> : null}
         </form>
       ) : null}
     </div>

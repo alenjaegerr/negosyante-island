@@ -32,7 +32,7 @@ export default async function BusinessFeedPage({ params }: BusinessFeedPageProps
         </div>
 
         <div className="mt-5 space-y-3">
-          <BusinessFeedList posts={business.posts} />
+          <BusinessFeedList businessSlug={business.slug} posts={business.posts} />
         </div>
       </div>
     </section>

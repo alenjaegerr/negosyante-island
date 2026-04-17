@@ -12,6 +12,7 @@ export async function GET() {
       email: user.email,
       role: user.role,
       businessName: user.businessName,
+      avatarUrl: user.avatarUrl,
     },
   });
 }

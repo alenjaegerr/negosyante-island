@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" fill="none">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A5AA8"/>
+      <stop offset="1" stop-color="#1F8BFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg2)"/>
+  <circle cx="290" cy="520" r="180" fill="#F8FAFC" fill-opacity="0.18"/>
+  <circle cx="980" cy="190" r="140" fill="#FCD34D" fill-opacity="0.22"/>
+  <rect x="120" y="120" width="960" height="435" rx="12" fill="#082F6B" fill-opacity="0.42" stroke="#BAE6FD" stroke-width="3"/>
+  <text x="160" y="250" fill="#E0F2FE" font-size="64" font-family="Roboto Mono, monospace" font-weight="700">Me and my Bro</text>
+  <text x="160" y="320" fill="#FEF08A" font-size="40" font-family="Roboto Mono, monospace" font-weight="600">The Internet #usgovernment</text>
+  <text x="160" y="390" fill="#E2E8F0" font-size="30" font-family="Roboto Mono, monospace">Meme cycle and policy chatter in one trend</text>
+</svg>
