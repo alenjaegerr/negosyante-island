@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 function formatDateTime(value: Date) {
   const date = new Intl.DateTimeFormat(undefined, {
@@ -20,18 +20,16 @@ function formatDateTime(value: Date) {
 }
 
 export function LiveTimestamp() {
-  const [now, setNow] = useState<Date | null>(null);
+  const nowMs = useSyncExternalStore(
+    (onStoreChange) => {
+      const timer = window.setInterval(onStoreChange, 1000);
+      return () => window.clearInterval(timer);
+    },
+    () => Date.now(),
+    () => 0,
+  );
 
-  useEffect(() => {
-    setNow(new Date());
-    const timer = window.setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const display = useMemo(() => (now ? formatDateTime(now) : "Loading clock..."), [now]);
+  const display = useMemo(() => (nowMs > 0 ? formatDateTime(new Date(nowMs)) : "Loading clock..."), [nowMs]);
 
   return <>{display}</>;
 }

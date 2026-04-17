@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 type NavShellProps = {
@@ -13,8 +13,25 @@ type NavShellProps = {
 
 export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [isThemeReady, setIsThemeReady] = useState(false);
+  const theme = useSyncExternalStore<"light" | "dark">(
+    (onStoreChange) => {
+      const onThemeChange = () => onStoreChange();
+      window.addEventListener("storage", onThemeChange);
+      window.addEventListener("ni-theme-change", onThemeChange);
+      return () => {
+        window.removeEventListener("storage", onThemeChange);
+        window.removeEventListener("ni-theme-change", onThemeChange);
+      };
+    },
+    () => {
+      const storedTheme = window.localStorage.getItem("ni-theme");
+      const documentTheme = document.documentElement.getAttribute("data-theme");
+      if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
+      if (documentTheme === "light" || documentTheme === "dark") return documentTheme;
+      return "light";
+    },
+    () => "light",
+  );
 
   const latestHref =
     role === "admin"
@@ -44,29 +61,16 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
     };
   }, [isOpen]);
 
-  useLayoutEffect(() => {
-    const storedTheme = window.localStorage.getItem("ni-theme");
-    const documentTheme = document.documentElement.getAttribute("data-theme");
-    const nextTheme =
-      storedTheme === "light" || storedTheme === "dark"
-        ? storedTheme
-        : documentTheme === "light" || documentTheme === "dark"
-          ? documentTheme
-          : "light";
-
-    setTheme(nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    window.localStorage.setItem("ni-theme", nextTheme);
-    setIsThemeReady(true);
-  }, []);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem("ni-theme", theme);
+  }, [theme]);
 
   function toggleTheme() {
-    setTheme((currentTheme) => {
-      const nextTheme = currentTheme === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", nextTheme);
-      window.localStorage.setItem("ni-theme", nextTheme);
-      return nextTheme;
-    });
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    window.localStorage.setItem("ni-theme", nextTheme);
+    window.dispatchEvent(new Event("ni-theme-change"));
   }
 
   const links = [
@@ -103,7 +107,6 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
           <button
             type="button"
             onClick={toggleTheme}
-            aria-disabled={!isThemeReady}
             className="font-reddit tracking-figma-tight cursor-pointer rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[9px] font-extrabold text-[var(--ni-text-strong)] transition-colors hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)] sm:text-[15px]"
           >
             THEME: {theme === "dark" ? "DARK MODE 🌙" : "LIGHT MODE ☀️"}
