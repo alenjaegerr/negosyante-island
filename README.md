@@ -30,6 +30,7 @@ A Next.js + Prisma starter for **Negosyante Island**, a social + internet cultur
 - Database: PostgreSQL via Prisma ORM
 - Auth: JWT + HttpOnly cookie
 - Uploads: saved to `data/uploads` and served through an authenticated API route
+- Design context endpoint: `GET /api/get_design_context`
 
 ## Quick Start
 
