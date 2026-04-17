@@ -7,6 +7,7 @@ import { LocalBusinessesPanel } from "@/components/local-businesses-panel";
 import { Role } from "@prisma/client";
 import { TrendingFeedGrid } from "@/components/trending-feed-grid";
 import { getPublishedTrendingPosts } from "@/lib/trending-posts";
+import { LiveTimestamp } from "@/components/live-timestamp";
 
 export default async function Home() {
   const user = await getCurrentUser();
@@ -23,7 +24,7 @@ export default async function Home() {
   return (
     <section className="mx-auto w-full max-w-6xl px-0 pb-7 pt-1 sm:px-2 md:pt-4">
       <div className="font-roboto-mono inline-flex items-center rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1.5 text-[10px] font-bold tracking-figma-tight text-[var(--ni-text-strong)] sm:px-4 sm:py-2 sm:text-[11px] md:text-base">
-        Updated April 10, 2026 <span className="ml-2 text-[var(--ni-brand)]">• LIVE</span>
+        Updated <LiveTimestamp /> <span className="ml-2 text-[var(--ni-brand)]">• LIVE</span>
       </div>
 
       <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

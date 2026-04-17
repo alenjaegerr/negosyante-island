@@ -52,6 +52,15 @@ const categoryStyleMap: Record<TrendCategory, { box: string; border: string; lab
 export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
+  const formatStableDate = (value: string | Date) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   if (!posts.length) {
     return (
       <article className="rounded border border-dashed border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-6 text-center text-sm text-[var(--ni-text)]">
@@ -80,7 +89,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
               <span className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/35 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide">
                 {style.label}
               </span>
-              <span className="text-xs opacity-85">{new Date(post.createdAt).toLocaleDateString()}</span>
+              <span className="text-xs opacity-85">{formatStableDate(post.createdAt)}</span>
             </div>
 
             <h2 className="text-[1.55rem] font-semibold leading-[1.05] tracking-tight sm:text-lg">{post.title}</h2>
