@@ -38,7 +38,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="w-full mx-auto max-w-8xl px-2 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto max-w-8xl px-3 sm:px-6 lg:px-8">
         <div className="mt-6 w-full">
           <h1 className="font-flex-bold text-[44px] leading-[0.94] tracking-tight text-[var(--ni-text-strong)] sm:text-6xl md:text-[80px]">
             TRENDING <span className="align-middle">🔥</span>
