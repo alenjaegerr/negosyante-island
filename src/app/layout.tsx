@@ -32,9 +32,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${robotoFlex.variable} ${robotoMono.variable} ${redditMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-[var(--ni-bg)] text-[var(--ni-text-strong)] transition-colors duration-200">
+      <body className="flex min-h-full flex-col overflow-x-hidden bg-[var(--ni-bg)] text-[var(--ni-text-strong)] transition-colors duration-200">
         <NavBar />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-2 py-3 sm:p-4">{children}</main>
+        <main className="w-full flex-1">{children}</main>
         <footer className="mt-8 border-t border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-6 sm:px-4">
           <nav className="mx-auto max-w-6xl font-reddit flex flex-wrap gap-x-5 gap-y-3 text-[11px] font-extrabold uppercase tracking-figma-tight text-[var(--ni-text)] sm:text-[13px]">
             <a href="#">Advertising</a>
