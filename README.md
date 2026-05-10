@@ -1,6 +1,25 @@
-# Negosyante Island
+# Negosyante Island BETA 1.0 Build 1
 
-A Next.js + Prisma starter for **Negosyante Island**, a social + internet culture analytics platform with B2C users, verified B2B businesses, and admin moderation.
+A Next.js + Prisma web app for **Negosyante Island**, a social + internet culture analytics platform with B2C users, verified B2B businesses, and admin moderation.
+
+## Version Information
+
+**Current Version:** BETA 1.0 Build 1 (MVP)
+
+This is the first major release following the prototype phase. This build focuses on:
+- **Complete UI rework** for PC/Tablet browser optimization
+- Preparing the foundation for a dedicated mobile web app (coming in future builds)
+- Enhanced user experience and interface consistency
+- Stability and performance improvements
+
+**Related Repositories:**
+- [Negosyante Island ALPHA 0.1.0](https://github.com/alenjaegerr/negosyante-island-alpha-0.1.0) - Prototype phase
+
+## Project Structure
+
+This repository is part of the **Negosyante Island** project, which includes:
+- **negosyante-island-alpha-0.1.0** - Original prototype/ALPHA version
+- **negosyante-island-beta-1.0-build-1** - Current MVP with reworked UI (this repository)
 
 ## Features
 
