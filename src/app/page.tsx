@@ -8,6 +8,7 @@ import { Role } from "@prisma/client";
 import { TrendingFeedGrid } from "@/components/trending-feed-grid";
 import { getPublishedTrendingPosts } from "@/lib/trending-posts";
 import { LiveTimestamp } from "@/components/live-timestamp";
+import { LiveIndicator } from "@/components/live-indicator";
 
 export default async function Home() {
   const user = await getCurrentUser();
@@ -25,8 +26,8 @@ export default async function Home() {
     <section className="w-full px-0 pb-7 pt-1 md:pt-4">
       <div className="w-full">
         <div className="w-full mx-auto max-w-8xl px-3 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="inline-flex items-center rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1.5 text-[10px] font-bold tracking-figma-tight text-[var(--ni-text-strong)] sm:text-[11px] md:text-base">
-            Updated <LiveTimestamp /> <span className="ml-2 text-[var(--ni-brand)]">• LIVE</span>
+          <div className="font-roboto-mono inline-flex items-center rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1.5 text-[10px] font-bold tracking-figma-tight text-[var(--ni-text-strong)] sm:px-4 sm:py-2 sm:text-[11px] md:text-base">
+            Updated <LiveTimestamp /> <LiveIndicator />
           </div>
 
           <aside className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-2.5 sm:max-w-[280px] sm:p-3">
