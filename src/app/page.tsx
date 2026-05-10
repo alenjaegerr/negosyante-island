@@ -49,28 +49,7 @@ export default async function Home() {
         <LocalBusinessesPanel businesses={localBusinesses} />
       </div>
 
-      <footer className="mt-16 border-t border-[color:var(--ni-border)] pt-7">
-        <nav className="font-reddit flex flex-wrap gap-x-5 gap-y-3 text-[11px] font-extrabold uppercase tracking-figma-tight text-[var(--ni-text)] sm:text-[13px]">
-          <Link href="#">Advertising</Link>
-          <Link href="#">What We Do</Link>
-          <Link href="#">Data Analytic Process</Link>
-          <Link href="#">Legal</Link>
-          <Link href="#">Privacy Policy</Link>
-        </nav>
-        <div className="mt-8 flex flex-col items-start justify-between gap-5 md:flex-row md:items-center">
-          <div>
-            <p className="font-reddit tracking-figma-tight mb-2 text-[10px] font-extrabold leading-[1.4] text-[var(--ni-text-strong)] sm:text-[14px]">
-              INTERNET CULTURE IS COMEDY GOLD
-            </p>
-            <BrandLogo />
-          </div>
-          <p className="font-roboto-mono self-end text-right text-[10.5px] leading-[1.4] tracking-[-0.03em] text-[var(--ni-text)] sm:text-[12px]">
-            © Negosyante Island Inc. 2025
-            <br />
-            All Rights Reserved
-          </p>
-        </div>
-      </footer>
+      
     </section>
   );
 }
