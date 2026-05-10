@@ -22,10 +22,12 @@ export default async function Home() {
   const posts = await getPublishedTrendingPosts(8);
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-0 pb-7 pt-1 sm:px-2 md:pt-4">
+    <section className="w-full px-0 pb-7 pt-1 md:pt-4">
       <div className="font-roboto-mono inline-flex items-center rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1.5 text-[10px] font-bold tracking-figma-tight text-[var(--ni-text-strong)] sm:px-4 sm:py-2 sm:text-[11px] md:text-base">
         Updated <LiveTimestamp /> <span className="ml-2 text-[var(--ni-brand)]">• LIVE</span>
       </div>
+
+      <div className="w-full mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
 
       <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="w-full lg:max-w-[64%]">
@@ -41,15 +43,17 @@ export default async function Home() {
         </aside>
       </div>
 
-      <div className="mt-3 md:mt-4 md:grid md:grid-cols-[minmax(0,1fr)_260px] md:gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="mt-6 w-full">
         <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/65 p-1">
           <TrendingFeedGrid posts={posts} />
         </div>
 
-        <LocalBusinessesPanel businesses={localBusinesses} />
+        <div className="mt-6">
+          <LocalBusinessesPanel businesses={localBusinesses} />
+        </div>
       </div>
 
-      
+      </div>
     </section>
   );
 }

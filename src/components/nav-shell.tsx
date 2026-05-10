@@ -101,13 +101,13 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
       ];
 
   return (
-    <header className="border-b border-[color:var(--ni-border)] bg-[var(--ni-bg)]">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-3 py-3">
+    <header className="w-full border-b border-[color:var(--ni-border)] bg-[var(--ni-bg)]">
+      <div className="w-full mx-auto flex max-w-8xl items-center justify-between gap-4 px-3 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center gap-4">
           <Link href={isAuthenticated ? "/feed" : "/"} aria-label="Go to home" className="flex items-center">
             <BrandLogo compact />
           </Link>
-          <nav className="hidden gap-6 pl-4 md:flex">
+          <nav className="hidden gap-8 pl-4 md:flex">
             {links.map((item) => (
               <Link key={item.label} href={item.href} className="font-reddit text-sm font-extrabold uppercase tracking-figma-tight hover:text-[var(--ni-brand)]">
                 {item.label}
@@ -120,7 +120,7 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
           <button
             type="button"
             onClick={toggleTheme}
-            className="hidden rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1 text-[12px] font-extrabold text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)] md:inline-flex"
+            className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1 text-[12px] font-extrabold text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)]"
           >
             {theme === "dark" ? "DARK" : "LIGHT"}
           </button>
