@@ -222,6 +222,24 @@ export function DiscoveryConsole({ posts }: DiscoveryConsoleProps) {
 
   const activeHero = heroCards.length ? heroCards[heroIndex % heroCards.length] : posts[0];
 
+  const getSectionTransform = (sectionIndex: number) => {
+    const distance = sectionIndex - activeSectionIndex;
+
+    if (distance === 0) {
+      return "translate-y-0 scale-100 opacity-100 z-30";
+    }
+
+    if (distance === -1) {
+      return "-translate-y-[32vh] scale-[0.88] opacity-55 z-20";
+    }
+
+    if (distance === 1) {
+      return "translate-y-[32vh] scale-[0.88] opacity-55 z-20";
+    }
+
+    return `${distance < 0 ? "-translate-y-[58vh]" : "translate-y-[58vh]"} scale-[0.82] opacity-0 z-0 pointer-events-none`;
+  };
+
   useEffect(() => {
     if (heroCards.length <= 1) return undefined;
 
@@ -289,12 +307,8 @@ export function DiscoveryConsole({ posts }: DiscoveryConsoleProps) {
 
   return (
     <div ref={shellRef} className="mx-auto w-full max-w-8xl px-3 sm:px-6 lg:px-8">
-      <div className="sticky top-0 z-20 pt-4 sm:pt-5">
-        <div
-          className={`overflow-hidden rounded-[2rem] border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/92 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur transition-all duration-700 sm:p-6 lg:p-8 ${
-            activeSectionIndex === 0 ? "scale-100 opacity-100" : "scale-[0.96] opacity-80"
-          }`}
-        >
+      <div className="mt-4 sm:mt-5">
+        <div className="overflow-hidden rounded-[2rem] border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/92 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur sm:p-6 lg:p-8">
           <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
             <div className="flex flex-col justify-between gap-5">
               <div>
@@ -305,7 +319,7 @@ export function DiscoveryConsole({ posts }: DiscoveryConsoleProps) {
                   TRENDING <span className="align-middle">🔥</span>
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--ni-text)] sm:text-base">
-                  The first channel rotates every 5 seconds. As you scroll, the page locks to each category rail and keeps the live stage visible.
+                  The top hero moves away with the page. The category stack below keeps three rails visible at once, with the active rail centered.
                 </p>
               </div>
 
@@ -388,12 +402,12 @@ export function DiscoveryConsole({ posts }: DiscoveryConsoleProps) {
                 sectionRefs.current[sectionIndex] = node;
               }}
               data-section-index={sectionIndex}
-              className="min-h-[88vh] scroll-mt-6 pt-2 sm:pt-4"
+              className="min-h-[110vh] scroll-mt-6 pt-2 sm:pt-4"
             >
               <div
-                className={`rounded-[2rem] border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/88 p-4 shadow-[0_20px_64px_rgba(15,23,42,0.08)] transition-all duration-700 sm:p-5 lg:p-6 ${
-                  sectionActive ? "scale-100 opacity-100" : "scale-[0.97] opacity-70"
-                } ${section.glow}`}
+                className={`sticky top-20 rounded-[2rem] border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)]/88 p-4 shadow-[0_20px_64px_rgba(15,23,42,0.08)] transition-all duration-700 sm:p-5 lg:p-6 ${getSectionTransform(
+                  sectionIndex,
+                )} ${section.glow}`}
               >
                 <div className={`rounded-[1.5rem] bg-gradient-to-r ${section.tone} p-4 sm:p-5`}>
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
