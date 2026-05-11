@@ -67,5 +67,21 @@ html {
 }
 
 .tracking-figma-tight {
-  letter-spacing: -0.025em;
+  letter-spacing: 0;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto;
+  }
 }

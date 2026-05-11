@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Roboto_Flex, Roboto_Mono } from "next/font/google";
 import { Reddit_Mono } from "next/font/google";
 import "./globals.css";
@@ -50,7 +51,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 INTERNET CULTURE IS COMEDY GOLD
               </p>
               <div className="mt-1">
-                <img src="/brand/ni-logo.png" alt="Negosyante Island" className="h-8" />
+                <Image src="/brand/wordmark.png" alt="Negosyante Island" width={220} height={74} className="h-8 w-auto" />
               </div>
             </div>
 

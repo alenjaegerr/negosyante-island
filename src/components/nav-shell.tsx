@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useSyncExternalStore } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 type NavShellProps = {
@@ -12,7 +13,7 @@ type NavShellProps = {
 };
 
 export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   const theme = useSyncExternalStore<"light" | "dark">(
     (onStoreChange) => {
       const onThemeChange = () => onStoreChange();
@@ -33,14 +34,23 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
     () => "light",
   );
 
-  const latestHref =
+  const workspaceHref =
     role === "admin"
       ? "/admin"
       : role === "business_pending" || role === "business_verified"
-        ? "/business/dashboard"
-        : "/feed";
+        ? "/business/home"
+        : isAuthenticated
+          ? "/feed"
+          : "/login";
+  const workspaceLabel =
+    role === "admin"
+      ? "Admin"
+      : role === "business_pending" || role === "business_verified"
+        ? "Business Hub"
+        : "Island Feed";
 
-  const internetHref = isAuthenticated ? "/trending" : "/login";
+  const internetHref = "/";
+  const homeHref = isAuthenticated ? workspaceHref : "/";
 
   const modeLabel =
     role === "business_pending" || role === "business_verified"
@@ -55,13 +65,6 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
     .join("") || "U";
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     window.localStorage.setItem("ni-theme", theme);
   }, [theme]);
@@ -74,42 +77,45 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
   }
 
   const links = [
-    { href: latestHref, label: "Latest" },
-    { href: internetHref, label: "The Internet" },
-    { href: "#", label: "Contact Us" },
+    { href: internetHref, label: "Signal Browser" },
+    { href: workspaceHref, label: workspaceLabel },
+    { href: isAuthenticated ? "/notifications" : "/signup", label: isAuthenticated ? "Alerts" : "Join" },
   ];
 
-  const roleLinks = [
-    ...(role === "business_pending" || role === "business_verified" ? [{ href: "/business/home", label: "Business Home" }] : []),
-    ...(role === "business_pending" ? [{ href: "/business/dashboard", label: "Business Dashboard" }] : []),
-    ...(role === "business_pending" ? [{ href: "/business/pending", label: "Business Verify" }] : []),
-    ...(role === "business_verified" ? [{ href: "/business/dashboard", label: "Business Dashboard" }] : []),
-    ...(role === "admin" ? [{ href: "/admin", label: "Admin Panel" }] : []),
-  ];
-
-  const authLinks = isAuthenticated
-    ? [
-        ...links,
-        { href: "/notifications", label: "Notifications" },
-        ...roleLinks,
-        { href: "/feed", label: "My Feed" },
-      ]
-    : [
-        ...links,
-        { href: "/login", label: "Login" },
-        { href: "/signup", label: "Signup" },
-      ];
+  const isActiveLink = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+  const isSignalRoute = pathname === "/";
 
   return (
-    <header className="w-full border-b border-[color:var(--ni-border)] bg-[var(--ni-bg)]">
-      <div className="w-full mx-auto flex max-w-8xl items-center justify-between gap-4 px-3 sm:px-6 lg:px-8 py-3">
+    <header
+      className={`sticky top-0 z-50 w-full border-b backdrop-blur ${
+        isSignalRoute
+          ? "border-white/10 bg-[#07080d]/90 text-white"
+          : "border-[color:var(--ni-border)] bg-[var(--ni-bg)]/92"
+      }`}
+    >
+      <div className="w-full mx-auto flex max-w-8xl items-center justify-between gap-4 px-3 py-2 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href={isAuthenticated ? "/feed" : "/"} aria-label="Go to home" className="flex items-center">
+          <Link href={homeHref} aria-label="Go to home" className="flex items-center">
             <BrandLogo compact />
           </Link>
           <nav className="hidden gap-8 pl-4 md:flex">
             {links.map((item) => (
-              <Link key={item.label} href={item.href} className="font-reddit text-sm font-extrabold uppercase tracking-figma-tight hover:text-[var(--ni-brand)]">
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`font-reddit rounded-full px-3 py-1.5 text-sm font-extrabold uppercase transition ${
+                  isActiveLink(item.href)
+                    ? isSignalRoute
+                      ? "bg-cyan-200/10 text-cyan-100"
+                      : "bg-[var(--ni-accent-soft)] text-[var(--ni-brand)]"
+                    : isSignalRoute
+                      ? "text-white/80 hover:bg-white/10 hover:text-white"
+                      : "text-[var(--ni-text-strong)] hover:bg-[var(--ni-surface-2)] hover:text-[var(--ni-brand)]"
+                }`}
+              >
                 {item.label}
               </Link>
             ))}
@@ -120,21 +126,40 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
           <button
             type="button"
             onClick={toggleTheme}
-            className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1 text-[12px] font-extrabold text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)]"
+            className={`rounded border px-3 py-1 text-[12px] font-extrabold transition ${
+              isSignalRoute
+                ? "border-white/20 bg-white/[0.08] text-white/80 hover:border-white/30 hover:text-white"
+                : "border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)] hover:text-[var(--ni-brand)]"
+            }`}
           >
             {theme === "dark" ? "DARK" : "LIGHT"}
           </button>
 
           {!isAuthenticated ? (
-            <Link href="/login" className="font-reddit rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-3 py-1 text-sm font-extrabold text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)]">
+            <Link
+              href="/login"
+              className={`font-reddit rounded border px-3 py-1 text-sm font-extrabold transition ${
+                isSignalRoute
+                  ? "border-white/20 bg-white/[0.08] text-white/80 hover:border-white/30 hover:text-white"
+                  : "border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] text-[var(--ni-text-strong)] hover:border-[color:var(--ni-brand)]"
+              }`}
+            >
               BUSINESS LOGIN
             </Link>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-cyan-300/50 bg-[var(--ni-accent-soft)] text-sm text-[var(--ni-brand)]">
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
+                  isSignalRoute
+                    ? "border-cyan-200/30 bg-cyan-200/10 text-cyan-100"
+                    : "border-cyan-300/50 bg-[var(--ni-accent-soft)] text-[var(--ni-brand)]"
+                }`}
+              >
                 {initials}
               </span>
-              <span className="hidden truncate text-sm md:inline-block">{modeLabel}</span>
+              <span className={`hidden truncate text-sm md:inline-block ${isSignalRoute ? "text-white/80" : ""}`}>
+                {modeLabel}
+              </span>
             </div>
           )}
         </div>

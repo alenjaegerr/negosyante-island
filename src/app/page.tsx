@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
 import { getPublishedTrendingPosts } from "@/lib/trending-posts";
-import { DiscoveryConsole } from "@/components/discovery-console";
-import { localBusinesses } from "@/lib/local-businesses";
+import { TrendingFeedGrid } from "@/components/trending-feed-grid";
 
 export default async function Home() {
   const user = await getCurrentUser();
@@ -13,12 +11,22 @@ export default async function Home() {
     if (user.role === Role.business_pending || user.role === Role.business_verified) {
       redirect("/business/home");
     }
-    redirect("/feed");
   }
 
   const posts = await getPublishedTrendingPosts(24);
 
   return (
-    <DiscoveryConsole posts={posts} businesses={localBusinesses} />
+    <section className="relative isolate min-h-screen bg-[#07080d] text-white">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-[-12rem] top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-cyan-300/10 blur-3xl" />
+        <div className="absolute right-[-8rem] top-[16rem] h-[24rem] w-[24rem] rounded-full bg-rose-300/10 blur-3xl" />
+        <div className="absolute bottom-[-10rem] left-[22%] h-[28rem] w-[28rem] rounded-full bg-amber-200/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),transparent_28%,rgba(255,255,255,0.025))]" />
+      </div>
+
+      <div className="w-full px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+        <TrendingFeedGrid posts={posts} />
+      </div>
+    </section>
   );
 }
