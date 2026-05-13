@@ -6,16 +6,18 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const AUTH_COOKIE = "negosyante_token";
-const jwtSecret =
-  process.env.JWT_SECRET && process.env.JWT_SECRET.trim().length > 0
-    ? process.env.JWT_SECRET
-    : process.env.NODE_ENV === "production"
-      ? ""
-      : "dev-only-secret";
-const secret = new TextEncoder().encode(jwtSecret);
 
-if (process.env.NODE_ENV === "production" && !jwtSecret) {
-  throw new Error("JWT_SECRET is required in production");
+function getSecret(): Uint8Array {
+  const jwtSecret =
+    process.env.JWT_SECRET && process.env.JWT_SECRET.trim().length > 0
+      ? process.env.JWT_SECRET
+      : process.env.NODE_ENV === "production"
+        ? ""
+        : "dev-only-secret";
+  if (process.env.NODE_ENV === "production" && !jwtSecret) {
+    throw new Error("JWT_SECRET is required in production");
+  }
+  return new TextEncoder().encode(jwtSecret);
 }
 
 export type AuthPayload = {
@@ -43,7 +45,7 @@ export async function createToken(user: User) {
     .setSubject(user.id)
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(secret);
+    .sign(getSecret());
 }
 
 export async function setAuthCookie(token: string) {
@@ -68,7 +70,7 @@ export async function getCurrentUser() {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSecret());
     if (!payload.sub) return null;
 
     const user = await prisma.user.findUnique({
