@@ -12,23 +12,24 @@ This is the first major release following the prototype phase. This build focuse
 - Enhanced user experience and interface consistency
 - Stability and performance improvements
 
-**Related Repositories:**
-- [Negosyante Island ALPHA 0.1.0](https://github.com/alenjaegerr/negosyante-island-alpha-0.1.0) - Prototype phase
+**Related Branches:**
+- `alpha-0.1.0` - Prototype phase baseline
+- `beta-1.0-build-1` - Current MVP (this branch)
 
 ## Version Flow
 
 Negosyante Island now follows a simple release path so changes stay reviewable and reversible:
 
-1. **ALPHA 0.1.0** lives in the `negosyante-island-alpha-0.1.0` repository as the prototype baseline.
+1. **ALPHA 0.1.0** lives on the `alpha-0.1.0` branch as the prototype baseline.
 2. **BETA 1.0 Build 1** is developed on the `beta-1.0-build-1` branch and reviewed through a pull request.
-3. Approved BETA changes are merged into the ALPHA repository's `main` branch as the tracked release line.
+3. Approved BETA changes are merged into `main` as the tracked release line.
 4. Future builds should continue from the current BETA branch or a new build branch, not from an ad hoc direct edit on `main`.
 
 ## Project Structure
 
 This repository is part of the **Negosyante Island** project, which includes:
-- **negosyante-island-alpha-0.1.0** - Original prototype/ALPHA version
-- **negosyante-island-beta-1.0-build-1** - Current MVP with reworked UI (this repository)
+- **alpha-0.1.0** - Original prototype/ALPHA version
+- **beta-1.0-build-1** - Current MVP with reworked UI (this branch)
 
 ## Features
 
