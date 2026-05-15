@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 type NavShellProps = {
@@ -14,6 +14,7 @@ type NavShellProps = {
 
 export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
   const pathname = usePathname();
+  const [scrollY, setScrollY] = useState(0);
   const theme = useSyncExternalStore<"light" | "dark">(
     (onStoreChange) => {
       const onThemeChange = () => onStoreChange();
@@ -69,6 +70,17 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
     window.localStorage.setItem("ni-theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   function toggleTheme() {
     const nextTheme = theme === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", nextTheme);
@@ -90,9 +102,11 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full border-b backdrop-blur ${
+      className={`fixed top-0 left-0 right-0 z-50 w-full border-b transition-all duration-300 ${
         isSignalRoute
-          ? "border-white/10 bg-[#07080d]/90 text-white"
+          ? scrollY === 0
+            ? "border-white/0 bg-transparent text-white backdrop-blur-none"
+            : "border-white/10 bg-[#07080d]/90 text-white"
           : "border-[color:var(--ni-border)] bg-[var(--ni-bg)]/92"
       }`}
     >

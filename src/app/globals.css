@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --ni-fixed-header-offset: calc(4.5rem + 0.5cm);
   --ni-bg: #f8faff;
   --ni-brand: #0069a8;
   --ni-brand-cta: #0084d1;
@@ -46,6 +47,11 @@ body {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--ni-fixed-header-offset);
+}
+
+.ni-main-offset {
+  padding-top: var(--ni-fixed-header-offset);
 }
 
 .font-roboto-mono {

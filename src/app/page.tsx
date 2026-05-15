@@ -24,7 +24,7 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),transparent_28%,rgba(255,255,255,0.025))]" />
       </div>
 
-      <div className="w-full px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+      <div className="w-full py-4 lg:py-5">
         <TrendingFeedGrid posts={posts} />
       </div>
     </section>
