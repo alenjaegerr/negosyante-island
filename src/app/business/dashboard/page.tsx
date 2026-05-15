@@ -42,52 +42,52 @@ export default async function BusinessDashboardPage() {
 
   return (
     <section className="space-y-4">
-      <div className="rounded-xl bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-semibold">Good day, {dashboardName}</h1>
-        <p className="text-sm text-slate-600">{isVerified ? "Verified Business Dashboard" : "Business Dashboard Preview (Pending Verification)"}</p>
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-5 shadow-sm">
+        <h1 className="text-2xl font-semibold text-[var(--ni-text-strong)]">Good day, {dashboardName}</h1>
+        <p className="text-sm text-[var(--ni-text)]">{isVerified ? "Verified Business Dashboard" : "Business Dashboard Preview (Pending Verification)"}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl bg-white p-4">Total Posts: <strong>{posts.length}</strong></div>
-        <div className="rounded-xl bg-white p-4">Total Likes: <strong>{totals.likes}</strong></div>
-        <div className="rounded-xl bg-white p-4">Total Views: <strong>{totals.views}</strong></div>
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4 text-[var(--ni-text)]">Total Posts: <strong className="text-[var(--ni-text-strong)]">{posts.length}</strong></div>
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4 text-[var(--ni-text)]">Total Likes: <strong className="text-[var(--ni-text-strong)]">{totals.likes}</strong></div>
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4 text-[var(--ni-text)]">Total Views: <strong className="text-[var(--ni-text-strong)]">{totals.views}</strong></div>
       </div>
 
-      <div className="rounded-xl border border-cyan-500/50 bg-white p-4">
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="font-reddit flex h-12 w-12 items-center justify-center rounded-full border-2 border-cyan-700 bg-cyan-100 text-sm font-extrabold text-cyan-900">
               {dashboardInitials}
             </div>
             <div>
-              <p className="font-flex-bold text-base text-slate-900">{dashboardName}</p>
-              <p className="text-xs font-semibold text-slate-700">
+              <p className="font-flex-bold text-base text-[var(--ni-text-strong)]">{dashboardName}</p>
+              <p className="text-xs font-semibold text-[var(--ni-text)]">
                 {isVerified ? "Verified Business ✅" : "Unverified Business"}
               </p>
             </div>
           </div>
           {!isVerified ? (
-            <Link href="/business/pending" className="rounded border border-amber-500 px-2 py-1 text-xs font-semibold text-amber-800">
+            <Link href="/business/pending" className="rounded border border-amber-500 px-2 py-1 text-xs font-semibold text-amber-500">
               Complete Verification
             </Link>
           ) : null}
         </div>
       </div>
 
-      <div className="rounded-xl border bg-white p-4">
-        <h2 className="font-semibold">Trending tags for your market</h2>
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
+        <h2 className="font-semibold text-[var(--ni-text-strong)]">Trending tags for your market</h2>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {trends.map((trend) => (
             <Link
               key={trend.id}
               href={`/trending?tag=${encodeURIComponent(trend.keyword.replace(/^#/, ""))}`}
-              className="rounded-lg border border-cyan-300 bg-cyan-50 px-3 py-2 text-sm transition hover:border-cyan-500 hover:bg-cyan-100"
+              className="rounded-lg border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-sm transition hover:border-[color:var(--ni-brand)] hover:bg-[var(--ni-accent-soft)]"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-reddit text-cyan-900">#{trend.keyword.replace(/^#/, "")}</span>
-                <span className="text-xs font-semibold text-emerald-700">+{trend.growthPercent}%</span>
+                <span className="font-reddit text-[var(--ni-text-strong)]">#{trend.keyword.replace(/^#/, "")}</span>
+                <span className="text-xs font-semibold text-emerald-500">+{trend.growthPercent}%</span>
               </div>
-              <div className="mt-1 flex items-center justify-between text-[11px] text-slate-600">
+              <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--ni-text)]">
                 <span>{trend.views.toLocaleString()} views</span>
                 <span>{trend.engagementPercent}% engagement</span>
               </div>
@@ -96,8 +96,8 @@ export default async function BusinessDashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border bg-white p-4">
-        <h2 className="font-semibold">Similar Businesses</h2>
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
+        <h2 className="font-semibold text-[var(--ni-text-strong)]">Similar Businesses</h2>
         <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
           {similarBusinesses.map((business) => (
             <Link key={business.slug} href={`/business/${business.slug}`} className="group shrink-0 text-center">
@@ -106,18 +106,18 @@ export default async function BusinessDashboardPage() {
                   {business.initials}
                 </div>
                 <span
-                  className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border border-white ${business.online ? "bg-emerald-500" : "bg-red-500"}`}
+                  className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border border-[var(--ni-surface-1)] ${business.online ? "bg-emerald-500" : "bg-red-500"}`}
                   aria-hidden
                 />
               </div>
-              <p className="mt-1 w-20 truncate text-[11px] text-slate-700">{business.name}</p>
+              <p className="mt-1 w-20 truncate text-[11px] text-[var(--ni-text)]">{business.name}</p>
             </Link>
           ))}
         </div>
       </div>
 
-      <div className="rounded-xl border bg-white p-4">
-        <h2 className="font-semibold">Culture Feed</h2>
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
+        <h2 className="font-semibold text-[var(--ni-text-strong)]">Culture Feed</h2>
         <div className="mt-3 space-y-3">
           <article className="rounded border border-cyan-700 bg-cyan-600/80 p-3 text-white">
             <p className="text-sm font-semibold">🌐 The Internet • #usgovernment</p>

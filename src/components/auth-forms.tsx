@@ -9,6 +9,7 @@ type SignupState = {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   accountType: "user" | "business_pending";
   businessName: string;
   error: string | null;
@@ -60,6 +61,7 @@ export function SignupForm() {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     accountType: "user",
     businessName: "",
     error: null,
@@ -69,9 +71,18 @@ export function SignupForm() {
   const requestedType = searchParams.get("accountType");
   const forceBusiness = requestedType === "business_pending";
   const selectedAccountType: SignupState["accountType"] = forceBusiness ? "business_pending" : state.accountType;
+  const hasConfirmationInput = state.confirmPassword.length > 0;
+  const passwordsMatch = state.password === state.confirmPassword;
+  const passwordsMismatch = hasConfirmationInput && !passwordsMatch;
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (state.password !== state.confirmPassword) {
+      setState((prev) => ({ ...prev, error: "Passwords do not match" }));
+      return;
+    }
+
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     const response = await fetch("/api/auth/signup", {
@@ -94,7 +105,23 @@ export function SignupForm() {
       <h2 className="text-xl font-semibold text-[var(--ni-text-strong)]">Create your account</h2>
       <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" required placeholder="Full name" value={state.name} onChange={(e) => setState((p) => ({ ...p, name: e.target.value }))} />
       <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
-      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="password" required minLength={8} pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}" title="Use at least 8 characters including uppercase, lowercase, and number." placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
+      <input className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" type="password" required placeholder="Password" value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
+      <input
+        className={`w-full rounded border bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)] ${passwordsMismatch ? "border-rose-500" : "border-[color:var(--ni-border)]"}`}
+        type="password"
+        required
+        placeholder="Repeat password"
+        value={state.confirmPassword}
+        onChange={(e) => setState((p) => ({ ...p, confirmPassword: e.target.value }))}
+        aria-invalid={passwordsMismatch}
+      />
+      {hasConfirmationInput ? (
+        passwordsMatch ? (
+          <p className="text-sm text-emerald-600">Passwords match.</p>
+        ) : (
+          <p className="text-sm text-rose-600">Passwords do not match.</p>
+        )
+      ) : null}
       <select
         className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)]"
         value={selectedAccountType}

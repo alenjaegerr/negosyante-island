@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --ni-fixed-header-offset: calc(4.5rem + 0.5cm);
   --ni-bg: #f8faff;
   --ni-brand: #0069a8;
   --ni-brand-cta: #0084d1;
@@ -40,6 +41,17 @@ body {
   font-family: var(--font-flex), Arial, Helvetica, sans-serif;
   background-color: var(--ni-bg);
   color: var(--ni-text-strong);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--ni-fixed-header-offset);
+}
+
+.ni-main-offset {
+  padding-top: var(--ni-fixed-header-offset);
 }
 
 .font-roboto-mono {
@@ -61,5 +73,21 @@ body {
 }
 
 .tracking-figma-tight {
-  letter-spacing: -0.025em;
+  letter-spacing: 0;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto;
+  }
 }

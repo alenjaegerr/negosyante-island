@@ -17,15 +17,15 @@ export default async function BusinessFeedPage({ params }: BusinessFeedPageProps
 
   return (
     <section className="mx-auto w-full max-w-4xl px-3 py-6 sm:px-4 md:py-8">
-      <div className="rounded-xl border border-cyan-600/60 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="font-reddit text-xs font-extrabold tracking-figma-tight text-slate-700">BUSINESS FEED</p>
-            <h1 className="font-flex-bold mt-1 text-2xl text-slate-900">{business.name}</h1>
+            <p className="font-reddit text-xs font-extrabold tracking-figma-tight text-[var(--ni-text)]">BUSINESS FEED</p>
+            <h1 className="font-flex-bold mt-1 text-2xl text-[var(--ni-text-strong)]">{business.name}</h1>
           </div>
           <Link
             href={`/business/${business.slug}`}
-            className="inline-flex rounded border border-cyan-700 px-3 py-1.5 text-sm font-semibold text-cyan-800 hover:bg-cyan-50"
+            className="inline-flex rounded border border-[color:var(--ni-brand)] px-3 py-1.5 text-sm font-semibold text-[var(--ni-brand)] hover:bg-[var(--ni-accent-soft)]"
           >
             View Profile
           </Link>
