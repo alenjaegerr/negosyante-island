@@ -200,13 +200,14 @@ html[data-theme="dark"] .story-read-more:hover {
   border-radius: inherit;
   z-index: 0;
 }
-
-.insight-cta::after {
-  content: "";
+/* inner rotating gradient layer (element-level) */
+.insight-cta-ring {
   position: absolute;
   inset: -3px;
   border-radius: inherit;
   padding: 3px;
+  pointer-events: none;
+  z-index: 0;
   background: conic-gradient(
     from var(--gdeg, 0deg),
     #7c3aed 0deg,
@@ -219,12 +220,23 @@ html[data-theme="dark"] .story-read-more:hover {
   );
   opacity: 0;
   transition: opacity 220ms ease;
-  pointer-events: none;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
+}
+
+/* static overlay border that sits above the rotating gradient */
+.insight-cta-ring-overlay {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  padding: 3px;
+  z-index: 2;
+  pointer-events: none;
+  border: 3px solid rgba(186,230,253,0.16);
+  background: transparent;
 }
 
 .insight-cta-label {
@@ -248,38 +260,32 @@ html[data-theme="dark"] .story-read-more:hover {
   animation: none;
 }
 
-.insight-cta::after {
-  display: none;
-}
-
-/* Rotating inner ring element placed behind the label but above the surface */
-.insight-cta-ring {
-  position: absolute;
-  inset: -3px;
-  border-radius: inherit;
-  padding: 3px;
-  z-index: 0;
-  pointer-events: none;
-  background: conic-gradient(#7c3aed, #06b6d4, #60a5fa, #22c55e, #f97316, #ef4444, #7c3aed);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  transform: rotate(0deg);
-  transition: opacity 220ms ease;
-  opacity: 0;
-}
-
 .insight-cta:hover .insight-cta-ring,
 .insight-cta:focus-visible .insight-cta-ring {
   opacity: 1;
-  animation: insight-ring-rotate var(--insight-orbit-duration, 12s) linear infinite;
+  animation: insight-border-orbit var(--insight-orbit-duration) linear infinite;
 }
 
-@keyframes insight-ring-rotate {
-  to { transform: rotate(360deg); }
+html[data-theme="light"] .insight-cta:hover,
+html[data-theme="light"] .insight-cta:focus-visible {
+  color: var(--ni-brand-cta);
 }
+
+html[data-theme="light"] .insight-cta:hover .insight-cta-ring,
+html[data-theme="light"] .insight-cta:focus-visible .insight-cta-ring,
+html[data-theme="dark"] .insight-cta:hover .insight-cta-ring,
+html[data-theme="dark"] .insight-cta:focus-visible .insight-cta-ring {
+  opacity: 1 !important;
+  animation: insight-border-orbit var(--insight-orbit-duration) linear infinite !important;
+}
+
+html[data-theme="dark"] .insight-cta:hover,
+html[data-theme="dark"] .insight-cta:focus-visible {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .insight-cta:hover .insight-cta-label,
+html[data-theme="light"] .insight-cta:focus-visible .insight-cta-label {
   color: var(--ni-brand-cta) !important;
 }
 
