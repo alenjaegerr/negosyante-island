@@ -17,18 +17,18 @@ export default async function BusinessHomePage() {
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-4 px-3 py-6 sm:px-4">
-      <div className="rounded-xl border border-cyan-600/50 bg-white p-5">
+      <div className="rounded-xl border border-cyan-600/50 bg-[color:var(--ni-surface-1)] p-5">
         <p className="font-reddit text-xs font-extrabold tracking-figma-tight text-cyan-700">B2B HOME</p>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Welcome, {user.businessName ?? user.name}</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="mt-2 text-2xl font-semibold text-[color:var(--ni-text-strong)]">Welcome, {user.businessName ?? user.name}</h1>
+        <p className="mt-1 text-sm text-[color:var(--ni-text)]">
           This is your business-owner workspace. B2C users must sign up as business accounts and complete verification to access business-owner inquiries.
         </p>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-xl border bg-white p-4">
-          <h2 className="font-semibold text-slate-900">Verification Status</h2>
-          <p className="mt-2 text-sm text-slate-700">
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+          <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Verification Status</h2>
+          <p className="mt-2 text-sm text-[color:var(--ni-text)]">
             {isVerified ? "Verified ✅. You can interact as a business owner." : "Pending verification. Complete this to unlock B2B interaction tools."}
           </p>
           <Link
@@ -39,9 +39,9 @@ export default async function BusinessHomePage() {
           </Link>
         </div>
 
-        <div className="rounded-xl border bg-white p-4">
-          <h2 className="font-semibold text-slate-900">B2B Inquiry Controls</h2>
-          <p className="mt-2 text-sm text-slate-700">
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+          <h2 className="font-semibold text-[color:var(--ni-text-strong)]">B2B Inquiry Controls</h2>
+          <p className="mt-2 text-sm text-[color:var(--ni-text)]">
             Use this lane for owner-to-owner collaboration, supplier talk, and verified partnership inquiries.
           </p>
           <Link

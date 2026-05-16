@@ -1,23 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
-import { notFound, redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { buildTrendingMediaPreview } from "@/lib/trending-media";
 
 export default async function TrendingInsightPage(
   props: { params: Promise<{ id: string }> },
 ) {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
-
   const { id } = await props.params;
 
   const post = await prisma.trendingPost.findUnique({
     where: { id },
   });
 
-  if (!post || post.isDraft || !post.isInsightReady) {
+  if (!post || post.isDraft) {
     notFound();
   }
 
@@ -25,16 +21,18 @@ export default async function TrendingInsightPage(
 
   return (
     <section className="space-y-4">
-      <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Negosyante Insight</p>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">
+      <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">
+          {post.isInsightReady ? "Negosyante Insight" : "Trending Article"}
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-[color:var(--ni-text-strong)]">
           {post.insightTitle?.trim() || post.title}
         </h1>
-        <p className="mt-2 text-sm text-slate-500">Category: {post.category.replaceAll("_", " ")}</p>
+        <p className="mt-2 text-sm text-[color:var(--ni-text)]">Category: {post.category.replaceAll("_", " ")}</p>
       </div>
 
       {media ? (
-        <div className={`relative overflow-hidden rounded-2xl border bg-white shadow-sm ${media.aspectClass}`}>
+        <div className={`relative overflow-hidden rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] shadow-sm ${media.aspectClass}`}>
           <iframe
             src={media.embedUrl}
             title={`${post.title} - ${media.label}`}
@@ -44,11 +42,11 @@ export default async function TrendingInsightPage(
           />
         </div>
       ) : post.videoUrl ? (
-        <div className="rounded-2xl border bg-white p-4 text-sm text-slate-600 shadow-sm">
+        <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 text-sm text-[color:var(--ni-text)] shadow-sm">
           Video link saved, but this platform could not be embedded. Open it from the source link.
         </div>
       ) : post.imageUrl ? (
-        <div className="relative h-72 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <div className="relative h-72 overflow-hidden rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] shadow-sm">
           <Image
             src={post.imageUrl}
             alt={post.title}
@@ -59,12 +57,12 @@ export default async function TrendingInsightPage(
         </div>
       ) : null}
 
-      <article className="rounded-2xl border bg-white p-5 text-sm leading-relaxed text-slate-700 shadow-sm">
+      <article className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 text-sm leading-relaxed text-[color:var(--ni-text)] shadow-sm">
         <p className="whitespace-pre-wrap">{post.insightBody?.trim() || post.content}</p>
       </article>
 
-      <Link href="/trending" className="inline-flex rounded-full border px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-        Back to Trending Feed
+      <Link href="/" className="inline-flex rounded-full border border-[color:var(--ni-border)] px-4 py-2 text-sm font-semibold text-[color:var(--ni-text-strong)] hover:bg-[color:var(--ni-surface-2)]">
+        Back to Home
       </Link>
     </section>
   );

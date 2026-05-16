@@ -13,17 +13,13 @@ type NavShellProps = {
 
 export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isThemeReady, setIsThemeReady] = useState(false);
 
-  const latestHref =
-    role === "admin"
-      ? "/admin"
-      : role === "business_pending" || role === "business_verified"
-        ? "/business/dashboard"
-        : "/feed";
+  const latestHref = "/";
 
-  const internetHref = isAuthenticated ? "/trending" : "/login";
+  const internetHref = "/theinternet";
 
   const modeLabel =
     role === "business_pending" || role === "business_verified"
@@ -43,6 +39,19 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isProfileOpen) return;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsProfileOpen(false);
+    }
+
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isProfileOpen]);
 
   useLayoutEffect(() => {
     const storedTheme = window.localStorage.getItem("ni-theme");
@@ -70,30 +79,30 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
   }
 
   const links = [
-    { href: latestHref, label: "Latest" },
-    { href: internetHref, label: "The Internet" },
-    { href: "#", label: "Contact Us" },
+    { href: latestHref, label: "🏠 Home" },
+    { href: internetHref, label: "🌐 The Internet" },
+    { href: "/contact-us", label: "✉️ Contact Us" },
   ];
 
   const roleLinks = [
-    ...(role === "business_pending" || role === "business_verified" ? [{ href: "/business/home", label: "Business Home" }] : []),
-    ...(role === "business_pending" ? [{ href: "/business/dashboard", label: "Business Dashboard" }] : []),
-    ...(role === "business_pending" ? [{ href: "/business/pending", label: "Business Verify" }] : []),
-    ...(role === "business_verified" ? [{ href: "/business/dashboard", label: "Business Dashboard" }] : []),
-    ...(role === "admin" ? [{ href: "/admin", label: "Admin Panel" }] : []),
+    ...(role === "business_pending" || role === "business_verified" ? [{ href: "/business/home", label: "🧭 Business Home" }] : []),
+    ...(role === "business_pending" ? [{ href: "/business/dashboard", label: "📊 Business Dashboard" }] : []),
+    ...(role === "business_pending" ? [{ href: "/business/pending", label: "✅ Business Verify" }] : []),
+    ...(role === "business_verified" ? [{ href: "/business/dashboard", label: "📊 Business Dashboard" }] : []),
+    ...(role === "admin" ? [{ href: "/admin", label: "🛠 Admin Panel" }] : []),
   ];
 
   const authLinks = isAuthenticated
     ? [
         ...links,
-        { href: "/notifications", label: "Notifications" },
+        { href: "/notifications", label: "🔔 Notifications" },
         ...roleLinks,
-        { href: "/feed", label: "My Feed" },
+        { href: "/feed", label: "🧵 My Feed" },
       ]
     : [
         ...links,
-        { href: "/login", label: "Login" },
-        { href: "/signup", label: "Signup" },
+        { href: "/login", label: "🔑 Login" },
+        { href: "/signup", label: "📝 Signup" },
       ];
 
   return (
@@ -116,11 +125,35 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
               BUSINESS LOGIN/SIGNUP 💼
             </Link>
           ) : (
-            <div className="font-reddit tracking-figma-tight flex items-center gap-2 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] sm:px-3 sm:text-sm">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-cyan-300/50 bg-[var(--ni-accent-soft)] text-[10px] text-[var(--ni-brand)]">
-                {initials}
-              </span>
-              <span className="max-w-[120px] truncate sm:max-w-[220px]">{modeLabel}</span>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen((current) => !current)}
+                aria-haspopup="menu"
+                aria-expanded={isProfileOpen}
+                className="font-reddit tracking-figma-tight flex items-center gap-2 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] sm:px-3 sm:text-sm"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full border border-cyan-300/50 bg-[var(--ni-accent-soft)] text-[10px] text-[var(--ni-brand)]">
+                  {initials}
+                </span>
+                <span className="max-w-[120px] truncate sm:max-w-[220px]">{modeLabel}</span>
+              </button>
+
+              {isProfileOpen ? (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-2 w-44 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-2 shadow-xl"
+                >
+                  <form action="/api/auth/logout" method="post">
+                    <button
+                      type="submit"
+                      className="w-full rounded border border-[color:var(--ni-brand)] bg-[var(--ni-accent-soft)] px-3 py-2 text-[11px] font-extrabold text-[var(--ni-brand)]"
+                    >
+                      Logout
+                    </button>
+                  </form>
+                </div>
+              ) : null}
             </div>
           )}
         </div>

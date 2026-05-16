@@ -23,19 +23,19 @@ export default async function BusinessPendingPage({ searchParams }: PendingPageP
   });
 
   return (
-    <section className="space-y-4 rounded-xl border bg-white p-5">
-      <h1 className="text-2xl font-semibold">Business Verification</h1>
-      <p className="text-sm text-slate-600">
+    <section className="space-y-4 rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5">
+      <h1 className="text-2xl font-semibold text-[color:var(--ni-text-strong)]">Business Verification</h1>
+      <p className="text-sm text-[color:var(--ni-text)]">
         Good day, {user.businessName ?? user.name}. Submit your BIR TIN or Mayor&apos;s Business Permit for admin review.
       </p>
 
       <form action="/api/business/verify" method="post" encType="multipart/form-data" className="space-y-3">
-        <select className="w-full rounded border p-2" name="documentType" required>
+        <select className="w-full rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] text-[color:var(--ni-text-strong)] p-2" name="documentType" required>
           <option value="bir_tin">BIR TIN Number</option>
           <option value="mayor_permit">Mayor&apos;s Business Permit</option>
         </select>
-        <input className="w-full rounded border p-2" name="businessName" required defaultValue={user.businessName ?? ""} placeholder="Business name" />
-        <input className="w-full rounded border p-2" name="document" required type="file" accept="image/*,.pdf" />
+        <input className="w-full rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] text-[color:var(--ni-text-strong)] p-2" name="businessName" required defaultValue={user.businessName ?? ""} placeholder="Business name" />
+        <input className="w-full rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] text-[color:var(--ni-text-strong)] p-2" name="document" required type="file" accept="image/*,.pdf" />
         <button type="submit" className="rounded bg-sky-600 px-4 py-2 text-white">Submit Verification</button>
       </form>
 
@@ -47,7 +47,7 @@ export default async function BusinessPendingPage({ searchParams }: PendingPageP
       ) : null}
 
       {latestRequest ? (
-        <div className="rounded border bg-slate-50 p-3 text-sm">
+        <div className="rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-3 text-sm text-[color:var(--ni-text)]">
           <p>Status: <strong className="uppercase">{latestRequest.status}</strong></p>
           <p>Document: <a className="text-sky-700 underline" href={`/api/business/documents/${latestRequest.id}`}>View uploaded document</a></p>
           {latestRequest.rejectionNote ? <p>Rejection note: {latestRequest.rejectionNote}</p> : null}

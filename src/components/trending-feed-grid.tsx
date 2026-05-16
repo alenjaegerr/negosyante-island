@@ -102,16 +102,22 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
                   {isExpanded ? "Collapse" : "Read More"}
                 </button>
               ) : (
-                <span className="min-h-8 rounded border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold opacity-80">
-                  Full text shown
-                </span>
+                <Link
+                  href={`/trending/${post.id}/insight`}
+                  className="story-read-more mt-1 inline-flex w-full flex-col items-start text-left text-[13px] font-semibold leading-snug underline decoration-current underline-offset-4 transition-colors hover:text-white sm:w-auto"
+                >
+                  <span className="whitespace-pre-line">Interesting....{"\n"}read more</span>
+                </Link>
               )}
               {post.isInsightReady ? (
                 <Link
                   href={`/trending/${post.id}/insight`}
-                  className="min-h-8 rounded border border-white/50 px-3 py-1.5 text-xs font-semibold hover:bg-white/15"
+                  className="insight-cta group relative inline-flex min-h-8 items-center overflow-hidden rounded-full px-3 py-1.5 text-xs font-semibold text-white transition-all duration-300"
                 >
-                  Negosyante Insight
+                  <span className="relative z-10 inline-flex items-center gap-1">
+                    <span>Negosyante Insight</span>
+                    <span className="insight-cta-emoji">📊</span>
+                  </span>
                 </Link>
               ) : null}
             </div>

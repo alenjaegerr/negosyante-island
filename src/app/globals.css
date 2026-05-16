@@ -63,3 +63,105 @@ body {
 .tracking-figma-tight {
   letter-spacing: -0.025em;
 }
+
+@keyframes ni-live-pulse {
+  0% {
+    color: var(--ni-brand);
+    text-shadow: 0 0 0 rgba(239, 68, 68, 0);
+  }
+  35% {
+    color: #ef4444;
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.55);
+  }
+  70% {
+    color: #fb7185;
+    text-shadow: 0 0 8px rgba(251, 113, 133, 0.4);
+  }
+  100% {
+    color: var(--ni-brand);
+    text-shadow: 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.live-pulse-text {
+  animation: ni-live-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ni-rainbow-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes insight-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes insight-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) translateX(0) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.insight-cta {
+  position: relative;
+  background: linear-gradient(90deg, #8b5cf6, #6366f1, #3b82f6, #06b6d4, #10b981, #f59e0b, #f97316, #ef4444, #ec4899, #8b5cf6);
+  background-size: 200% 100%;
+  overflow: visible;
+}
+
+html[data-theme="light"] .story-read-more {
+  color: #facc15;
+}
+
+html[data-theme="dark"] .story-read-more {
+  color: var(--ni-muted);
+}
+
+html[data-theme="light"] .story-read-more:hover {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .story-read-more:hover {
+  color: #ffffff;
+}
+
+.story-read-more:hover {
+  color: #ffffff;
+}
+
+
+
+/* Glow effect on hover */
+.insight-cta:hover,
+.insight-cta:focus-visible {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(99, 102, 241, 0.3);
+  filter: brightness(1.1);
+}
+
+.insight-cta-emoji {
+  display: inline-block;
+  opacity: 1;
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.insight-cta:hover .insight-cta-emoji,
+.insight-cta:focus-visible .insight-cta-emoji {
+  transform: scale(1.15) rotate(12deg);
+}
