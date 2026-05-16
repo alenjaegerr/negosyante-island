@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { TrendCategory } from "@prisma/client";
 import { buildTrendingMediaPreview } from "@/lib/trending-media";
 import type { TrendingPostCard } from "@/lib/trending-posts";
@@ -51,6 +51,19 @@ const categoryStyleMap: Record<TrendCategory, { box: string; border: string; lab
 
 export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [theme, setTheme] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = document.documentElement.getAttribute('data-theme');
+    setTheme(t);
+
+    const obs = new MutationObserver(() => {
+      const next = document.documentElement.getAttribute('data-theme');
+      setTheme(next);
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
 
   if (!posts.length) {
     return (
@@ -104,7 +117,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
               ) : (
                 <Link
                   href={`/trending/${post.id}/insight`}
-                  className="story-read-more mt-1 inline-flex w-full flex-col items-start text-left text-[13px] font-semibold leading-snug underline decoration-current underline-offset-4 transition-colors hover:text-white sm:w-auto"
+                  className="story-read-more mt-1 inline-flex w-full flex-col items-start text-left text-[12px] pr-3 font-semibold leading-snug underline decoration-current underline-offset-4 transition-colors hover:text-white sm:w-auto"
                 >
                   <span className="whitespace-pre-line">Interesting....{"\n"}read more</span>
                 </Link>
@@ -112,11 +125,19 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
               {post.isInsightReady ? (
                 <Link
                   href={`/trending/${post.id}/insight`}
-                  className="insight-cta group relative inline-flex min-h-8 items-center overflow-hidden rounded-full px-3 py-1.5 text-xs font-semibold text-white transition-all duration-300"
+                  className={`insight-cta ${theme === 'dark' ? 'insight-cta--dark' : 'insight-cta--light'} group relative inline-flex items-center justify-center overflow-visible rounded-full px-3 py-0.5 text-xs font-semibold transition-all duration-300`}
+                  style={{
+                    backgroundColor: theme === 'light' ? '#e6e6e6' : '#1e293b',
+                    borderColor: theme === 'light' ? 'rgba(15,23,42,0.06)' : 'rgba(186,230,253,0.16)'
+                  }}
                 >
-                  <span className="relative z-10 inline-flex items-center gap-1">
-                    <span>Negosyante Insight</span>
-                    <span className="insight-cta-emoji">📊</span>
+                  <span
+                    aria-hidden="true"
+                    className="insight-cta-surface"
+                    style={{ backgroundColor: theme === 'dark' ? '#1e293b' : '#e6e6e6' }}
+                  />
+                  <span className="insight-cta-label relative z-10 block whitespace-pre-line text-center leading-tight">
+                    Negosyante{`\n`}Insight ✨
                   </span>
                 </Link>
               ) : null}

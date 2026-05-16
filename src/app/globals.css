@@ -108,6 +108,15 @@ body {
   }
 }
 
+@keyframes insight-border-orbit {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
 @keyframes insight-sparkle {
   0%, 100% {
     opacity: 0;
@@ -121,9 +130,27 @@ body {
 
 .insight-cta {
   position: relative;
-  background: linear-gradient(90deg, #8b5cf6, #6366f1, #3b82f6, #06b6d4, #10b981, #f59e0b, #f97316, #ef4444, #ec4899, #8b5cf6);
-  background-size: 200% 100%;
+  background: transparent;
   overflow: visible;
+  border-radius: 9999px;
+}
+
+/* default: keep a transparent border so outline exists but is invisible until themed */
+.insight-cta {
+  border: 1px solid transparent;
+  box-sizing: border-box;
+}
+
+html[data-theme="light"] .insight-cta {
+  background: #f3f4f6; /* subtle white-gray */
+  color: #000000;
+  border-color: rgba(15,23,42,0.06);
+}
+
+html[data-theme="dark"] .insight-cta {
+  background: var(--ni-surface-2);
+  color: #bae6fd;
+  border-color: rgba(186,230,253,0.16);
 }
 
 html[data-theme="light"] .story-read-more {
@@ -148,20 +175,162 @@ html[data-theme="dark"] .story-read-more:hover {
 
 
 
-/* Glow effect on hover */
+.insight-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  background-size: 200% 100%;
+  opacity: 0.06;
+  transition: opacity 220ms ease, transform 400ms cubic-bezier(.2,.9,.2,1);
+  pointer-events: none;
+  transform: translateX(-6%);
+}
+
+.insight-cta-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.insight-cta::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  padding: 3px;
+  background: linear-gradient(90deg, #7c3aed, #06b6d4, #60a5fa, #f97316, #ef4444);
+  background-size: 400% 100%;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.insight-cta-label {
+  font-family: var(--font-inter), var(--font-slab), "Inter", "Roboto Slab", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-weight: 800;
+  font-size: 0.85rem;
+  line-height: 1;
+  text-align: center;
+}
+
 .insight-cta:hover,
 .insight-cta:focus-visible {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(99, 102, 241, 0.3);
-  filter: brightness(1.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.18), 0 0 18px rgba(59, 130, 246, 0.18);
+  color: #ffffff;
 }
 
-.insight-cta-emoji {
-  display: inline-block;
+.insight-cta:hover::before,
+.insight-cta:focus-visible::before {
+  opacity: 0;
+  animation: none;
+}
+
+.insight-cta:hover::after,
+.insight-cta:focus-visible::after {
   opacity: 1;
-  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: insight-border-orbit 20s linear infinite;
 }
 
-.insight-cta:hover .insight-cta-emoji,
-.insight-cta:focus-visible .insight-cta-emoji {
-  transform: scale(1.15) rotate(12deg);
+html[data-theme="light"] .insight-cta:hover,
+html[data-theme="light"] .insight-cta:focus-visible {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .insight-cta:hover,
+html[data-theme="dark"] .insight-cta:focus-visible {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .insight-cta:hover .insight-cta-label,
+html[data-theme="light"] .insight-cta:focus-visible .insight-cta-label {
+  color: #000000;
+}
+
+html[data-theme="dark"] .insight-cta:hover .insight-cta-label,
+html[data-theme="dark"] .insight-cta:focus-visible .insight-cta-label {
+  color: #ffffff;
+}
+
+.local-business-view-profile {
+  border-color: #0e7490;
+}
+
+html[data-theme="light"] .local-business-view-profile {
+  background: #ffffff;
+  color: #0e7490;
+}
+
+html[data-theme="light"] .local-business-view-profile:hover {
+  background: #ecfeff;
+  color: #155e75;
+}
+
+html[data-theme="dark"] .local-business-view-profile {
+  background: transparent;
+  color: #bae6fd;
+}
+
+html[data-theme="dark"] .local-business-view-profile:hover {
+  background: rgba(6, 182, 212, 0.1);
+  color: #ffffff;
+}
+
+/* Stronger theme overrides to ensure CTA visuals are consistent across compiled CSS order */
+html[data-theme="light"] body .insight-cta {
+  background: #f3f4f6 !important; /* white-gray */
+  color: #000000 !important;
+  border-color: rgba(15,23,42,0.06) !important;
+}
+
+html[data-theme="dark"] body .insight-cta {
+  background: var(--ni-surface-2) !important;
+  color: #bae6fd !important;
+  border-color: rgba(186,230,253,0.16) !important;
+}
+
+/* Explicit theme classes applied at the element level to guarantee visuals */
+.insight-cta--light {
+  background: #f3f4f6 !important;
+  color: #000000 !important;
+  border-color: rgba(15,23,42,0.06) !important;
+}
+
+.insight-cta--dark {
+  background: var(--ni-surface-2) !important;
+  color: #bae6fd !important;
+  border-color: rgba(186,230,253,0.16) !important;
+}
+
+/* Dark mode: thicker border per request */
+.insight-cta--dark {
+  border: 3px solid rgba(186,230,253,0.16) !important;
+}
+
+.insight-cta--light .insight-cta-surface {
+  background: #e6e6e6 !important;
+}
+
+/* increase spacing between label text and pill edge (smaller padding for smaller button) */
+.insight-cta .insight-cta-label {
+  padding: 2px 6px;
+  display: inline-block;
+}
+
+/* ensure high contrast label color in light mode */
+html[data-theme="light"] .insight-cta .insight-cta-label {
+  color: #0f172b !important;
+}
+
+.insight-cta--dark .insight-cta-surface {
+  /* use the site's dark surface token so the pill reads consistently with other cards */
+  background: var(--ni-surface-2) !important;
 }
