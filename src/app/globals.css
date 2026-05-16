@@ -248,7 +248,7 @@ html[data-theme="dark"] .story-read-more:hover {
   animation: none;
 }
 
-.insight-cta:hover::after,
+.insight-cta::after {
   display: none;
 }
 
