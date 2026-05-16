@@ -136,6 +136,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
                     className="insight-cta-surface"
                     style={{ backgroundColor: theme === 'dark' ? '#1e293b' : '#e6e6e6' }}
                   />
+                  <span aria-hidden="true" className="insight-cta-ring" />
                   <span className="insight-cta-label relative z-10 block whitespace-pre-line text-center leading-tight">
                     Negosyante{`\n`}Insight ✨
                   </span>
