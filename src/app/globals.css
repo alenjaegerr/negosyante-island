@@ -109,12 +109,8 @@ body {
 }
 
 @keyframes insight-border-orbit {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 400% 50%;
-  }
+  from { --gdeg: 0deg; }
+  to   { --gdeg: 360deg; }
 }
 
 @keyframes insight-sparkle {
@@ -201,10 +197,19 @@ html[data-theme="dark"] .story-read-more:hover {
   inset: -3px;
   border-radius: inherit;
   padding: 3px;
-  background: linear-gradient(90deg, #7c3aed, #06b6d4, #60a5fa, #f97316, #ef4444);
-  background-size: 400% 100%;
+  background: conic-gradient(
+    from var(--gdeg, 0deg),
+    #7c3aed 0deg,
+    #06b6d4 70deg,
+    #60a5fa 140deg,
+    #22c55e 210deg,
+    #f97316 280deg,
+    #ef4444 330deg,
+    #7c3aed 360deg
+  );
   opacity: 0;
-  transition: opacity 220ms ease;
+    animation: insight-border-orbit 14s linear infinite;
+    transition: opacity 220ms ease;
   pointer-events: none;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -237,12 +242,18 @@ html[data-theme="dark"] .story-read-more:hover {
 .insight-cta:hover::after,
 .insight-cta:focus-visible::after {
   opacity: 1;
-  animation: insight-border-orbit 20s linear infinite;
 }
 
 html[data-theme="light"] .insight-cta:hover,
 html[data-theme="light"] .insight-cta:focus-visible {
-  color: #ffffff;
+  color: var(--ni-brand-cta);
+}
+
+html[data-theme="light"] .insight-cta:hover::after,
+html[data-theme="light"] .insight-cta:focus-visible::after,
+html[data-theme="dark"] .insight-cta:hover::after,
+html[data-theme="dark"] .insight-cta:focus-visible::after {
+  opacity: 1 !important;
 }
 
 html[data-theme="dark"] .insight-cta:hover,
@@ -252,7 +263,7 @@ html[data-theme="dark"] .insight-cta:focus-visible {
 
 html[data-theme="light"] .insight-cta:hover .insight-cta-label,
 html[data-theme="light"] .insight-cta:focus-visible .insight-cta-label {
-  color: #000000;
+  color: var(--ni-brand-cta) !important;
 }
 
 html[data-theme="dark"] .insight-cta:hover .insight-cta-label,
