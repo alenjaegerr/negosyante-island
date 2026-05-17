@@ -37,13 +37,13 @@ html[data-theme="dark"] {
 }
 
 body {
-  font-family: var(--font-flex), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--ni-bg);
   color: var(--ni-text-strong);
 }
 
 .font-roboto-mono {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .font-reddit {
@@ -51,12 +51,12 @@ body {
 }
 
 .font-flex-bold {
-  font-family: var(--font-flex), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
 }
 
 .font-flex-extrabold {
-  font-family: var(--font-flex), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-weight: 800;
 }
 
@@ -99,8 +99,14 @@ body {
   }
 }
 
+@property --gdeg {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 :root {
-  --insight-orbit-duration: 3.5s;
+  --insight-orbit-duration: 0.4s;
 }
 
 @keyframes insight-shimmer {
@@ -113,12 +119,8 @@ body {
 }
 
 @keyframes insight-border-orbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { --gdeg: 0deg; }
+  to   { --gdeg: 360deg; }
 }
 
 @keyframes insight-sparkle {
@@ -134,27 +136,23 @@ body {
 
 .insight-cta {
   position: relative;
-  background: transparent;
+  background-image: linear-gradient(115deg, #4fcf70, #fad648, #a767e5, #12bcfe, #44ce7b);
   overflow: visible;
   border-radius: 9999px;
 }
 
 /* default: keep a transparent border so outline exists but is invisible until themed */
 .insight-cta {
-  border: 1px solid transparent;
+  border: 0;
   box-sizing: border-box;
 }
 
 html[data-theme="light"] .insight-cta {
-  background: #f3f4f6; /* subtle white-gray */
   color: #000000;
-  border-color: rgba(15,23,42,0.06);
 }
 
 html[data-theme="dark"] .insight-cta {
-  background: var(--ni-surface-2);
   color: #bae6fd;
-  border-color: rgba(186,230,253,0.16);
 }
 
 html[data-theme="light"] .story-read-more {
@@ -177,6 +175,13 @@ html[data-theme="dark"] .story-read-more:hover {
   color: #ffffff;
 }
 
+.story-read-more {
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 
 
 .insight-cta::before {
@@ -194,46 +199,9 @@ html[data-theme="dark"] .story-read-more:hover {
 
 .insight-cta-surface {
   position: absolute;
-  inset: 0;
+  inset: 3px;
   border-radius: inherit;
   z-index: 0;
-}
-/* inner rotating gradient layer (element-level) */
-.insight-cta-ring {
-  position: absolute;
-  inset: -3px;
-  border-radius: inherit;
-  padding: 3px;
-  pointer-events: none;
-  z-index: 0;
-  background: repeating-conic-gradient(
-    from 0deg,
-    #7c3aed 0deg 18deg,
-    #06b6d4 18deg 36deg,
-    #60a5fa 36deg 54deg,
-    #22c55e 54deg 72deg,
-    #f97316 72deg 90deg,
-    #ef4444 90deg 108deg
-  );
-  opacity: 0;
-  transition: opacity 220ms ease;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-/* static overlay border that sits above the rotating gradient */
-.insight-cta-ring-overlay {
-  position: absolute;
-  inset: -3px;
-  border-radius: inherit;
-  padding: 3px;
-  z-index: 2;
-  pointer-events: none;
-  border: 3px solid rgba(186,230,253,0.14);
-  background: transparent;
 }
 
 .insight-cta-label {
@@ -246,9 +214,7 @@ html[data-theme="dark"] .story-read-more:hover {
 
 .insight-cta:hover,
 .insight-cta:focus-visible {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.18), 0 0 18px rgba(59, 130, 246, 0.18);
-  color: #ffffff;
+  animation: insight-rainbow-hue var(--insight-orbit-duration) linear infinite;
 }
 
 .insight-cta:hover::before,
@@ -257,29 +223,13 @@ html[data-theme="dark"] .story-read-more:hover {
   animation: none;
 }
 
-.insight-cta:hover .insight-cta-ring,
-.insight-cta:focus-visible .insight-cta-ring {
-  opacity: 1;
-  animation: insight-border-orbit var(--insight-orbit-duration) linear infinite;
-}
-
-html[data-theme="light"] .insight-cta:hover,
-html[data-theme="light"] .insight-cta:focus-visible {
-  color: var(--ni-brand-cta);
-}
-
-html[data-theme="light"] .insight-cta:hover .insight-cta-ring,
-html[data-theme="light"] .insight-cta:focus-visible .insight-cta-ring,
-html[data-theme="dark"] .insight-cta:hover .insight-cta-ring,
-html[data-theme="dark"] .insight-cta:focus-visible .insight-cta-ring {
-  opacity: 1 !important;
-  animation: insight-border-orbit var(--insight-orbit-duration) linear infinite !important;
-  transform-origin: center;
-}
-
-html[data-theme="light"] .insight-cta-ring-overlay,
-html[data-theme="dark"] .insight-cta-ring-overlay {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+@keyframes insight-rainbow-hue {
+  from {
+    filter: hue-rotate(0deg);
+  }
+  to {
+    filter: hue-rotate(-360deg);
+  }
 }
 
 html[data-theme="dark"] .insight-cta:hover,
@@ -370,4 +320,90 @@ html[data-theme="light"] .insight-cta .insight-cta-label {
 .insight-cta--dark .insight-cta-surface {
   /* use the site's dark surface token so the pill reads consistently with other cards */
   background: var(--ni-surface-2) !important;
+}
+
+/* Final CTA hover behavior: slow rainbow border flow, stable text colors */
+:root {
+  --insight-orbit-duration: 20s;
+  --insight-shine-duration: 4.8s;
+}
+
+.insight-cta {
+  isolation: isolate;
+}
+
+.insight-cta::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  padding: 3px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background-image: linear-gradient(115deg, #4fcf70, #fad648, #a767e5, #12bcfe, #44ce7b);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity 220ms ease;
+}
+
+/* hover shine loop across both themes */
+.insight-cta::before {
+  z-index: 12;
+  opacity: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 22%,
+    rgba(255, 255, 255, 0.16) 42%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.16) 58%,
+    rgba(255, 255, 255, 0) 78%
+  );
+  background-size: 220% 100%;
+  background-position: -180% 0;
+  transform: none;
+}
+
+.insight-cta:hover,
+.insight-cta:focus-visible {
+  animation: none !important;
+  filter: none !important;
+}
+
+.insight-cta:hover::after,
+.insight-cta:focus-visible::after {
+  opacity: 1;
+  animation: insight-rainbow-hue var(--insight-orbit-duration) linear infinite;
+}
+
+.insight-cta:hover::before,
+.insight-cta:focus-visible::before {
+  opacity: 0.45 !important;
+  animation: insight-shimmer var(--insight-shine-duration) linear infinite !important;
+}
+
+html[data-theme="light"] .insight-cta:hover::before,
+html[data-theme="light"] .insight-cta:focus-visible::before {
+  opacity: 0.34 !important;
+}
+
+html[data-theme="light"] .insight-cta:hover .insight-cta-label,
+html[data-theme="light"] .insight-cta:focus-visible .insight-cta-label {
+  color: #0f172b !important;
+}
+
+html[data-theme="light"] .insight-cta:hover .insight-cta-emoji,
+html[data-theme="light"] .insight-cta:focus-visible .insight-cta-emoji {
+  color: var(--ni-brand-cta) !important;
+}
+
+html[data-theme="dark"] .insight-cta:hover .insight-cta-label,
+html[data-theme="dark"] .insight-cta:focus-visible .insight-cta-label {
+  color: #ffffff !important;
 }
