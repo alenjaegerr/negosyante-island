@@ -10,6 +10,7 @@ export async function NavBar() {
       role={user?.role ?? null}
       displayName={user?.name ?? null}
       businessName={user?.businessName ?? null}
+      avatarUrl={user?.avatarUrl ?? null}
     />
   );
 }

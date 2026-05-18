@@ -3,7 +3,9 @@ import { Role } from "@prisma/client";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { localBusinesses } from "@/lib/local-businesses";
+import { getBusinesses } from "@/lib/businesses";
+import { getPublishedTrendingPosts } from "@/lib/trending-posts";
+import { TrendingFeedGrid } from "@/components/trending-feed-grid";
 
 export default async function BusinessDashboardPage() {
   const user = await getCurrentUser();
@@ -38,7 +40,9 @@ export default async function BusinessDashboardPage() {
     orderBy: { growthPercent: "desc" },
   });
 
-  const similarBusinesses = localBusinesses.slice(0, 10);
+  const allBusinesses = await getBusinesses();
+  const similarBusinesses = allBusinesses.slice(0, 10);
+  const trendingPosts = await getPublishedTrendingPosts(8);
 
   return (
     <section className="space-y-4">
@@ -66,11 +70,16 @@ export default async function BusinessDashboardPage() {
               </p>
             </div>
           </div>
-          {!isVerified ? (
-            <Link href="/business/pending" className="rounded border border-amber-500 px-2 py-1 text-xs font-semibold text-amber-800">
-              Complete Verification
+          <div className="flex items-center gap-2">
+            <Link href="/business/account" className="rounded border border-[color:var(--ni-border)] px-2 py-1 text-xs font-semibold text-[color:var(--ni-text-strong)]">
+              Account Settings
             </Link>
-          ) : null}
+            {!isVerified ? (
+              <Link href="/business/pending" className="rounded border border-amber-500 px-2 py-1 text-xs font-semibold text-amber-800">
+                Complete Verification
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -118,22 +127,9 @@ export default async function BusinessDashboardPage() {
 
       <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
         <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Culture Feed</h2>
-        <div className="mt-3 space-y-3">
-          <article className="rounded border border-cyan-700 bg-cyan-600/80 p-3 text-white">
-            <p className="text-sm font-semibold">🌐 The Internet • #usgovernment</p>
-            <h3 className="font-flex-bold mt-2 text-xl tracking-tight">Me with my Bro 🧑‍🤝‍🧑</h3>
-            <p className="font-flex-bold mt-2 text-sm text-zinc-50">
-              Social trend snapshots and internet culture analysis curated for Filipino users and verified businesses.
-            </p>
-            <div className="mt-3">
-              <Link
-                href="/theinternet"
-                className="inline-flex rounded-full border-[3px] border-violet-700 bg-amber-200 px-4 py-1 text-xs font-black text-zinc-900 shadow-[3px_0_0_0_#ff4d00]"
-              >
-                Negosyante Insight
-              </Link>
-            </div>
-          </article>
+        <div className="mt-3">
+          {/* Trending feed grid reused here */}
+          <TrendingFeedGrid posts={trendingPosts} />
         </div>
       </div>
     </section>

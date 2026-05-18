@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 type NavShellProps = {
@@ -9,11 +10,13 @@ type NavShellProps = {
   role: string | null;
   displayName: string | null;
   businessName: string | null;
+  avatarUrl?: string | null;
 };
 
-export function NavShell({ isAuthenticated, role, displayName, businessName }: NavShellProps) {
+export function NavShell({ isAuthenticated, role, displayName, businessName, avatarUrl }: NavShellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileHoverTimer = useRef<number | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isThemeReady, setIsThemeReady] = useState(false);
 
@@ -125,7 +128,17 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
               BUSINESS LOGIN/SIGNUP 💼
             </Link>
           ) : (
-            <div className="relative">
+            <div
+              className="relative"
+              onMouseEnter={() => {
+                if (profileHoverTimer.current) window.clearTimeout(profileHoverTimer.current);
+                setIsProfileOpen(true);
+              }}
+              onMouseLeave={() => {
+                // small delay to avoid flicker when moving between button and menu
+                profileHoverTimer.current = window.setTimeout(() => setIsProfileOpen(false), 180);
+              }}
+            >
               <button
                 type="button"
                 onClick={() => setIsProfileOpen((current) => !current)}
@@ -133,9 +146,19 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
                 aria-expanded={isProfileOpen}
                 className="font-reddit tracking-figma-tight flex items-center gap-2 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] px-2 py-1 text-[10px] font-extrabold text-[var(--ni-text-strong)] sm:px-3 sm:text-sm"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full border border-cyan-300/50 bg-[var(--ni-accent-soft)] text-[10px] text-[var(--ni-brand)]">
-                  {initials}
-                </span>
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={modeLabel}
+                    width={28}
+                    height={28}
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full border border-cyan-300/50 bg-[var(--ni-accent-soft)] text-[10px] text-[var(--ni-brand)]">
+                    {initials}
+                  </span>
+                )}
                 <span className="max-w-[120px] truncate sm:max-w-[220px]">{modeLabel}</span>
               </button>
 
@@ -144,14 +167,19 @@ export function NavShell({ isAuthenticated, role, displayName, businessName }: N
                   role="menu"
                   className="absolute right-0 mt-2 w-44 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-2 shadow-xl"
                 >
-                  <form action="/api/auth/logout" method="post">
-                    <button
-                      type="submit"
-                      className="w-full rounded border border-[color:var(--ni-brand)] bg-[var(--ni-accent-soft)] px-3 py-2 text-[11px] font-extrabold text-[var(--ni-brand)]"
-                    >
-                      Logout
-                    </button>
-                  </form>
+                  <div className="space-y-2">
+                    <Link href="/business/account" className="block rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-[11px] font-extrabold text-[var(--ni-text-strong)]">
+                      Account Settings
+                    </Link>
+                    <form action="/api/auth/logout" method="post">
+                      <button
+                        type="submit"
+                        className="w-full rounded border border-[color:var(--ni-brand)] bg-[var(--ni-accent-soft)] px-3 py-2 text-[11px] font-extrabold text-[var(--ni-brand)]"
+                      >
+                        Logout
+                      </button>
+                    </form>
+                  </div>
                 </div>
               ) : null}
             </div>

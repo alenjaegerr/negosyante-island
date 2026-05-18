@@ -18,6 +18,8 @@ export default async function BusinessProfilePage({ params }: BusinessProfilePag
     notFound();
   }
 
+  const isOwner = user?.businessName === business.name || user?.role === "admin";
+
   return (
     <section className="mx-auto w-full max-w-4xl px-3 py-6 sm:px-4 md:py-8">
       <div className="rounded-xl border border-cyan-600/60 bg-[color:var(--ni-surface-1)] p-5 shadow-sm">
@@ -27,7 +29,7 @@ export default async function BusinessProfilePage({ params }: BusinessProfilePag
               slug={business.slug}
               initials={business.initials}
               online={business.online}
-              canUpload={user?.role === "business_verified" || user?.role === "admin"}
+              canUpload={Boolean(isOwner)}
             />
 
             <div>

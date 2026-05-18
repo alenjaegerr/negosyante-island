@@ -85,6 +85,15 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {posts.map((post) => {
+        const slugify = (s: string) =>
+          encodeURIComponent(
+            s
+              .toLowerCase()
+              .replace(/[^a-z0-9\s-]/g, "")
+              .trim()
+              .replace(/\s+/g, "-")
+          );
+        const slug = slugify(post.title || post.id);
         const style = categoryStyleMap[post.category];
         const CategoryIcon = style.icon;
         const isExpanded = Boolean(expanded[post.id]);
@@ -127,7 +136,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
                 </button>
               ) : (
                 <Link
-                  href={`/trending/${post.id}/insight`}
+                  href={`/trending/${slug}`}
                   className="story-read-more mt-1 inline-flex w-full flex-col items-start text-left pr-3 underline decoration-current underline-offset-4 transition-colors hover:text-white sm:w-auto"
                 >
                   <span className="inline-flex flex-col gap-0.5">
@@ -138,7 +147,7 @@ export function TrendingFeedGrid({ posts }: TrendingFeedGridProps) {
               )}
               {post.isInsightReady ? (
                 <Link
-                  href={`/trending/${post.id}/insight`}
+                  href={`/trending/${slug}`}
                   className={`insight-cta ${theme === 'dark' ? 'insight-cta--dark' : 'insight-cta--light'} group relative inline-flex items-center justify-center overflow-visible rounded-full px-3 py-0.5 text-xs font-semibold transition-all duration-300`}
                 >
                   <span

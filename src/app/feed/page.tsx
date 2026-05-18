@@ -9,6 +9,10 @@ export default async function FeedPage() {
   if (!user) {
     redirect("/login");
   }
+  // If the current user is a business, send them to the business home feed
+  if (user.role === "business_pending" || user.role === "business_verified") {
+    redirect("/business/home");
+  }
 
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },

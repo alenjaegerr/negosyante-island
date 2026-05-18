@@ -1,8 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { FaFacebookF, FaGlobe, FaInstagram, FaRedditAlien, FaTiktok, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { prisma } from "@/lib/prisma";
 import { buildTrendingMediaPreview } from "@/lib/trending-media";
+
+const insightCategoryMeta = {
+  tiktok: { label: "Tiktok", icon: FaTiktok },
+  the_internet: { label: "The Internet", icon: FaGlobe },
+  youtube: { label: "Youtube", icon: FaYoutube },
+  facebook: { label: "Facebook", icon: FaFacebookF },
+  reddit: { label: "Reddit", icon: FaRedditAlien },
+  x: { label: "X", icon: FaXTwitter },
+  instagram: { label: "Instagram", icon: FaInstagram },
+} as const;
 
 export default async function TrendingInsightPage(
   props: { params: Promise<{ id: string }> },
@@ -17,6 +28,12 @@ export default async function TrendingInsightPage(
     notFound();
   }
 
+  const categoryMeta = insightCategoryMeta[post.category as keyof typeof insightCategoryMeta] ?? {
+    label: post.category.replaceAll("_", " "),
+    icon: FaGlobe,
+  };
+  const CategoryIcon = categoryMeta.icon;
+
   const media = post.videoUrl ? buildTrendingMediaPreview(post.videoUrl, post.videoLoopSeconds) : null;
 
   return (
@@ -28,7 +45,10 @@ export default async function TrendingInsightPage(
         <h1 className="mt-2 text-2xl font-semibold text-[color:var(--ni-text-strong)]">
           {post.insightTitle?.trim() || post.title}
         </h1>
-        <p className="mt-2 text-sm text-[color:var(--ni-text)]">Category: {post.category.replaceAll("_", " ")}</p>
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-text)]">
+          <CategoryIcon className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>{categoryMeta.label}</span>
+        </div>
       </div>
 
       {media ? (
@@ -57,7 +77,7 @@ export default async function TrendingInsightPage(
         </div>
       ) : null}
 
-      <article className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 text-sm leading-relaxed text-[color:var(--ni-text)] shadow-sm">
+      <article className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 text-sm font-normal leading-relaxed text-[color:var(--ni-text)] shadow-sm">
         <p className="whitespace-pre-wrap">{post.insightBody?.trim() || post.content}</p>
       </article>
 

@@ -38,8 +38,13 @@ export default async function AdminPage({
       id: string;
       title: string;
       category: string;
+      snippet: string;
+      content: string;
+      imageUrl?: string | null;
       isInsightReady: boolean;
       isDraft: boolean;
+      insightTitle?: string | null;
+      insightBody?: string | null;
       videoUrl: string | null;
       videoLoopSeconds: number;
     }>>(Prisma.sql`

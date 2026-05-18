@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { BrandLogo } from "@/components/brand-logo";
-import { localBusinesses } from "@/lib/local-businesses";
+import { getBusinesses } from "@/lib/businesses";
 import { LocalBusinessesPanel } from "@/components/local-businesses-panel";
 import { Role } from "@prisma/client";
 import { TrendingFeedGrid } from "@/components/trending-feed-grid";
@@ -20,6 +20,7 @@ export default async function Home() {
   }
 
   const posts = await getPublishedTrendingPosts(8);
+  const localBusinesses = await getBusinesses();
 
   return (
     <section className="mx-auto w-full max-w-6xl px-0 pb-7 pt-1 sm:px-2 md:pt-4">

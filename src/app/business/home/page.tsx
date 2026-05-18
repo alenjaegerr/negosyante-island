@@ -1,56 +1,46 @@
-import Link from "next/link";
-import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { CreatePostForm } from "@/components/create-post-form";
+import { PostActions } from "@/components/post-actions";
 
 export default async function BusinessHomePage() {
   const user = await getCurrentUser();
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
-  if (user.role !== Role.business_pending && user.role !== Role.business_verified) {
+  // Only allow business accounts here
+  if (user.role !== "business_pending" && user.role !== "business_verified") {
     redirect("/feed");
   }
 
-  const isVerified = user.role === Role.business_verified;
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { author: true },
+    take: 25,
+  });
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-4 px-3 py-6 sm:px-4">
-      <div className="rounded-xl border border-cyan-600/50 bg-[color:var(--ni-surface-1)] p-5">
-        <p className="font-reddit text-xs font-extrabold tracking-figma-tight text-cyan-700">B2B HOME</p>
-        <h1 className="mt-2 text-2xl font-semibold text-[color:var(--ni-text-strong)]">Welcome, {user.businessName ?? user.name}</h1>
-        <p className="mt-1 text-sm text-[color:var(--ni-text)]">
-          This is your business-owner workspace. B2C users must sign up as business accounts and complete verification to access business-owner inquiries.
-        </p>
+    <section className="space-y-4">
+      <div className="rounded-xl bg-[color:var(--ni-surface-1)] p-5 shadow-sm border border-[color:var(--ni-border)]">
+        <h1 className="text-2xl font-semibold text-[color:var(--ni-text-strong)]">Welcome, {user.businessName ?? user.name}</h1>
+        <p className="text-sm text-[color:var(--ni-text)]">Role: {user.role}</p>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
-          <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Verification Status</h2>
-          <p className="mt-2 text-sm text-[color:var(--ni-text)]">
-            {isVerified ? "Verified ✅. You can interact as a business owner." : "Pending verification. Complete this to unlock B2B interaction tools."}
-          </p>
-          <Link
-            href={isVerified ? "/business/dashboard" : "/business/pending"}
-            className="mt-3 inline-flex rounded bg-cyan-700 px-3 py-1.5 text-sm font-semibold text-white"
-          >
-            {isVerified ? "Open Business Dashboard" : "Continue Verification"}
-          </Link>
-        </div>
+      <CreatePostForm />
 
-        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
-          <h2 className="font-semibold text-[color:var(--ni-text-strong)]">B2B Inquiry Controls</h2>
-          <p className="mt-2 text-sm text-[color:var(--ni-text)]">
-            Use this lane for owner-to-owner collaboration, supplier talk, and verified partnership inquiries.
-          </p>
-          <Link
-            href="/"
-            className="mt-3 inline-flex rounded border border-cyan-700 px-3 py-1.5 text-sm font-semibold text-cyan-800"
-          >
-            View B2C Homepage
-          </Link>
-        </div>
+      <div className="space-y-3">
+        {posts.map((post) => (
+          <article key={post.id} className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+            <p className="text-sm text-[color:var(--ni-muted)]">@{post.author.name}</p>
+            <p className="mt-2 whitespace-pre-wrap text-[color:var(--ni-text-strong)]">{post.content}</p>
+            <div className="mt-2 flex gap-2 text-xs text-[color:var(--ni-text)]">
+              {post.tags.map((tag) => (
+                <span key={tag} className="rounded bg-[color:var(--ni-surface-2)] px-2 py-1">#{tag}</span>
+              ))}
+            </div>
+            <PostActions post={post} />
+          </article>
+        ))}
       </div>
     </section>
   );
