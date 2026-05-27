@@ -11,16 +11,17 @@ const ALLOWED_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".pdf", ".webp"]);
 export async function POST(request: Request) {
   const user = await getCurrentUser();
 
-  if (!user || user.role !== Role.business_pending) {
+  if (!user || (user.role !== Role.business_pending && user.role !== Role.marketing_pending)) {
     redirect("/login");
   }
 
   const formData = await request.formData();
   const businessName = String(formData.get("businessName") ?? "");
+  const portfolioUrl = String(formData.get("portfolioUrl") ?? "").trim();
   const documentType = String(formData.get("documentType") ?? "");
   const file = formData.get("document");
   const isDocumentTypeValid =
-    documentType === DocumentType.bir_tin || documentType === DocumentType.mayor_permit;
+    documentType === DocumentType.portfolio || documentType === DocumentType.bir_tin || documentType === DocumentType.mayor_permit;
   const isFileValid = file instanceof File;
 
   if (!businessName || !isDocumentTypeValid || !isFileValid) {
@@ -55,6 +56,8 @@ export async function POST(request: Request) {
       businessName,
       documentType,
       documentUrl: safeFilename,
+      verificationType: user.role === Role.marketing_pending ? "marketing" : "business",
+      portfolioUrl: portfolioUrl || null,
     },
   });
 

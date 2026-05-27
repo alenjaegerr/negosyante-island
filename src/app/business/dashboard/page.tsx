@@ -6,13 +6,20 @@ import { prisma } from "@/lib/prisma";
 import { getBusinesses } from "@/lib/businesses";
 import { getPublishedTrendingPosts } from "@/lib/trending-posts";
 import { TrendingFeedGrid } from "@/components/trending-feed-grid";
+import { getSiteSettingMap, getInsightBarConfig } from "@/lib/site-settings";
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 
 export default async function BusinessDashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== Role.business_verified && user.role !== Role.business_pending) redirect("/feed");
+  if (user.role !== Role.business_verified && user.role !== Role.business_pending && user.role !== Role.marketing_verified && user.role !== Role.marketing_pending) redirect("/feed");
 
-  const isVerified = user.role === Role.business_verified;
+  const isVerified = user.role === Role.business_verified || user.role === Role.marketing_verified;
   const dashboardName = user.businessName ?? user.name;
   const dashboardInitials = dashboardName
     .split(" ")
@@ -40,9 +47,39 @@ export default async function BusinessDashboardPage() {
     orderBy: { growthPercent: "desc" },
   });
 
+  const siteSettings = await getSiteSettingMap();
+  const insightButtonLabel = siteSettings.get("insightPrimaryButtonLabel") ?? "Open Insight Brief";
+  const insightBarConfig = getInsightBarConfig(siteSettings, {
+    eyebrow: "Negosyante Insight",
+    title: "Signal overview",
+    footnote: "Signals update every 6 hours",
+    ctaLabel: "Create business account",
+    buttonLabel: insightButtonLabel,
+    stats: [
+      { label: "Stories tracked", value: 30, color: "bg-cyan-500", note: "1 live" },
+      { label: "Signal velocity", value: 38, color: "bg-amber-400", note: "1 platforms" },
+      { label: "Creator momentum", value: 46, color: "bg-rose-500" },
+      { label: "Buyer intent", value: 32, color: "bg-emerald-400" },
+    ],
+    signals: ["Breaking chatter"],
+  });
+
   const allBusinesses = await getBusinesses();
+  const businessRecord = user.businessName
+    ? allBusinesses.find((business) => business.name === user.businessName || business.slug === user.businessName)
+    : undefined;
+  const businessSlug = businessRecord?.slug ?? (user.businessName ? slugify(user.businessName) : null);
   const similarBusinesses = allBusinesses.slice(0, 10);
   const trendingPosts = await getPublishedTrendingPosts(8);
+
+  const [messageCount, followerCount, latestMessage] = businessSlug
+    ? await Promise.all([
+        prisma.businessMessage.count({ where: { businessSlug } }),
+        prisma.businessFollow.count({ where: { businessSlug } }),
+        prisma.businessMessage.findFirst({ where: { businessSlug }, orderBy: { createdAt: "desc" } }),
+      ])
+    : [0, 0, null];
+  const followerTotal = (businessRecord?.followers ?? 0) + followerCount;
 
   return (
     <section className="space-y-4">
@@ -51,10 +88,11 @@ export default async function BusinessDashboardPage() {
         <p className="text-sm text-[color:var(--ni-text)]">{isVerified ? "Verified Business Dashboard" : "Business Dashboard Preview (Pending Verification)"}</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl bg-[color:var(--ni-surface-1)] p-4 border border-[color:var(--ni-border)]">Total Posts: <strong>{posts.length}</strong></div>
         <div className="rounded-xl bg-[color:var(--ni-surface-1)] p-4 border border-[color:var(--ni-border)]">Total Likes: <strong>{totals.likes}</strong></div>
         <div className="rounded-xl bg-[color:var(--ni-surface-1)] p-4 border border-[color:var(--ni-border)]">Total Views: <strong>{totals.views}</strong></div>
+        <div className="rounded-xl bg-[color:var(--ni-surface-1)] p-4 border border-[color:var(--ni-border)]">Lead Inquiries: <strong>{messageCount}</strong></div>
       </div>
 
       <div className="rounded-xl border border-cyan-500/50 bg-[color:var(--ni-surface-1)] p-4">
@@ -66,7 +104,7 @@ export default async function BusinessDashboardPage() {
             <div>
               <p className="font-flex-bold text-base text-[color:var(--ni-text-strong)]">{dashboardName}</p>
               <p className="text-xs font-semibold text-[color:var(--ni-text)]">
-                {isVerified ? "Verified Business ✅" : "Unverified Business"}
+                    {isVerified ? "Verified Pro Account ✅" : "Verification in progress"}
               </p>
             </div>
           </div>
@@ -79,6 +117,9 @@ export default async function BusinessDashboardPage() {
                 Complete Verification
               </Link>
             ) : null}
+                <Link href="/business/billing" className="rounded border border-[color:var(--ni-border)] px-2 py-1 text-xs font-semibold text-[color:var(--ni-text-strong)]">
+                  Billing
+                </Link>
           </div>
         </div>
       </div>
@@ -89,7 +130,7 @@ export default async function BusinessDashboardPage() {
           {trends.map((trend) => (
             <Link
               key={trend.id}
-              href={`/theinternet?tag=${encodeURIComponent(trend.keyword.replace(/^#/, ""))}`}
+              href={`/trending?tag=${encodeURIComponent(trend.keyword.replace(/^#/, ""))}`}
               className="rounded-lg border border-cyan-300 bg-cyan-50 px-3 py-2 text-sm transition hover:border-cyan-500 hover:bg-cyan-100"
             >
               <div className="flex items-center justify-between gap-2">
@@ -126,10 +167,30 @@ export default async function BusinessDashboardPage() {
       </div>
 
       <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Lead Inbox</h2>
+          <Link href="/business/inbox" className="rounded border border-[color:var(--ni-border)] px-2 py-1 text-xs font-semibold text-[color:var(--ni-text-strong)]">
+            Open Inbox
+          </Link>
+        </div>
+        <p className="mt-2 text-sm text-[color:var(--ni-text)]">
+          {businessRecord ? `${followerTotal.toLocaleString()} followers` : "Connect a business profile to track followers and leads."}
+        </p>
+        {latestMessage ? (
+          <div className="mt-3 rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-3 text-sm text-[color:var(--ni-text)]">
+            <p className="font-semibold text-[color:var(--ni-text-strong)]">Latest inquiry</p>
+            <p className="mt-1">{latestMessage.senderName}: {latestMessage.note}</p>
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-[color:var(--ni-muted)]">No recent inquiries yet.</p>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
         <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Culture Feed</h2>
         <div className="mt-3">
           {/* Trending feed grid reused here */}
-          <TrendingFeedGrid posts={trendingPosts} />
+          <TrendingFeedGrid posts={trendingPosts} viewerRole={user.role} insightButtonLabel="Negosyante Insight" />
         </div>
       </div>
     </section>

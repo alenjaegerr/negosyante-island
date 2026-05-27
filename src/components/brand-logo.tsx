@@ -6,25 +6,38 @@ type BrandLogoProps = {
 
 export function BrandLogo({ compact = false }: BrandLogoProps) {
   return (
-    <div className={`flex max-w-full items-center ${compact ? "gap-1.5 sm:gap-3" : "gap-2 sm:gap-3"}`}>
+    <div className={`inline-flex w-max items-center ${compact ? "-ml-0.5 gap-0 sm:-ml-0.5 md:-ml-1" : "gap-2 sm:gap-3 md:gap-4"}`}>
       <Image
         src="/brand/logo-main.png"
         alt="Negosyante Island icon"
-        width={compact ? 120 : 180}
-        height={compact ? 120 : 180}
-        className={`h-auto w-auto shrink-0 ${compact ? "w-8 sm:w-12 md:w-20" : "w-14 sm:w-20 md:w-24"}`}
+        width={512}
+        height={512}
+        className={`block shrink-0 object-contain ${compact ? "h-[3.4rem] w-auto sm:h-[3.55rem] md:h-[3.6rem]" : "w-20 sm:w-20 md:w-24"}`}
         priority
       />
-      <div className="min-w-0 leading-none">
-        <Image
-          src="/brand/wordmark.png"
-          alt="Negosyante Island"
-          width={compact ? 420 : 560}
-          height={compact ? 140 : 190}
-          className={`h-auto w-auto max-w-full ${compact ? "w-[7.5rem] sm:w-36 md:w-52" : "w-40 sm:w-56 md:w-[17.5rem]"}`}
-          priority
-        />
-      </div>
+      {compact ? (
+        <div className="shrink-0 -ml-0 leading-none sm:-ml-1 md:-ml-1.5">
+          <Image
+            src="/brand/NegosyanteIslandNewLogoTextOnly.png"
+            alt="Negosyante Island"
+            width={2752}
+            height={1536}
+            className="block h-[2.65rem] w-auto object-contain sm:h-[2.9rem] md:h-[3.1rem]"
+            priority
+          />
+        </div>
+      ) : (
+        <div className="shrink-0 leading-none">
+          <Image
+            src="/brand/NegosyanteIslandNewLogoTextOnly.png"
+            alt="Negosyante Island"
+            width={2752}
+            height={1536}
+            className="block h-auto w-auto sm:w-56 md:w-[17.5rem]"
+            priority
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ services:
     container_name: negosyante-db
     restart: always
     ports:
-      - "5432:5432"
+      - "0.0.0.0:5432:5432"
     environment:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev123

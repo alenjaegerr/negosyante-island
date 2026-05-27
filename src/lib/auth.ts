@@ -25,6 +25,24 @@ export type AuthPayload = {
   businessName?: string | null;
 };
 
+export function isProRole(role?: Role | null) {
+  return role === Role.business_verified || role === Role.marketing_verified || role === Role.admin;
+}
+
+export function isPublisherRole(role?: Role | null) {
+  return role === Role.publisher_verified || role === Role.publisher;
+}
+
+export function isBusinessOrMarketingPending(role?: Role | null) {
+  return role === Role.business_pending || role === Role.marketing_pending;
+}
+
+export function getInsightAccessLevel(role?: Role | null) {
+  if (!role) return "guest";
+  if (isProRole(role)) return "pro";
+  return "basic";
+}
+
 export async function hashPassword(password: string) {
   return hash(password, 10);
 }
@@ -46,13 +64,13 @@ export async function createToken(user: User) {
     .sign(secret);
 }
 
-export async function setAuthCookie(token: string) {
+export async function setAuthCookie(token: string, secure = process.env.NODE_ENV === "production") {
   const cookieStore = await cookies();
   cookieStore.set(AUTH_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure,
     maxAge: 60 * 60 * 24 * 7,
   });
 }

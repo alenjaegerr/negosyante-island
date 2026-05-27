@@ -5,25 +5,19 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, email, password, accountType, businessName } = body;
+  const { name, email, password, confirmPassword, accountType, businessName } = body;
+  const normalizedAccountType = accountType === Role.business_pending || accountType === Role.marketing_pending ? accountType : Role.user;
 
   if (!name || !email || !password) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  if (password.length < 8) {
-    return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
-  }
-  const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  if (!strongPasswordPattern.test(password)) {
-    return NextResponse.json(
-      { error: "Password must include uppercase, lowercase, and a number" },
-      { status: 400 },
-    );
+  if (password !== confirmPassword) {
+    return NextResponse.json({ error: "Passwords do not match" }, { status: 400 });
   }
 
-  if (accountType === Role.business_pending && !businessName) {
-    return NextResponse.json({ error: "Business name is required for business accounts" }, { status: 400 });
+  if ((normalizedAccountType === Role.business_pending || normalizedAccountType === Role.marketing_pending) && !businessName) {
+    return NextResponse.json({ error: "Business or agency name is required for pro accounts" }, { status: 400 });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -38,8 +32,8 @@ export async function POST(request: Request) {
       name,
       email,
       passwordHash,
-      role: accountType === Role.business_pending ? Role.business_pending : Role.user,
-      businessName: accountType === Role.business_pending ? businessName : null,
+      role: normalizedAccountType,
+      businessName: normalizedAccountType === Role.user ? null : businessName,
     },
   });
 

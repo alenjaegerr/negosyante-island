@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLocalBusinessBySlug } from "@/lib/local-businesses";
+import { getBusinessBySlug } from "@/lib/businesses";
 import { BusinessFeedList } from "@/components/business-feed-list";
 
 type BusinessFeedPageProps = {
@@ -9,7 +9,7 @@ type BusinessFeedPageProps = {
 
 export default async function BusinessFeedPage({ params }: BusinessFeedPageProps) {
   const { slug } = await params;
-  const business = getLocalBusinessBySlug(slug);
+  const business = await getBusinessBySlug(slug);
 
   if (!business) {
     notFound();

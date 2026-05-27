@@ -91,6 +91,32 @@ npm run prisma:seed
 npm run dev
 ```
 
+## Deployment
+
+This project is Netlify-ready with the following settings already configured:
+
+- Build command: `npm run build`
+- Publish directory: `.next`
+- Next.js plugin: `@netlify/plugin-nextjs`
+
+For production, make sure these environment variables are set:
+
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `NEXT_PUBLIC_APP_URL`
+
+The app will refuse to start in production without a `JWT_SECRET`, and Prisma needs a valid `DATABASE_URL`.
+
+## Auto-start in VS Code Remote SSH
+
+If you want the database and website to start automatically when you open the folder over Remote SSH, use the included VS Code task:
+
+```bash
+npm run dev:all
+```
+
+That task is wired in `.vscode/tasks.json` with `runOn: folderOpen`, so VS Code launches it as soon as the remote workspace opens.
+
 ## Demo Accounts (seed)
 
 Password for all: `password123`

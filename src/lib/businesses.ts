@@ -1,76 +1,116 @@
-import { prisma } from "@/lib/prisma";
 import { localBusinesses, type LocalBusiness } from "./local-businesses";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { isRecentlyActive } from "@/lib/presence";
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+export const slugifyBusinessName = slugify;
+
+function initialsFromName(value: string) {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "NI";
+}
 
 export async function getBusinesses(): Promise<LocalBusiness[]> {
-  try {
-    // Try to read a Business table if it exists. Use a raw query so this file
-    // doesn't depend on a generated Prisma model being present yet.
-    const rows: any[] = await prisma.$queryRawUnsafe('SELECT * FROM "Business" ORDER BY "name"');
-    if (!rows || rows.length === 0) return localBusinesses;
+  const businessUsers = await prisma.$queryRaw<Array<{
+    businessName: string | null;
+    name: string;
+    role: string;
+    avatarUrl: string | null;
+    backgroundPhotoUrl: string | null;
+    businessTagline: string | null;
+    businessCategory: string | null;
+    businessLocation: string | null;
+    lastSeenAt: Date | null;
+  }>>(Prisma.sql`
+    SELECT
+      "businessName" AS "businessName",
+      name,
+      role,
+      "avatarUrl" AS "avatarUrl",
+      "backgroundPhotoUrl" AS "backgroundPhotoUrl",
+      "businessTagline" AS "businessTagline",
+      "businessCategory" AS "businessCategory",
+      "businessLocation" AS "businessLocation",
+      "lastSeenAt" AS "lastSeenAt"
+    FROM "User"
+    WHERE role IN ('business_pending', 'business_verified', 'marketing_pending', 'marketing_verified')
+    LIMIT 200
+  `);
 
-    return rows.map((r) => ({
-      slug: r.slug,
-      name: r.name,
-      category: r.category,
-      location: r.location,
-      tagline: r.tagline,
-      online: Boolean(r.online),
-      verified: Boolean(r.verified),
-      followers: Number(r.followers || 0),
-      initials: r.initials || (r.name || "").split(" ").map((p: string) => p[0]?.toUpperCase() ?? "").slice(0, 2).join("") || "B",
-      contactOptions: (() => {
-        try {
-          return typeof r.contactOptions === "string" ? JSON.parse(r.contactOptions) : r.contactOptions ?? [];
-        } catch {
-          return [];
-        }
-      })(),
-      posts: (() => {
-        try {
-          return typeof r.posts === "string" ? JSON.parse(r.posts) : r.posts ?? [];
-        } catch {
-          return [];
-        }
-      })(),
-    }));
-  } catch (e) {
-    return localBusinesses;
-  }
+  const derived = businessUsers
+    .map((user) => {
+      const displayName = user.businessName?.trim() || user.name.trim();
+      const slug = slugify(displayName);
+      const verified = user.role === "business_verified" || user.role === "marketing_verified";
+      const online = isRecentlyActive(user.lastSeenAt);
+
+      return {
+        slug,
+        name: displayName,
+        category: user.businessCategory ?? "Local Business",
+        location: user.businessLocation ?? "Philippines",
+        tagline: user.businessTagline ?? "This business has not completed its public profile yet.",
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+        backgroundPhotoUrl: user.backgroundPhotoUrl,
+        online,
+        verified,
+        followers: 0,
+        initials: initialsFromName(displayName),
+        contactOptions: ["Inquire", "Book a visit", "Request partnership"],
+        posts: [],
+      } as LocalBusiness;
+    })
+    .filter((business) => !localBusinesses.some((local) => local.slug === business.slug));
+
+  return [...localBusinesses, ...derived];
 }
 
 export async function getBusinessBySlug(slug: string): Promise<LocalBusiness | undefined> {
-  try {
-    const rows: any[] = await prisma.$queryRawUnsafe('SELECT * FROM "Business" WHERE "slug" = $1 LIMIT 1', slug);
-    if (!rows || rows.length === 0) return localBusinesses.find((b) => b.slug === slug);
-    const r = rows[0];
-    return {
-      slug: r.slug,
-      name: r.name,
-      category: r.category,
-      location: r.location,
-      tagline: r.tagline,
-      online: Boolean(r.online),
-      verified: Boolean(r.verified),
-      followers: Number(r.followers || 0),
-      initials: r.initials || (r.name || "").split(" ").map((p: string) => p[0]?.toUpperCase() ?? "").slice(0, 2).join("") || "B",
-      contactOptions: (() => {
-        try {
-          return typeof r.contactOptions === "string" ? JSON.parse(r.contactOptions) : r.contactOptions ?? [];
-        } catch {
-          return [];
-        }
-      })(),
-      posts: (() => {
-        try {
-          return typeof r.posts === "string" ? JSON.parse(r.posts) : r.posts ?? [];
-        } catch {
-          return [];
-        }
-      })(),
-    };
-  } catch (e) {
-    return localBusinesses.find((b) => b.slug === slug);
-  }
+  const all = await getBusinesses();
+  return all.find((business) => business.slug === slug);
+}
+
+export async function getBusinessUserBySlug(slug: string) {
+  const businessUsers = await prisma.$queryRaw<Array<{
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    backgroundPhotoUrl: string | null;
+    businessName: string | null;
+    businessTagline: string | null;
+    businessCategory: string | null;
+    businessLocation: string | null;
+    lastSeenAt: Date | null;
+    role: string;
+  }>>(Prisma.sql`
+    SELECT
+      id,
+      name,
+      "avatarUrl" AS "avatarUrl",
+      "backgroundPhotoUrl" AS "backgroundPhotoUrl",
+      "businessName" AS "businessName",
+      "businessTagline" AS "businessTagline",
+      "businessCategory" AS "businessCategory",
+      "businessLocation" AS "businessLocation",
+      "lastSeenAt" AS "lastSeenAt",
+      role
+    FROM "User"
+    WHERE role IN ('business_pending', 'business_verified', 'marketing_pending', 'marketing_verified')
+    LIMIT 200
+  `);
+
+  return businessUsers.find((user) => slugify(user.businessName?.trim() || user.name.trim()) === slug) ?? null;
 }
 
 export { LocalBusiness };

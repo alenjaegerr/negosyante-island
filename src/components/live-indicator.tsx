@@ -19,11 +19,9 @@ function formatTimestamp(value: Date) {
 }
 
 export function LiveIndicator() {
-  const [timestamp, setTimestamp] = useState("");
+  const [timestamp, setTimestamp] = useState(() => formatTimestamp(new Date()));
 
   useEffect(() => {
-    setTimestamp(formatTimestamp(new Date()));
-
     const intervalId = window.setInterval(() => {
       setTimestamp(formatTimestamp(new Date()));
     }, 1000);

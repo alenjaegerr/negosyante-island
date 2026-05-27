@@ -9,9 +9,10 @@ type BusinessAvatarProps = {
   initials: string;
   online: boolean;
   canUpload: boolean;
+  avatarUrl?: string | null;
 };
 
-export function BusinessAvatar({ slug, initials, online, canUpload }: BusinessAvatarProps) {
+export function BusinessAvatar({ slug, initials, online, canUpload, avatarUrl }: BusinessAvatarProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -32,6 +33,8 @@ export function BusinessAvatar({ slug, initials, online, canUpload }: BusinessAv
       ignore = true;
     };
   }, [canUpload, slug]);
+
+  const resolvedAvatarUrl = imageSrc ?? avatarUrl ?? null;
 
   async function onUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -58,9 +61,9 @@ export function BusinessAvatar({ slug, initials, online, canUpload }: BusinessAv
 
   return (
     <div className="relative shrink-0">
-      {imageSrc ? (
+      {resolvedAvatarUrl ? (
         <Image
-          src={imageSrc}
+          src={resolvedAvatarUrl}
           alt="Business profile"
           width={80}
           height={80}
