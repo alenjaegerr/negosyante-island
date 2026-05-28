@@ -1,0 +1,3 @@
+-- Add lastSeenAt to User
+ALTER TABLE "User"
+ADD COLUMN IF NOT EXISTS "lastSeenAt" TIMESTAMP(3);
