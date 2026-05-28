@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
   const staticRoutes = [
@@ -20,11 +22,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/select-region",
   ];
 
-  const trendingPosts = await prisma.trendingPost.findMany({
-    where: { isDraft: false },
-    select: { id: true, updatedAt: true, createdAt: true },
-    orderBy: { updatedAt: "desc" },
-  });
+  let trendingPosts: Array<{ id: string; updatedAt: Date | null; createdAt: Date }> = [];
+
+  try {
+    trendingPosts = await prisma.trendingPost.findMany({
+      where: { isDraft: false },
+      select: { id: true, updatedAt: true, createdAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+  } catch (error) {
+    console.warn("[sitemap] skipping trending posts because the database is unavailable during build", error instanceof Error ? error.message : error);
+  }
 
   return [
     ...staticRoutes.map((path) => ({
