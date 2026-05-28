@@ -96,12 +96,16 @@ export async function issueAndSendOtpEmail(options: {
 
   const { otp } = await createOtpRecord(options);
 
-  await sendTransactionalEmail({
+  const delivery = await sendTransactionalEmail({
     to: options.email,
     subject: options.subject,
     text,
     html,
   });
+
+  if (!delivery.sent && (process.env.SMTP_HOST || process.env.SENDGRID_API_KEY)) {
+    throw new Error("Email delivery failed");
+  }
 
   return otp;
 }
