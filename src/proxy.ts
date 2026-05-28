@@ -25,6 +25,11 @@ export function proxy(request: NextRequest) {
   const response = NextResponse.next();
   const { pathname } = request.nextUrl;
 
+  // Serve the favicon from /brand/favicon.png when browsers request /favicon.ico
+  if (pathname === "/favicon.ico") {
+    return NextResponse.rewrite(new URL("/brand/favicon.png", request.url));
+  }
+
   if (shouldRateLimit(pathname)) {
     const ip = getClientIp(request);
     const now = Date.now();
@@ -55,5 +60,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image).*)"],
 };
