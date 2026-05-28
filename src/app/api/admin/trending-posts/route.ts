@@ -75,7 +75,7 @@ async function storeTrendingImage(file: File): Promise<string> {
     throw new Error("invalid_image_type");
   }
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "trending");
+  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "trending");
   await mkdir(uploadDir, { recursive: true });
 
   const originalName = file.name || "upload";
@@ -95,7 +95,7 @@ async function storeTrendingGif(file: File): Promise<string> {
     throw new Error("invalid_gif_type");
   }
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "trending", "gifs");
+  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "trending", "gifs");
   await mkdir(uploadDir, { recursive: true });
 
   const originalName = file.name || "upload";
@@ -115,7 +115,7 @@ async function storeTrendingVideo(file: File): Promise<string> {
     throw new Error("invalid_video_type");
   }
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "trending", "videos");
+  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "trending", "videos");
   await mkdir(uploadDir, { recursive: true });
 
   const originalName = file.name || "upload";

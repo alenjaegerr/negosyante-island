@@ -42,7 +42,7 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const filePath = path.join(process.cwd(), "data", "uploads", verificationRequest.documentUrl);
+  const filePath = path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "uploads", verificationRequest.documentUrl);
 
   try {
     const file = await readFile(filePath);

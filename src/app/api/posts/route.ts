@@ -18,7 +18,7 @@ async function storePostMedia(file: File, kind: "image" | "gif" | "video") {
   }
 
   const folder = kind === "gif" ? ["public", "uploads", "posts", "gifs"] : kind === "video" ? ["public", "uploads", "posts", "videos"] : ["public", "uploads", "posts", "images"];
-  const uploadDir = path.join(process.cwd(), ...folder);
+  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), ...folder);
   await mkdir(uploadDir, { recursive: true });
 
   const originalName = file.name || "upload";

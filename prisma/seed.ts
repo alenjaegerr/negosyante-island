@@ -10,7 +10,7 @@ async function main() {
     throw new Error("Do not run seed in production");
   }
 
-  const uploadsDir = path.join(process.cwd(), "data", "uploads");
+  const uploadsDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "uploads");
   await mkdir(uploadsDir, { recursive: true });
   const seedDocumentName = "seed-sample-permit.pdf";
   await writeFile(path.join(uploadsDir, seedDocumentName), Buffer.from("%PDF-1.1\n%seed file\n"));

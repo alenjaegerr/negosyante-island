@@ -15,7 +15,7 @@ async function storeUserImage(file: File, subdir: string) {
     throw new Error("file_too_large");
   }
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "users", subdir);
+  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "users", subdir);
   await mkdir(uploadDir, { recursive: true });
 
   const originalName = file.name || "upload";

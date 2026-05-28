@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   const buffer = Buffer.from(bytes);
   const safeFilename = `${Date.now()}-${user.id}-${Math.random().toString(36).slice(2)}${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "data", "uploads");
+  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "uploads");
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, safeFilename), buffer);
 
