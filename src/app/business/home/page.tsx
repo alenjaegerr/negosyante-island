@@ -57,12 +57,12 @@ export default async function BusinessHomePage({ searchParams }: BusinessHomePag
   const followerTotal = (businessRecord?.followers ?? 0) + followsCount;
 
   return (
-    <section className="mx-auto w-full max-w-screen-2xl space-y-4 px-3 py-6 sm:px-4">
-      <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 shadow-sm">
+    <section className="mx-auto w-full max-w-screen-2xl space-y-4 px-3 py-5 sm:px-4 sm:py-6">
+      <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 shadow-sm sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--ni-muted)]">Business Home</p>
-            <h1 className="mt-2 text-2xl font-semibold text-[color:var(--ni-text-strong)]">Welcome, {user.businessName ?? user.name}</h1>
+            <h1 className="mt-2 text-xl font-semibold text-[color:var(--ni-text-strong)] sm:text-2xl">Welcome, {user.businessName ?? user.name}</h1>
             <p className="mt-1 text-sm text-[color:var(--ni-text)]">Manage leads, update your public profile, and publish updates.</p>
           </div>
           <RoleBadge role={user.role} />
@@ -85,14 +85,14 @@ export default async function BusinessHomePage({ searchParams }: BusinessHomePag
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 sm:p-4">
           <p className="text-xs text-[color:var(--ni-muted)]">Inbox leads</p>
           <p className="text-2xl font-semibold text-[color:var(--ni-text-strong)]">{messageCount}</p>
           <Link href="/business/inbox" className="mt-2 inline-flex text-xs font-semibold text-[color:var(--ni-brand)]">
             Open Inbox
           </Link>
         </div>
-        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 sm:p-4">
           <p className="text-xs text-[color:var(--ni-muted)]">Followers</p>
           <p className="text-2xl font-semibold text-[color:var(--ni-text-strong)]">{followerTotal.toLocaleString()}</p>
           {businessRecord ? (
@@ -105,13 +105,13 @@ export default async function BusinessHomePage({ searchParams }: BusinessHomePag
             </Link>
           )}
         </div>
-        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 sm:p-4">
           <p className="text-xs text-[color:var(--ni-muted)]">Business Dashboard</p>
           <Link href="/business/dashboard" className="mt-2 inline-flex rounded bg-[color:var(--ni-brand-cta)] px-3 py-1.5 text-xs font-semibold text-white">
             Open Dashboard
           </Link>
         </div>
-        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <div className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 sm:p-4">
           <p className="text-xs text-[color:var(--ni-muted)]">Promote on Insight</p>
           <Link href="/advertising" className="mt-2 inline-flex rounded border border-[color:var(--ni-border)] px-3 py-1.5 text-xs font-semibold text-[color:var(--ni-text-strong)]">
             Advertising Options
@@ -125,7 +125,7 @@ export default async function BusinessHomePage({ searchParams }: BusinessHomePag
 
           <div className="space-y-3">
             {posts.map((post) => (
-              <article key={post.id} className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+              <article key={post.id} className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 sm:p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-[color:var(--ni-text-strong)]">@{post.author.name}</p>
                   <span className="text-xs text-[color:var(--ni-muted)]">{new Date(post.createdAt).toLocaleString()}</span>
@@ -144,7 +144,7 @@ export default async function BusinessHomePage({ searchParams }: BusinessHomePag
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 shadow-sm">
+          <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 shadow-sm sm:p-4">
             <h2 className="text-lg font-semibold text-[color:var(--ni-text-strong)]">Public profile</h2>
             <p className="mt-1 text-sm text-[color:var(--ni-text)]">Preview how partners see your business.</p>
             <div className="mt-3 flex flex-wrap gap-2">

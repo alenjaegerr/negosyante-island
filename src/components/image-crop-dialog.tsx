@@ -75,18 +75,23 @@ export default function ImageCropDialog({
 
   useEffect(() => {
     if (!open || !file) {
-      setImageUrl(null);
-      setCrop({ x: 0, y: 0 });
-      setZoom(1);
-      setCroppedAreaPixels(null);
-      setBusy(false);
+      requestAnimationFrame(() => {
+        setImageUrl((prev) => (prev !== null ? null : prev));
+        setCrop((prev) => (prev.x !== 0 || prev.y !== 0 ? { x: 0, y: 0 } : prev));
+        setZoom((prev) => (prev !== 1 ? 1 : prev));
+        setCroppedAreaPixels((prev) => (prev !== null ? null : prev));
+        setBusy((prev) => (prev ? false : prev));
+      });
       return;
     }
 
     const url = URL.createObjectURL(file);
-    setImageUrl(url);
+    const raf = requestAnimationFrame(() => setImageUrl(url));
 
-    return () => URL.revokeObjectURL(url);
+    return () => {
+      cancelAnimationFrame(raf);
+      URL.revokeObjectURL(url);
+    };
   }, [file, open]);
 
   const canSave = useMemo(() => open && !!file && !!imageUrl && !!croppedAreaPixels && !busy, [busy, croppedAreaPixels, file, imageUrl, open]);

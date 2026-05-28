@@ -11,6 +11,8 @@ import PostComments from "@/components/post-comments";
 import RoleBadge from "@/components/role-badge";
 import { TrendingMediaBlock } from "@/components/trending-media-block";
 import { UserAvatar } from "@/components/user-avatar";
+import { AdPlacementCard } from "@/components/ad-placement-card";
+import { getAdPlacementConfig, getSiteSettingMap } from "@/lib/site-settings";
 
 export default async function FeedPage() {
   const user = await getCurrentUser();
@@ -22,7 +24,7 @@ export default async function FeedPage() {
     redirect("/business/home");
   }
 
-  const [posts, businesses, threads] = await Promise.all([
+  const [posts, businesses, threads, siteSettings] = await Promise.all([
     prisma.post.findMany({
       orderBy: { createdAt: "desc" },
       include: { author: true },
@@ -37,8 +39,11 @@ export default async function FeedPage() {
       orderBy: { createdAt: "desc" },
       take: 6,
     }),
+    getSiteSettingMap(),
   ]);
   const visiblePosts = posts.filter((post) => post.author.role !== "admin");
+  const adPlacementConfig = getAdPlacementConfig(siteSettings);
+  const showAds = user.role === "user";
 
   return (
     <section className="mx-auto w-full max-w-screen-2xl space-y-4 px-3 py-6 sm:px-4">
@@ -70,6 +75,7 @@ export default async function FeedPage() {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <div className="space-y-4">
+          <AdPlacementCard config={adPlacementConfig} show={showAds} />
           <CreatePostForm />
 
           <div className="space-y-3">

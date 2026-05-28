@@ -8,6 +8,7 @@ import type { LocalBusiness } from "@/lib/businesses";
 
 type BusinessDiscoveryPanelProps = {
   businesses: LocalBusiness[];
+  viewerRole?: string;
   compact?: boolean;
 };
 export default function BusinessDiscoveryPanel({ businesses, compact = false }: BusinessDiscoveryPanelProps) {
@@ -71,7 +72,7 @@ export default function BusinessDiscoveryPanel({ businesses, compact = false }: 
         {shown.map((business) => (
           <div
             key={business.slug}
-            className={`overflow-hidden rounded-xl border border-[color:var(--ni-border)] p-4 ${business.backgroundPhotoUrl ? "business-photo-card" : "bg-[color:var(--ni-surface-2)]"}`}
+            className={`relative overflow-hidden rounded-xl border border-[color:var(--ni-border)] p-4 ${business.backgroundPhotoUrl ? "business-photo-card" : "bg-[color:var(--ni-surface-2)]"}`}
             style={business.backgroundPhotoUrl ? { backgroundImage: `url(${business.backgroundPhotoUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
           >
               <div className="relative z-10 flex items-start justify-between gap-3">

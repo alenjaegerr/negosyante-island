@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Roboto_Mono, Roboto_Slab, Inter, Source_Serif_4 } from "next/font/google";
 import { Reddit_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/nav-bar";
+import CookieConsentBanner from "@/components/cookie-consent-banner";
+import AnalyticsConsentScripts from "@/components/analytics-consent";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
 const metadataBase = new URL(siteUrl);
@@ -68,18 +69,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="en" className={`${robotoMono.variable} ${redditMono.variable} ${robotoSlab.variable} ${inter.variable} ${articleSerif.variable} h-full antialiased`}>
       <body className="min-h-full bg-[var(--ni-bg)] text-[var(--ni-text-strong)] transition-colors duration-200">
         <NavBar />
-        <main className="page-enter mx-auto w-full max-w-screen-2xl px-2 py-3 pb-20 sm:p-4 md:pb-4">{children}</main>
-        {gaId ? (
-          <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
-            <Script id="ga-setup" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || [];
-function gtag(){window.dataLayer.push(arguments);} 
-gtag('js', new Date());
-gtag('config', '${gaId}');`}
-            </Script>
-          </>
-        ) : null}
+        <main className="page-enter mx-auto w-full max-w-screen-2xl px-3 py-4 pb-24 sm:px-4 sm:py-4 md:pb-4">{children}</main>
+        <CookieConsentBanner />
+        <AnalyticsConsentScripts gaId={gaId} />
         <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
       </body>
     </html>

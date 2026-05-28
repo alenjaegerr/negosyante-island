@@ -48,13 +48,22 @@ export function BusinessAccountView({ business, currentUser }: Props) {
         ) : null}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.18),rgba(15,23,42,0.42)_38%,rgba(15,23,42,0.84))]" />
 
-        <div className={business.backgroundPhotoUrl ? "relative z-10 flex min-h-[280px] flex-col justify-end p-5 md:min-h-[340px]" : "p-5"}>
-        <div className="flex items-start justify-between gap-4">
+        <div className={business.backgroundPhotoUrl ? "relative z-10 p-5" : "p-5"}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <BusinessAvatar slug={business.slug} initials={business.initials} online={business.online} canUpload={Boolean(isOwner && !viewAsUser)} avatarUrl={business.avatarUrl ?? null} />
+            <div className="relative shrink-0">
+              <img
+                src={business.avatarUrl ?? "/uploads/default-avatar.png"}
+                alt={`${business.name} profile`}
+                className="h-16 w-16 rounded-full border-4 border-cyan-700 object-cover"
+              />
+              {isOwner && !viewAsUser ? (
+                <label className="absolute -bottom-2 left-0 block cursor-pointer rounded bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-700">Upload<input className="hidden" accept="image/*" type="file" /></label>
+              ) : null}
+            </div>
 
             <div>
-              <h1 className="font-flex-bold text-2xl text-white">{business.name}</h1>
+              <h1 className="font-flex-bold text-xl text-white">{business.name}</h1>
               <p className="mt-1 text-sm text-white/85">{business.category} • {business.location}</p>
               <p className="mt-1 text-sm font-semibold text-white">{business.verified ? "Verified Business ✅" : "Unverified Business"}</p>
               <div className="mt-1">
@@ -64,14 +73,14 @@ export function BusinessAccountView({ business, currentUser }: Props) {
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex shrink-0 items-start sm:items-center">
             {!viewAsUser ? (
-              <div className="flex gap-2">
+              <div className="mt-2 sm:mt-0 flex gap-2">
                 <button onClick={() => setViewAsUser(true)} className="rounded border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold">View as user</button>
                 <Link href={`/business/${business.slug}/feed`} className="inline-flex rounded bg-cyan-700 px-4 py-2 text-sm font-semibold text-white">Open Feed</Link>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="mt-2 sm:mt-0 flex gap-2">
                 <button onClick={() => setViewAsUser(false)} className="rounded border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold">Exit view</button>
                 <Link href="/business/account" className="inline-flex rounded bg-slate-100 px-3 py-1.5 text-sm font-semibold">Back to Account</Link>
               </div>

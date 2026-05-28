@@ -64,7 +64,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     : buildMessagingShellHref({ targetUserId: user.id });
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-4 px-3 py-6 sm:px-4">
+    <section className="mx-auto w-full max-w-5xl space-y-4 px-3 py-5 sm:px-4 sm:py-6">
       <div
         className="relative overflow-hidden rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] shadow-sm min-h-[320px] md:min-h-[360px]"
       >
@@ -76,12 +76,12 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
           />
         ) : null}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.18),rgba(2,6,23,0.38)_40%,rgba(2,6,23,0.78))]" />
-        <div className="relative z-10 flex min-h-[320px] flex-col justify-end p-5 md:min-h-[360px]">
-          <div className="flex flex-wrap items-center gap-4">
-            <UserAvatar name={displayName} avatarUrl={user.avatarUrl} size={88} />
+        <div className="relative z-10 flex min-h-[320px] flex-col justify-end p-4 sm:p-5 md:min-h-[360px]">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            <UserAvatar name={displayName} avatarUrl={user.avatarUrl} size={72} />
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/75">Public Profile</p>
-              <h1 className="mt-2 text-3xl font-semibold text-white">{displayName}</h1>
+              <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">{displayName}</h1>
               <p className="mt-2 text-sm text-white/85">{description}</p>
               <p className="mt-1 text-xs text-white/70">Joined {new Date(user.createdAt).toLocaleDateString()}</p>
             </div>
@@ -113,7 +113,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
             {mediaAttachments.length ? (
               mediaAttachments.map((attachment) => (
                 <article key={attachment.id} className="overflow-hidden rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)]">
-                  <img src={attachment.mediaUrl ?? ""} alt={attachment.body} className="h-52 w-full object-cover" />
+                  <img src={attachment.mediaUrl ?? ""} alt={attachment.body} className="h-44 w-full object-cover sm:h-52" />
                   <div className="p-3 text-xs text-[color:var(--ni-muted)]">{new Date(attachment.createdAt).toLocaleString()}</div>
                 </article>
               ))

@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 import { Role } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getInsightBarConfig, getSiteSettings } from "@/lib/site-settings";
+import { getAdPlacementConfig, getInsightBarConfig, getSiteSettings } from "@/lib/site-settings";
 import { defaultTrendingInsightSignals, defaultTrendingInsightStats, formatInsightDate, normalizeInsightSignals, normalizeInsightStats } from "@/lib/trending-insight";
 
 export default async function AdminPage({
@@ -109,6 +109,7 @@ export default async function AdminPage({
   const editingInsightSignals = normalizeInsightSignals(editingPost?.insightSignals, defaultTrendingInsightSignals);
   const editingInsightUpdatedLabel = formatInsightDate(editingPost?.insightUpdatedAt ?? null);
   const insightSettings = new Map(siteSettings.map((setting) => [setting.key, setting.value]));
+  const adPlacementConfig = getAdPlacementConfig(insightSettings);
   const insightBarEyebrow = insightSettings.get("insightBarEyebrow") ?? "Negosyante Insight";
   const insightBarTitle = insightSettings.get("insightBarTitle") ?? "Trend statistics";
   const insightBarCtaLabel = insightSettings.get("insightBarCtaLabel") ?? "Create business account";
@@ -269,6 +270,24 @@ export default async function AdminPage({
           <input name="billingPaymentQrUrl" defaultValue={billingPaymentQrUrl} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="QR code image URL (optional)" />
           <input name="billingPaymentNote" defaultValue={billingPaymentNote} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Billing note" />
           <button type="submit" className="rounded bg-[var(--ni-brand)] px-3 py-2 text-sm font-semibold text-[var(--ni-surface-1)] md:col-span-2">Save Billing Details</button>
+        </form>
+      </div>
+
+      <div className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-[var(--ni-text-strong)]">Custom Ad Placement</h2>
+          <span className="text-xs text-[var(--ni-text)]">Shown to guests and normal users only</span>
+        </div>
+
+        <form action="/api/admin/site-settings" method="post" className="mt-3 grid gap-2 md:grid-cols-2">
+          <input name="adPlacementEyebrow" defaultValue={adPlacementConfig.eyebrow} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Eyebrow" />
+          <input name="adPlacementSponsorName" defaultValue={adPlacementConfig.sponsorName} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Brand name" />
+          <input name="adPlacementTitle" defaultValue={adPlacementConfig.title} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Placement title" />
+          <input name="adPlacementCtaLabel" defaultValue={adPlacementConfig.ctaLabel} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="CTA label" />
+          <input name="adPlacementCtaHref" defaultValue={adPlacementConfig.ctaHref} className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="CTA link" />
+          <textarea name="adPlacementBody" defaultValue={adPlacementConfig.body} rows={3} className="md:col-span-2 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Ad body copy" />
+          <textarea name="adPlacementFootnote" defaultValue={adPlacementConfig.footnote} rows={2} className="md:col-span-2 rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)]" placeholder="Footnote" />
+          <button type="submit" className="rounded bg-[var(--ni-brand)] px-3 py-2 text-sm font-semibold text-[var(--ni-surface-1)] md:col-span-2">Save Ad Placement</button>
         </form>
       </div>
 

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { buildBusinessMessageHref, buildMessagingShellHref } from "@/lib/messaging";
 import { UserAvatar } from "@/components/user-avatar";
+import { OnlineStatusBadge } from "@/components/online-status-badge";
+import RoleBadge from "@/components/role-badge";
 
 type DiscoveryProfile = {
   id: string;
@@ -18,6 +20,7 @@ type DiscoveryProfile = {
   businessSlug?: string | null;
   isFollowed?: boolean;
   isContact?: boolean;
+  online?: boolean;
 };
 
 type Props = {
@@ -132,29 +135,32 @@ export default function B2bmDiscoveryPanel({ viewerRole, profiles }: Props) {
           return (
             <article
               key={profile.id}
-              className={`overflow-hidden rounded-xl border border-[color:var(--ni-border)] p-4 ${profile.backgroundPhotoUrl ? "b2bm-photo-card" : "bg-[color:var(--ni-surface-2)]"}`}
+              className={`relative overflow-hidden rounded-xl border border-[color:var(--ni-border)] p-4 ${profile.backgroundPhotoUrl ? "b2bm-photo-card" : "bg-[color:var(--ni-surface-2)]"}`}
               style={profile.backgroundPhotoUrl ? { backgroundImage: `url(${profile.backgroundPhotoUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
             >
+              {profile.backgroundPhotoUrl ? <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.18),rgba(15,23,42,0.78))]" aria-hidden /> : null}
               <div className="relative z-10 flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
                   <UserAvatar name={displayName} avatarUrl={profile.avatarUrl} size={52} />
                   <div>
-                    <p className={profile.backgroundPhotoUrl ? "text-sm font-semibold text-white" : "text-sm font-semibold text-[color:var(--ni-text-strong)]"}>{displayName}</p>
-                    <p className={profile.backgroundPhotoUrl ? "mt-1 text-xs text-white/85" : "mt-1 text-xs text-[color:var(--ni-text)]"}>{roleLabel(profile.role)}</p>
+                    <p className={profile.backgroundPhotoUrl ? "text-sm font-semibold leading-none text-white" : "text-sm font-semibold leading-none text-[color:var(--ni-text-strong)]"}>{displayName}</p>
+                    <div className="mt-0 flex items-center justify-between gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        <RoleBadge role={profile.role} compact />
+                      </div>
+                      <OnlineStatusBadge online={Boolean(profile.online)} compact />
+                    </div>
                     <p className={profile.backgroundPhotoUrl ? "mt-1 text-xs text-white/70" : "mt-1 text-xs text-[color:var(--ni-muted)]"}>{profile.businessCategory ?? "Community member"} • {profile.businessLocation ?? "Philippines"}</p>
                     {profile.businessTagline ? <p className={profile.backgroundPhotoUrl ? "mt-2 text-xs text-white/80" : "mt-2 text-xs text-[color:var(--ni-muted)]"}>{profile.businessTagline}</p> : null}
                   </div>
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${profile.backgroundPhotoUrl ? "border border-white/20 bg-white/10 text-white" : profile.isContact ? "bg-sky-100 text-sky-700" : profile.isFollowed ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700"}`}>
-                  {profile.isContact ? "Contact" : profile.isFollowed ? "Followed" : roleLabel(profile.role)}
-                </span>
               </div>
 
               <div className="relative z-10 mt-3 flex flex-wrap gap-2">
                 <Link href={profileHref} className="rounded bg-[color:var(--ni-brand-cta)] px-3 py-1.5 text-xs font-semibold text-white">
                   View profile
                 </Link>
-                <Link href={messageHref} className="rounded border border-[color:var(--ni-border)] px-3 py-1.5 text-xs font-semibold text-[color:var(--ni-text-strong)]">
+                <Link href={messageHref} className={`rounded px-3 py-1.5 text-xs font-semibold ${profile.backgroundPhotoUrl ? "border border-white/25 bg-white/10 text-white" : "border border-[color:var(--ni-border)] text-[color:var(--ni-text-strong)]"}`}>
                   Send message
                 </Link>
               </div>

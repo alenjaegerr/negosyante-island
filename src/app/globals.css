@@ -86,7 +86,7 @@ body[data-shell-mode="message"] {
 
 body[data-shell-mode="message"] main.page-enter {
   padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
 }
 
 @media (min-width: 768px) {
@@ -132,6 +132,18 @@ body[data-shell-mode="message"] main.page-enter {
 
 html[data-theme="dark"] .business-photo-card::before {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.18), rgba(2, 6, 23, 0.84));
+}
+
+.b2bm-photo-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0.78));
+  pointer-events: none;
+}
+
+html[data-theme="dark"] .b2bm-photo-card::before {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.24), rgba(2, 6, 23, 0.88));
 }
 
 @keyframes ni-live-pulse {

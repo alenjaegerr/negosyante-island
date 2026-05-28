@@ -37,6 +37,13 @@ export async function POST(request: Request) {
     ["billingPaymentDetails", String(formData.get("billingPaymentDetails") ?? "").trim()],
     ["billingPaymentQrUrl", String(formData.get("billingPaymentQrUrl") ?? "").trim()],
     ["billingPaymentNote", String(formData.get("billingPaymentNote") ?? "").trim()],
+    ["adPlacementEyebrow", String(formData.get("adPlacementEyebrow") ?? "").trim()],
+    ["adPlacementTitle", String(formData.get("adPlacementTitle") ?? "").trim()],
+    ["adPlacementBody", String(formData.get("adPlacementBody") ?? "").trim()],
+    ["adPlacementSponsorName", String(formData.get("adPlacementSponsorName") ?? "").trim()],
+    ["adPlacementCtaLabel", String(formData.get("adPlacementCtaLabel") ?? "").trim()],
+    ["adPlacementCtaHref", String(formData.get("adPlacementCtaHref") ?? "").trim()],
+    ["adPlacementFootnote", String(formData.get("adPlacementFootnote") ?? "").trim()],
   ] as const;
 
   for (const [key, value] of entries) {

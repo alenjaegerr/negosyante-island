@@ -25,8 +25,9 @@ export default function CreatePublisherPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed");
       router.push(`/admin?trendingSuccess=publisher_created`);
-    } catch (err: any) {
-      setError(err.message || String(err));
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError(String(err));
     } finally {
       setLoading(false);
     }

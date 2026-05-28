@@ -1,12 +1,13 @@
-const { PrismaClient } = require('@prisma/client');
-(async function(){
+import { PrismaClient } from '@prisma/client';
+
+(async function () {
   const p = new PrismaClient();
-  try{
+  try {
     const r = await p.trendingPost.findFirst();
     console.log('RESULT', r ? 'found' : 'none');
-  }catch(e){
+  } catch (e) {
     console.error('ERROR', e);
-  }finally{
+  } finally {
     await p.$disconnect();
   }
 })();

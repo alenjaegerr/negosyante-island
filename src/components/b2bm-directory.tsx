@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserAvatar } from "@/components/user-avatar";
 import { buildBusinessMessageHref, buildMessagingShellHref } from "@/lib/messaging";
+import { OnlineStatusBadge } from "@/components/online-status-badge";
+import RoleBadge from "@/components/role-badge";
 
 type DirectoryProfile = {
   id: string;
@@ -19,6 +21,7 @@ type DirectoryProfile = {
   businessSlug?: string | null;
   isFollowed?: boolean;
   isContact?: boolean;
+  online?: boolean;
 };
 
 type DirectoryContact = {
@@ -32,6 +35,7 @@ type DirectoryContact = {
   businessLocation?: string | null;
   businessTagline?: string | null;
   role?: string | null;
+  online?: boolean;
 };
 
 type Props = {
@@ -185,11 +189,16 @@ export default function B2bmDirectory({ viewerRole, viewerName, profiles, contac
             <div className="mt-3 space-y-2">
               {contacts.length ? (
                 contacts.map((contact) => (
-                  <Link key={contact.id} href={contact.profileHref ?? "/b2bm"} className="flex items-center gap-3 rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-2">
+                  <Link key={contact.id} href={contact.profileHref ?? "/b2bm"} className="flex items-start gap-3 rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-2">
                     <UserAvatar name={contact.displayName} avatarUrl={contact.avatarUrl} size={36} />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-[color:var(--ni-text-strong)]">{contact.displayName}</p>
-                      <p className="truncate text-xs text-[color:var(--ni-muted)]">{roleLabel(contact.role ?? contact.profileType)}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="truncate text-sm font-semibold text-[color:var(--ni-text-strong)]">{contact.displayName}</p>
+                        <OnlineStatusBadge online={Boolean(contact.online)} compact />
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        <RoleBadge role={contact.role ?? contact.profileType} />
+                      </div>
                     </div>
                   </Link>
                 ))
@@ -217,7 +226,7 @@ export default function B2bmDirectory({ viewerRole, viewerName, profiles, contac
             {relevantProfiles.map((profile) => (
               <article
                 key={profile.id}
-                className={`overflow-hidden rounded-2xl border p-4 transition ${selectedId === profile.id ? "border-[color:var(--ni-brand-cta)] bg-[color:var(--ni-accent-soft)]/40" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)]"} ${profile.backgroundPhotoUrl ? "b2bm-photo-card" : ""}`}
+                className={`relative overflow-hidden rounded-2xl border p-4 transition ${selectedId === profile.id ? "border-[color:var(--ni-brand-cta)] bg-[color:var(--ni-accent-soft)]/40" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)]"} ${profile.backgroundPhotoUrl ? "b2bm-photo-card" : ""}`}
                 style={profile.backgroundPhotoUrl ? { backgroundImage: `url(${profile.backgroundPhotoUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
                 role="button"
                 tabIndex={0}
@@ -229,13 +238,18 @@ export default function B2bmDirectory({ viewerRole, viewerName, profiles, contac
                   }
                 }}
               >
+                {profile.backgroundPhotoUrl ? <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.18),rgba(15,23,42,0.78))]" aria-hidden /> : null}
                 <div className="relative z-10 flex items-start gap-3">
                   <UserAvatar name={profile.businessName?.trim() || profile.name} avatarUrl={profile.avatarUrl} size={52} />
                   <div className="min-w-0 flex-1">
-                    <p className={profile.backgroundPhotoUrl ? "truncate text-sm font-semibold text-white" : "truncate text-sm font-semibold text-[color:var(--ni-text-strong)]"}>{profile.businessName?.trim() || profile.name}</p>
-                    <p className={profile.backgroundPhotoUrl ? "text-xs text-white/85" : "text-xs text-[color:var(--ni-muted)]"}>{roleLabel(profile.role)}</p>
-                    <p className={profile.backgroundPhotoUrl ? "mt-1 text-xs text-white/80" : "mt-1 text-xs text-[color:var(--ni-text)]"}>{profile.businessCategory ?? "Personal account"}</p>
-                    <p className={profile.backgroundPhotoUrl ? "text-xs text-white/80" : "text-xs text-[color:var(--ni-text)]"}>{profile.businessLocation ?? "Philippines"}</p>
+                    <p className={profile.backgroundPhotoUrl ? "truncate text-sm font-semibold leading-none text-white" : "truncate text-sm font-semibold leading-none text-[color:var(--ni-text-strong)]"}>{profile.businessName?.trim() || profile.name}</p>
+                    <div className="mt-0 flex items-center justify-between gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        <RoleBadge role={profile.role} compact />
+                      </div>
+                      <OnlineStatusBadge online={Boolean(profile.online)} compact />
+                    </div>
+                    <p className={profile.backgroundPhotoUrl ? "mt-1 text-xs text-white/80" : "mt-1 text-xs text-[color:var(--ni-text)]"}>{profile.businessCategory ?? "Personal account"} • {profile.businessLocation ?? "Philippines"}</p>
                     {profile.businessTagline ? <p className={profile.backgroundPhotoUrl ? "mt-1 line-clamp-2 text-xs text-white/80" : "mt-1 line-clamp-2 text-xs text-[color:var(--ni-text)]"}>{profile.businessTagline}</p> : null}
                   </div>
                 </div>
@@ -248,7 +262,7 @@ export default function B2bmDirectory({ viewerRole, viewerName, profiles, contac
                     type="button"
                     onClick={() => sendMessage(profile)}
                     disabled={sendingId === profile.id}
-                    className="rounded-full bg-[color:var(--ni-brand-cta)] px-3 py-1.5 text-white"
+                    className={profile.backgroundPhotoUrl ? "rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-white" : "rounded-full bg-[color:var(--ni-brand-cta)] px-3 py-1.5 text-white"}
                   >
                     {sendingId === profile.id ? "Opening..." : "Send Message"}
                   </button>
@@ -256,7 +270,7 @@ export default function B2bmDirectory({ viewerRole, viewerName, profiles, contac
 
                 <div className="relative z-10 mt-3 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--ni-muted)]">
                   {profile.isContact ? <span className={profile.backgroundPhotoUrl ? "rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-white" : "rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-0.5 text-[color:var(--ni-muted)]"}>Contact</span> : null}
-                  {profile.isFollowed ? <span>Followed</span> : null}
+                  {profile.isFollowed ? <span className={profile.backgroundPhotoUrl ? "rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-white" : "rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-0.5 text-[color:var(--ni-muted)]"}>Followed</span> : null}
                 </div>
               </article>
             ))}

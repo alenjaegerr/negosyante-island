@@ -9,14 +9,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  let body: any;
+  let body: Record<string, unknown> = {};
   try {
-    body = await request.json();
+    body = (await request.json()) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { editId, insightTitle, insightBody, insightSignals, insightStats } = body ?? {};
+  const editId = typeof body.editId === "string" ? body.editId : undefined;
+  const insightTitle = typeof body.insightTitle === "string" ? body.insightTitle : undefined;
+  const insightBody = typeof body.insightBody === "string" ? body.insightBody : undefined;
+  const insightSignals = Array.isArray(body.insightSignals) ? body.insightSignals : [];
+  const insightStats = Array.isArray(body.insightStats) ? body.insightStats : [];
   if (!editId) return NextResponse.json({ error: "Missing editId" }, { status: 400 });
 
   try {

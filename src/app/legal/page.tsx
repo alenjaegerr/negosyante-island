@@ -25,6 +25,10 @@ const sections = [
     title: "Appeals and Contact",
     body: "For verification disputes, moderation appeals, billing questions, or privacy concerns, contact the Negosyante Island team through the contact page.",
   },
+  {
+    title: "Cookies and Analytics",
+    body: "Essential cookies keep the site working. Optional analytics only load after a user accepts analytics in the cookie prompt. Advertising placements remain contextual and do not require cross-site tracking.",
+  },
 ];
 
 function slugifySection(title: string) {

@@ -89,15 +89,15 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
 
     if (!hasProAccess && post.isInsightReady) {
       return (
-        <section className="mx-auto w-full max-w-screen-2xl px-3 py-6 sm:px-4">
+        <section className="mx-auto w-full max-w-screen-2xl overflow-x-clip px-3 py-6 sm:px-4">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
-            <main className="space-y-4">
-              <div className="rounded-2xl bg-transparent p-5">
+            <main className="min-w-0 space-y-4">
+              <div className="rounded-2xl bg-transparent p-4 sm:p-5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">Negosyante Island</p>
                 <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--ni-muted)]">
                   {categoryMeta.label} · {new Date(post.createdAt).toLocaleDateString()} · {new Date(post.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                 </p>
-                <h1 className="mt-2 text-[48px] leading-tight font-semibold text-[color:var(--ni-text-strong)]">{post.snippet?.trim() || post.title}</h1>
+                <h1 className="mt-2 text-3xl font-semibold leading-tight text-[color:var(--ni-text-strong)] sm:text-[48px]">{post.snippet?.trim() || post.title}</h1>
               </div>
 
               <TrendingMediaBlock
@@ -109,8 +109,8 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
                 mediaClassName="h-72"
               />
 
-              <article className="rounded-2xl bg-transparent p-5 text-[24px] font-normal leading-relaxed text-[color:var(--ni-text-strong)] font-article-serif">
-                <div className="prose max-w-none">
+              <article className="break-words rounded-2xl bg-transparent p-4 text-lg font-normal leading-relaxed text-[color:var(--ni-text-strong)] font-article-serif sm:p-5 sm:text-[24px]">
+                <div className="prose prose-p:break-words max-w-none">
                   {((post.content || "").split(/\n\n+/)).flatMap((para, idx, arr) => {
                     const trimmed = para.trim();
                     const nodes: ReactNode[] = [];
@@ -135,7 +135,7 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
               </article>
 
               {post.isInsightReady ? (
-                <div id="negosyante-insight" className="rounded-2xl border border-dashed border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-5 py-4 text-sm text-[color:var(--ni-text)] shadow-sm">
+                <div id="negosyante-insight" className="min-w-0 rounded-2xl border border-dashed border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-4 py-4 text-sm text-[color:var(--ni-text)] shadow-sm sm:px-5">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">Negosyante Insight</p>
                   <h2 className="mt-2 font-medium text-[color:var(--ni-text-strong)]">{post.insightTitle?.trim() || post.title}</h2>
                   <p className="mt-3 text-sm text-[color:var(--ni-text)]">
@@ -152,8 +152,8 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
               ) : null}
 
               {post.isInsightReady ? (
-                <div className="relative overflow-hidden rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 shadow-sm">
-                  <div className={hasProAccess ? "" : "pointer-events-none blur-sm"}>
+                <div className="relative min-w-0 overflow-hidden rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 shadow-sm sm:p-4">
+                  <div className={hasProAccess ? "min-w-0" : "pointer-events-none min-w-0 blur-sm"}>
                     <InsightStatsPanel
                       title="Insight scorecard"
                       stats={insightStats}
@@ -162,13 +162,13 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
                       meta={insightUpdatedLabel ? `Last updated ${insightUpdatedLabel}` : undefined}
                       cta={hasProAccess ? insightCta : null}
                     />
-                    <article className="mt-4 rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-4 text-sm leading-relaxed text-[color:var(--ni-text)] shadow-sm">
+                    <article className="mt-4 break-words rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-4 text-sm leading-relaxed text-[color:var(--ni-text)] shadow-sm">
                       <p className="whitespace-pre-wrap">{post.insightBody?.trim() || post.content}</p>
                     </article>
                   </div>
                   {hasProAccess ? null : (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/60 p-4 text-center backdrop-blur-[2px]">
-                      <div className="max-w-xs rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/90 p-4 shadow-lg">
+                    <div className="absolute inset-0 flex items-center justify-center rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/60 p-3 text-center backdrop-blur-[2px] sm:p-4">
+                      <div className="max-w-xs rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/90 p-3 shadow-lg sm:p-4">
                         <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">Locked Insight</p>
                         <p className="mt-2 text-sm text-[color:var(--ni-text)]">Negosyante Insight is available to verified business and marketing expert accounts only.</p>
                       </div>
@@ -178,8 +178,8 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
               ) : null}
             </main>
 
-            <aside className="space-y-4">
-              <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 shadow-sm">
+            <aside className="min-w-0 space-y-4">
+              <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 shadow-sm sm:p-4">
                 <h3 className="text-sm font-semibold text-[color:var(--ni-text-strong)]">Activation paths</h3>
                 <div className="mt-3 space-y-2 text-sm text-[color:var(--ni-text)]">
                   <div className="rounded-lg border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-3 py-2">
@@ -202,15 +202,15 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
       );
     }
     return (
-      <section className="mx-auto w-full max-w-screen-2xl px-3 py-6 sm:px-4">
+      <section className="mx-auto w-full max-w-screen-2xl overflow-x-clip px-3 py-6 sm:px-4">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
-          <main className="space-y-4">
-            <div className="rounded-2xl bg-transparent p-5">
+          <main className="min-w-0 space-y-4">
+            <div className="rounded-2xl bg-transparent p-4 sm:p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">Negosyante Island</p>
               <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--ni-muted)]">
                 {categoryMeta.label} · {new Date(post.createdAt).toLocaleDateString()} · {new Date(post.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
               </p>
-              <h1 className="mt-2 text-[48px] leading-tight font-semibold text-[color:var(--ni-text-strong)]">{post.snippet?.trim() || post.title}</h1>
+              <h1 className="mt-2 text-3xl font-semibold leading-tight text-[color:var(--ni-text-strong)] sm:text-[48px]">{post.snippet?.trim() || post.title}</h1>
               <div className="mt-4 flex flex-wrap gap-2">
                 {post.isInsightReady ? (
                   <Link
@@ -262,8 +262,8 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
               </div>
             ) : null}
 
-            <article className="rounded-2xl bg-transparent p-5 text-[24px] font-normal leading-relaxed text-[color:var(--ni-text-strong)] font-article-serif">
-              <div className="prose max-w-none">
+            <article className="break-words rounded-2xl bg-transparent p-4 text-lg font-normal leading-relaxed text-[color:var(--ni-text-strong)] font-article-serif sm:p-5 sm:text-[24px]">
+              <div className="prose prose-p:break-words max-w-none">
                 {((post.content || "").split(/\n\n+/)).flatMap((para, idx) => {
                   const trimmed = para.trim();
                   const nodes: ReactNode[] = [];
@@ -305,8 +305,8 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
             ) : null}
           </main>
 
-          <aside className="space-y-4">
-            <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 shadow-sm">
+          <aside className="min-w-0 space-y-4">
+            <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 shadow-sm sm:p-4">
               <h3 className="text-sm font-semibold text-[color:var(--ni-text-strong)]">Activation paths</h3>
               <div className="mt-3 space-y-2 text-sm text-[color:var(--ni-text)]">
                 <div className="rounded-lg border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-3 py-2">
@@ -345,10 +345,10 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
     user?.role === Role.admin;
 
   return (
-    <section className="mx-auto w-full max-w-screen-2xl px-3 py-6 sm:px-4">
+    <section className="mx-auto w-full max-w-screen-2xl overflow-x-clip px-3 py-6 sm:px-4">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)]">
-        <main className="space-y-4">
-          <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 shadow-sm">
+        <main className="min-w-0 space-y-4">
+          <div className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 shadow-sm sm:p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">Negosyante Insight</p>
             <h1 className="mt-2 text-2xl font-semibold text-[color:var(--ni-text-strong)]">{title}</h1>
             <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-text)]">
@@ -361,7 +361,7 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
             Video link saved, but this platform could not be embedded. Open it from the source link.
           </div>
 
-          <article className="rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-5 text-sm font-normal leading-relaxed text-[color:var(--ni-text)] shadow-sm">
+          <article className="break-words rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4 text-sm font-normal leading-relaxed text-[color:var(--ni-text)] shadow-sm sm:p-5">
             <p className="whitespace-pre-wrap">Brands are hopping into the trend related to {title.toLowerCase()}.</p>
           </article>
 
@@ -370,14 +370,14 @@ export default async function TrendingPage(props: { params: Promise<{ id: string
           </Link>
         </main>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <div className="relative overflow-hidden rounded-2xl">
-            <div className={hasProAccess ? "" : "pointer-events-none blur-sm"}>
+            <div className={hasProAccess ? "min-w-0" : "pointer-events-none min-w-0 blur-sm"}>
               <InsightStatsPanel title="Insight preview" stats={insightStats} signals={insightSignals} footnote="Preview data only" />
             </div>
             {!hasProAccess ? (
-              <div className="absolute inset-0 flex items-center justify-center rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/60 p-4 text-center backdrop-blur-[2px]">
-                <div className="max-w-xs rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/90 p-4 shadow-lg">
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/60 p-3 text-center backdrop-blur-[2px] sm:p-4">
+                <div className="max-w-xs rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]/90 p-3 shadow-lg sm:p-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ni-muted)]">Locked Insight</p>
                   <p className="mt-2 text-sm text-[color:var(--ni-text)]">Create a verified business or marketing expert account to unlock this insight preview.</p>
                   <Link href={user ? "/membership-program" : "/signup?accountType=business_pending"} className="mt-3 inline-flex rounded-full bg-[color:var(--ni-brand-cta)] px-4 py-2 text-sm font-semibold text-white">

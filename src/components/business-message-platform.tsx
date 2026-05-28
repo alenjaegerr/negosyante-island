@@ -103,6 +103,7 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<"chat" | "profiles">(() => (targetParticipant || initialConversationId ? "chat" : "profiles"));
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [selectedAttachment, setSelectedAttachment] = useState<string | null>(null);
@@ -124,11 +125,6 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
 
   const threadParticipant = activeParticipant ?? targetParticipant;
   const targetProfileLabel = threadParticipant ? threadParticipant.businessName ?? threadParticipant.name : businessContext.name;
-  const targetProfileMeta = threadParticipant
-    ? [threadParticipant.businessCategory ?? threadParticipant.role, threadParticipant.businessLocation].filter(Boolean).join(" • ")
-    : [businessContext.category, businessContext.location].filter(Boolean).join(" • ");
-  const viewerProfileLabel = viewer.businessName ?? viewer.name;
-  const viewerProfileMeta = viewer.businessName ? viewer.role : viewer.role;
   const targetProfileHref = threadParticipant
     ? threadParticipant.businessName
       ? `/business/message/${threadParticipant.businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`
@@ -193,7 +189,7 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [initialConversationId, targetParticipant]);
 
   useEffect(() => {
     if (!activeConversationId) return;
@@ -213,6 +209,12 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
       ignore = true;
     };
   }, [activeConversationId]);
+
+  useEffect(() => {
+    if (activeConversationId && mobileView !== "chat") {
+      requestAnimationFrame(() => setMobileView("chat"));
+    }
+  }, [activeConversationId, mobileView]);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -273,52 +275,46 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
   }
 
   return (
-    <section className="mx-auto flex h-[calc(100dvh-4.5rem)] w-full max-w-7xl flex-col gap-3 overflow-hidden px-2 py-2 sm:px-4 md:h-[calc(100dvh-5rem)] md:py-3">
-      <div className="shrink-0 rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-3 py-2 shadow-sm sm:px-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[color:var(--ni-muted)]">Messages</p>
-              <span className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-2 py-0.5 text-[11px] font-semibold text-[color:var(--ni-text)]">
-                {threadParticipant ? "Direct thread" : "Inbox"}
-              </span>
-              {threadParticipant ? (
-                <Link href={targetProfileHref} className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-2 py-0.5 text-[11px] font-semibold text-[color:var(--ni-text)] transition hover:border-[color:var(--ni-brand)] hover:text-[color:var(--ni-brand)]">
-                  {targetProfileLabel}
-                </Link>
-              ) : null}
-              {targetProfileMeta ? (
-                <span className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-2 py-0.5 text-[11px] font-semibold text-[color:var(--ni-muted)]">
-                  {targetProfileMeta}
-                </span>
-              ) : null}
+    <section className="mx-auto flex h-[calc(100dvh-8.5rem)] w-full max-w-7xl flex-col gap-1.5 overflow-hidden px-2 py-2 sm:px-4 md:h-[calc(100dvh-6.5rem)] md:gap-3 md:py-3">
+      <div className="shrink-0 rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-1 shadow-sm sm:px-4 sm:py-2">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex items-center gap-2">
+            <div className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] text-sm font-extrabold text-[color:var(--ni-brand)]">
+              💬
             </div>
-            <p className="mt-1 truncate text-xs text-[color:var(--ni-text)]">
-              {threadParticipant
-                ? `Chatting with ${targetProfileLabel}`
-                : `A focused inbox for ${businessContext.name}.`}
-            </p>
+            <div className="min-w-0">
+              <p className="text-[12px] font-black uppercase tracking-[0.24em] text-[color:var(--ni-text-strong)] sm:text-[14px]">MESSAGES</p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-semibold">
-            <span className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-3 py-1.5 text-[color:var(--ni-text)]">
-              {viewerProfileLabel}
-            </span>
-            <span className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-3 py-1.5 text-[color:var(--ni-muted)]">
-              {viewerProfileMeta}
-            </span>
-          </div>
+        </div>
+
+        <div className="mt-2 flex gap-2 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileView("profiles")}
+            className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${mobileView === "profiles" ? "border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)] text-[color:var(--ni-brand)]" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] text-[color:var(--ni-text-strong)]"}`}
+          >
+            👤 Profiles
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileView("chat")}
+            className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${mobileView === "chat" ? "border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)] text-[color:var(--ni-brand)]" : "border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] text-[var(--ni-text-strong)]"}`}
+          >
+            💬 Message
+          </button>
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)]">
-        <aside className="flex min-h-0 flex-col rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-2 shadow-sm sm:p-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:grid lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-4">
+        <aside className={`order-2 min-h-0 flex-1 flex-col rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-2 shadow-sm sm:p-3 lg:order-none lg:flex lg:flex-none lg:max-h-none ${mobileView === "profiles" ? "flex" : "hidden"}`}>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold text-[color:var(--ni-text-strong)]">Profiles</h2>
+            <h2 className="text-base font-semibold text-[color:var(--ni-text-strong)] sm:text-lg">Profiles</h2>
             <span className="rounded-full border border-[color:var(--ni-border)] px-2 py-0.5 text-xs text-[color:var(--ni-muted)]">{conversations.length}</span>
           </div>
 
-          <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <div className="mt-2 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 lg:max-h-none">
             {conversations.map((conversation) => {
               const other = conversation.participants.find((participant) => participant.user.id !== viewer.id)?.user ?? conversation.participants[0]?.user;
               if (!other) return null;
@@ -331,13 +327,16 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                 <button
                   key={conversation.id}
                   type="button"
-                  onClick={() => setActiveConversationId(conversation.id)}
-                  className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left transition ${isActive ? "border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)]" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] hover:bg-[color:var(--ni-surface-3)]"}`}
+                  onClick={() => {
+                    setActiveConversationId(conversation.id);
+                    setMobileView("chat");
+                  }}
+                  className={`flex w-full items-start gap-3 rounded-xl border p-2.5 text-left transition ${isActive ? "border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)]" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] hover:bg-[color:var(--ni-surface-3)]"}`}
                 >
-                  <UserAvatar name={other.businessName ?? other.name} avatarUrl={other.avatarUrl} size={44} />
+                  <UserAvatar name={other.businessName ?? other.name} avatarUrl={other.avatarUrl} size={36} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="truncate text-sm font-semibold text-[color:var(--ni-text-strong)]">{other.businessName ?? other.name}</p>
+                      <p className="truncate text-[13px] font-semibold text-[color:var(--ni-text-strong)]">{other.businessName ?? other.name}</p>
                       <div className="flex items-center gap-2 text-[11px] font-semibold">
                         {isActive ? (
                           <span className="rounded-full border border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)] px-2 py-0.5 text-[color:var(--ni-brand)]">Selected</span>
@@ -345,8 +344,8 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                         <span className="shrink-0 text-[color:var(--ni-muted)]">{formatTimestamp(lastMessage?.createdAt ?? conversation.lastMessageAt)}</span>
                       </div>
                     </div>
-                    {profileMeta ? <p className="mt-1 truncate text-[11px] font-semibold text-[color:var(--ni-muted)]">{profileMeta}</p> : null}
-                    <p className="mt-1 line-clamp-2 text-xs text-[color:var(--ni-text)]">{profileHint}</p>
+                    {profileMeta ? <p className="mt-1 truncate text-[10px] font-semibold text-[color:var(--ni-muted)]">{profileMeta}</p> : null}
+                    <p className="mt-1 line-clamp-2 text-[11px] text-[color:var(--ni-text)]">{profileHint}</p>
                   </div>
                 </button>
               );
@@ -354,20 +353,20 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
           </div>
         </aside>
 
-        <main className="flex min-h-0 flex-col rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-3 shadow-sm sm:p-4">
+        <main className={`order-1 min-h-0 flex-1 flex-col rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-2 shadow-sm sm:p-4 lg:order-none lg:flex ${mobileView === "chat" ? "flex" : "hidden"}`}>
           {activeConversation && activeParticipant ? (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--ni-border)] pb-2 sm:gap-3 sm:pb-3">
-                <div className="flex items-center gap-3">
-                  <UserAvatar name={activeParticipant.businessName ?? activeParticipant.name} avatarUrl={activeParticipant.avatarUrl} size={44} />
+              <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-[color:var(--ni-border)] pb-2 sm:gap-3 sm:pb-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <UserAvatar name={activeParticipant.businessName ?? activeParticipant.name} avatarUrl={activeParticipant.avatarUrl} size={36} />
                   <div>
-                    <h2 className="text-base font-semibold text-[color:var(--ni-text-strong)] sm:text-lg">{activeParticipant.businessName ?? activeParticipant.name}</h2>
-                    <p className="text-xs text-[color:var(--ni-text)] sm:text-sm">
+                    <h2 className="truncate text-sm font-semibold text-[color:var(--ni-text-strong)]">{activeParticipant.businessName ?? activeParticipant.name}</h2>
+                    <p className="truncate text-[10px] text-[color:var(--ni-text)]">
                       {activeParticipant.businessCategory ?? activeParticipant.role} {activeParticipant.businessLocation ? `• ${activeParticipant.businessLocation}` : ""}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                <div className="flex flex-wrap gap-2 text-[11px] font-semibold sm:justify-end">
                   <Link href={`/profile/${activeParticipant.id}`} className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-3 py-1.5 text-[color:var(--ni-text-strong)]">
                     Open profile
                   </Link>
@@ -379,17 +378,17 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                 </div>
               </div>
 
-              <div ref={scrollRef} className="mt-3 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1 sm:mt-4">
+              <div ref={scrollRef} className="mt-2 min-h-0 flex-1 space-y-2.5 overflow-y-auto pr-1 sm:mt-3">
                 {messages.map((message) => {
                   const isMine = message.senderId === viewer.id;
                   return (
                     <article key={message.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[85%] rounded-2xl border px-4 py-3 ${isMine ? "border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)]" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)]"}`}>
-                        <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-[color:var(--ni-muted)]">
+                      <div className={`max-w-[85%] rounded-2xl border px-3 py-2.5 ${isMine ? "border-[color:var(--ni-brand)] bg-[color:var(--ni-accent-soft)]" : "border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)]"}`}>
+                        <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-[0.16em] text-[color:var(--ni-muted)]">
                           <span>{isMine ? "You" : message.sender?.businessName ?? message.sender?.name ?? "Participant"}</span>
                           <span>{formatTimestamp(message.createdAt)}</span>
                         </div>
-                        <p className="mt-2 whitespace-pre-wrap text-sm text-[color:var(--ni-text-strong)]">{message.body}</p>
+                        <p className="mt-2 whitespace-pre-wrap text-[13px] text-[color:var(--ni-text-strong)]">{message.body}</p>
                         {message.kind === "appointment" && message.appointmentAt ? (
                           <div className="mt-2 rounded-lg border border-amber-300/70 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
                             Appointment request • {new Date(message.appointmentAt).toLocaleString()}
@@ -397,7 +396,7 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                         ) : null}
                         {message.mediaUrl ? (
                           <div className="mt-2 overflow-hidden rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]">
-                            <img src={message.mediaUrl} alt={message.kind === "gif" ? "GIF attachment" : "Attachment"} className="max-h-72 w-full object-contain" />
+                            <img src={message.mediaUrl} alt={message.kind === "gif" ? "GIF attachment" : "Attachment"} className="max-h-56 w-full object-contain" />
                           </div>
                         ) : null}
                       </div>
@@ -406,36 +405,36 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                 })}
               </div>
 
-              <div className="shrink-0 rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-2 sm:p-2.5">
-                <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold text-[color:var(--ni-text-strong)] sm:gap-2">
+              <div className="shrink-0 rounded-2xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-1.5 sm:p-2">
+                <div className="flex flex-wrap gap-1 text-[10px] font-semibold text-[color:var(--ni-text-strong)] sm:gap-2">
                   <button type="button" onClick={() => setComposerMode("text")} className={`rounded-full px-2.5 py-1 ${composerMode === "text" ? "bg-[color:var(--ni-brand-cta)] text-white" : "border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]"}`}>Message</button>
                   <button type="button" onClick={() => setComposerMode("image")} className={`rounded-full px-2.5 py-1 ${composerMode === "image" ? "bg-[color:var(--ni-brand-cta)] text-white" : "border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]"}`}>Image</button>
                   <button type="button" onClick={() => setComposerMode("gif")} className={`rounded-full px-2.5 py-1 ${composerMode === "gif" ? "bg-[color:var(--ni-brand-cta)] text-white" : "border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]"}`}>GIF</button>
                   <button type="button" onClick={() => setComposerMode("appointment")} className={`rounded-full px-2.5 py-1 ${composerMode === "appointment" ? "bg-[color:var(--ni-brand-cta)] text-white" : "border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]"}`}>Appointment</button>
                 </div>
 
-                <div className="mt-2 grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] sm:mt-2.5">
+                <div className="mt-1.5 grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] sm:mt-2">
                   <div className="min-w-0">
                     <textarea
                       value={draft}
                       onChange={(event) => setDraft(event.target.value)}
                       rows={2}
                       placeholder={composerMode === "appointment" ? "Describe the appointment request" : "Write your message"}
-                      className="w-full rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-3 py-2 text-sm text-[color:var(--ni-text-strong)] placeholder:text-[color:var(--ni-muted)]"
+                      className="w-full rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2.5 py-1.5 text-[13px] text-[color:var(--ni-text-strong)] placeholder:text-[color:var(--ni-muted)]"
                     />
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold sm:gap-2">
-                      <label className="cursor-pointer rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2.5 py-1 text-[color:var(--ni-text-strong)]">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold sm:gap-2">
+                      <label className="cursor-pointer rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-0.5 text-[color:var(--ni-text-strong)]">
                         Attach image / GIF
                         <input type="file" accept="image/*,.gif" className="hidden" onChange={handleAttachmentChange} />
                       </label>
-                      <label className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2.5 py-1 text-[color:var(--ni-text-strong)]">
+                      <label className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-0.5 text-[color:var(--ni-text-strong)]">
                         Appointment time
-                        <input type="datetime-local" value={appointmentAt} onChange={(event) => setAppointmentAt(event.target.value)} className="ml-2 bg-transparent text-[11px] outline-none" />
+                        <input type="datetime-local" value={appointmentAt} onChange={(event) => setAppointmentAt(event.target.value)} className="ml-2 bg-transparent text-[10px] outline-none" />
                       </label>
                     </div>
                     {selectedAttachment ? (
                       <div className="mt-2 overflow-hidden rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)]">
-                        <img src={selectedAttachment} alt="Attachment preview" className="max-h-44 w-full object-contain" />
+                        <img src={selectedAttachment} alt="Attachment preview" className="max-h-36 w-full object-contain" />
                       </div>
                     ) : null}
                   </div>
@@ -445,7 +444,7 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                       type="button"
                       onClick={sendMessage}
                       disabled={sending}
-                      className="rounded-xl bg-[color:var(--ni-brand-cta)] px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+                      className="rounded-xl bg-[color:var(--ni-brand-cta)] px-2.5 py-1.5 text-[12px] font-semibold text-white disabled:opacity-60"
                     >
                       {sending ? "Sending..." : composerMode === "appointment" ? "Request" : "Send"}
                     </button>
@@ -458,7 +457,7 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                         setAppointmentAt("");
                         setComposerMode("text");
                       }}
-                      className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-3 py-2.5 text-sm font-semibold text-[color:var(--ni-text-strong)]"
+                      className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2.5 py-1.5 text-[12px] font-semibold text-[color:var(--ni-text-strong)]"
                     >
                       Clear
                     </button>

@@ -17,6 +17,16 @@ export type InsightBarConfig = {
   signals: string[];
 };
 
+export type AdPlacementConfig = {
+  eyebrow: string;
+  title: string;
+  body: string;
+  sponsorName: string;
+  ctaLabel: string;
+  ctaHref: string;
+  footnote: string;
+};
+
 const insightColorDefaults = ["bg-cyan-500", "bg-amber-400", "bg-rose-500", "bg-emerald-400"] as const;
 
 function clampPercent(value: number) {
@@ -66,6 +76,22 @@ export function getInsightBarConfig(
     buttonLabel: settings.get("insightPrimaryButtonLabel")?.trim() || fallback.buttonLabel,
     stats,
     signals: parseDelimitedList(settings.get("insightSignals") ?? undefined, fallback.signals),
+  };
+}
+
+export function getAdPlacementConfig(settings: Map<string, string>): AdPlacementConfig {
+  return {
+    eyebrow: settings.get("adPlacementEyebrow")?.trim() || "Sponsored placement",
+    title: settings.get("adPlacementTitle")?.trim() || "Custom brand box",
+    body:
+      settings.get("adPlacementBody")?.trim() ||
+      "Reserve this premium placement for a launch, seasonal campaign, or custom sponsor message.",
+    sponsorName: settings.get("adPlacementSponsorName")?.trim() || "Your brand here",
+    ctaLabel: settings.get("adPlacementCtaLabel")?.trim() || "Book this slot",
+    ctaHref: settings.get("adPlacementCtaHref")?.trim() || "/contact-us",
+    footnote:
+      settings.get("adPlacementFootnote")?.trim() ||
+      "Shown only to guests and normal users. Verified business and marketing accounts do not see this placement.",
   };
 }
 

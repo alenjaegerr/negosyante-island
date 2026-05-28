@@ -1,6 +1,7 @@
 type RoleBadgeProps = {
   role: string | null | undefined;
   isVerifiedBusiness?: boolean;
+  compact?: boolean;
 };
 
 function formatRole(role: string | null | undefined, isVerifiedBusiness?: boolean) {
@@ -17,11 +18,11 @@ function formatRole(role: string | null | undefined, isVerifiedBusiness?: boolea
   return { label: "Aspiring Negosyante", tone: "bg-sky-100 text-sky-700" };
 }
 
-export default function RoleBadge({ role, isVerifiedBusiness }: RoleBadgeProps) {
+export default function RoleBadge({ role, isVerifiedBusiness, compact = false }: RoleBadgeProps) {
   const { label, tone } = formatRole(role, isVerifiedBusiness);
 
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${tone}`}>
+    <span className={`inline-flex items-center rounded-full ${compact ? "px-1.5 py-0 text-[10px]" : "px-2 py-0.5 text-[11px]"} font-semibold ${tone}`}>
       {label}
     </span>
   );

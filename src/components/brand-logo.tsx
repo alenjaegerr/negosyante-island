@@ -33,7 +33,7 @@ export function BrandLogo({ compact = false }: BrandLogoProps) {
             alt="Negosyante Island"
             width={2752}
             height={1536}
-            className="block h-auto w-auto sm:w-56 md:w-[17.5rem]"
+            className="block h-auto w-40 sm:w-56 md:w-[17.5rem]"
             priority
           />
         </div>

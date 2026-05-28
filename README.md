@@ -70,6 +70,12 @@ npm install
 DATABASE_URL="postgresql://user:password@localhost:5432/negosyante_island"
 JWT_SECRET="replace-with-a-strong-secret"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+SMTP_USER="business.negosyanteisland@gmail.com"
+SMTP_PASS="your-gmail-app-password"
+SMTP_FROM="Negosyante Island <business.negosyanteisland@gmail.com>"
 ```
 
 3. Generate Prisma client and run migrations:
@@ -104,6 +110,14 @@ For production, make sure these environment variables are set:
 - `DATABASE_URL`
 - `JWT_SECRET`
 - `NEXT_PUBLIC_APP_URL`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM`
+
+If you use Gmail, create a Google App Password for `business.negosyanteisland@gmail.com` and use it for `SMTP_PASS`. Regular account passwords will not work for SMTP.
 
 The app will refuse to start in production without a `JWT_SECRET`, and Prisma needs a valid `DATABASE_URL`.
 

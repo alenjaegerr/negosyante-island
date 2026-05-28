@@ -94,20 +94,12 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className={`font-flex-bold truncate text-sm group-hover:text-[var(--ni-brand)] ${business.backgroundPhotoUrl ? "text-white" : "text-[var(--ni-text-strong)]"}`}>{business.name}</p>
-                        <p className={`text-xs ${business.backgroundPhotoUrl ? "text-white/85" : "text-[var(--ni-muted)]"}`}>{business.category} • {business.location}</p>
-                      </div>
-                      {business.role ? (
-                        <div className="shrink-0 pt-0.5">
-                          <RoleBadge role={business.role} />
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="mt-1">
+                    <p className={`font-flex-bold truncate text-sm leading-none group-hover:text-[var(--ni-brand)] ${business.backgroundPhotoUrl ? "text-white" : "text-[var(--ni-text-strong)]"}`}>{business.name}</p>
+                    <div className="mt-0 flex items-center justify-between gap-2">
+                      {business.role ? <RoleBadge role={business.role} compact /> : <span />}
                       <OnlineStatusBadge online={business.online} compact />
                     </div>
+                    <p className={`mt-1 text-xs ${business.backgroundPhotoUrl ? "text-white/85" : "text-[var(--ni-muted)]"}`}>{business.category} • {business.location}</p>
                   </div>
                 </div>
 

@@ -19,20 +19,24 @@ export default function PrivacyPolicyPage() {
           <p className="mt-2 text-sm text-[color:var(--ni-text)]">Data is used to authenticate users, deliver feeds and inboxes, review business verification, manage billing, and improve platform quality and safety.</p>
         </article>
         <article className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+          <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Cookies and tracking</h2>
+          <p className="mt-2 text-sm text-[var(--ni-text)]">We use essential cookies for sign-in and site functionality. Analytics cookies are only enabled after you accept them in the cookie prompt.</p>
+        </article>
+        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
           <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Sharing and access</h2>
           <p className="mt-2 text-sm text-[color:var(--ni-text)]">We do not sell personal data. Access is limited to the Negosyante Island team, service providers we use to host the app, and cases required by law.</p>
         </article>
-        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
           <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Deletion and retention</h2>
-          <p className="mt-2 text-sm text-[color:var(--ni-text)]">When an account is deleted, identifying profile data is removed or anonymized while public posts, comments, and forum threads may remain as Deleted User content to preserve the discussion history.</p>
+          <p className="mt-2 text-sm text-[var(--ni-text)]">When an account is deleted, identifying profile data is removed or anonymized while public posts, comments, and forum threads may remain as Deleted User content to preserve the discussion history.</p>
         </article>
-        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
           <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Security</h2>
-          <p className="mt-2 text-sm text-[color:var(--ni-text)]">We use password hashing, authenticated sessions, and access controls to protect accounts. Users should keep their credentials private and report suspicious activity quickly.</p>
+          <p className="mt-2 text-sm text-[var(--ni-text)]">We use password hashing, authenticated sessions, and access controls to protect accounts. Users should keep their credentials private and report suspicious activity quickly.</p>
         </article>
-        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] p-4">
+        <article className="rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4">
           <h2 className="font-semibold text-[color:var(--ni-text-strong)]">Questions and requests</h2>
-          <p className="mt-2 text-sm text-[color:var(--ni-text)]">For privacy concerns, deletion questions, or appeals, contact the team through the support page or review the launch policy summary on the legal page.</p>
+          <p className="mt-2 text-sm text-[var(--ni-text)]">For privacy concerns, deletion questions, or appeals, contact the team through the support page or review the launch policy summary on the legal page.</p>
         </article>
       </div>
 

@@ -46,11 +46,12 @@ export async function POST(request: Request) {
     const subdir = kind === "background" ? "backgrounds" : "avatars";
     const url = await storeUserImage(file, subdir);
     return NextResponse.json({ url });
-  } catch (err: any) {
-    if (err.message === "invalid_image_type") {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg === "invalid_image_type") {
       return NextResponse.json({ error: "invalid_image_type" }, { status: 400 });
     }
-    if (err.message === "file_too_large") {
+    if (msg === "file_too_large") {
       return NextResponse.json({ error: "file_too_large", limit: MAX_BYTES }, { status: 400 });
     }
     return NextResponse.json({ error: "upload_failed" }, { status: 500 });

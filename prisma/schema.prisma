@@ -24,6 +24,11 @@ enum VerificationStatus {
   rejected
 }
 
+enum AuthOtpPurpose {
+  email_verification
+  password_reset
+}
+
 enum DocumentType {
   portfolio
   bir_tin
@@ -61,6 +66,7 @@ model User {
   membershipStartedAt   DateTime?
   membershipEndsAt      DateTime?
   billingProvider       String?               @default("gcash")
+  emailVerifiedAt       DateTime?
   deletedAt             DateTime?
   anonymizedAt          DateTime?
   isDeleted             Boolean               @default(false)
@@ -81,6 +87,7 @@ model User {
   conversationParticipants ConversationParticipant[]
   messagesSent          Message[]
   contactsOwned         UserContact[]
+  authOtps              AuthOtp[]
 }
 
 model Post {
@@ -336,4 +343,21 @@ model SiteSetting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+model AuthOtp {
+  id          String         @id @default(cuid())
+  email       String
+  userId      String?
+  purpose     AuthOtpPurpose
+  codeHash    String
+  attempts    Int            @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, purpose, expiresAt])
+  @@index([userId, purpose])
 }

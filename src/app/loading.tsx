@@ -11,7 +11,7 @@ export default function Loading() {
             </p>
           </div>
           <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] text-[var(--ni-brand)] shadow-sm">
-            <div className="h-8 w-8 rounded-full border-2 border-[color:var(--ni-brand)] border-t-transparent animate-spin" />
+            <div className="h-8 aspect-square rounded-full border-2 border-[color:var(--ni-brand)] border-t-transparent animate-spin" />
           </div>
         </div>
 

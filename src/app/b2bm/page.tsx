@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isRecentlyActive } from "@/lib/presence";
 import B2bmDiscoveryPanel from "@/components/b2bm-discovery-panel";
 import B2bmDirectory from "@/components/b2bm-directory";
 
@@ -26,6 +27,7 @@ export default async function B2bmPage() {
       businessTagline: string | null;
       businessCategory: string | null;
       businessLocation: string | null;
+      lastSeenAt: Date | null;
     }>>`
       SELECT
         id,
@@ -36,7 +38,8 @@ export default async function B2bmPage() {
         "businessName" AS "businessName",
         "businessTagline" AS "businessTagline",
         "businessCategory" AS "businessCategory",
-        "businessLocation" AS "businessLocation"
+        "businessLocation" AS "businessLocation",
+        "lastSeenAt" AS "lastSeenAt"
       FROM "User"
       WHERE id <> ${user.id}
         AND role IN (
@@ -75,11 +78,15 @@ export default async function B2bmPage() {
       businessTagline: profile.businessTagline,
       businessCategory: profile.businessCategory,
       businessLocation: profile.businessLocation,
+      online: isRecentlyActive(profile.lastSeenAt),
       businessSlug,
       isFollowed: Boolean(businessSlug && followSet.has(businessSlug)),
       isContact: contactSet.has(`user:${profile.id}`) || (businessSlug ? contactSet.has(`business:${businessSlug}`) : false),
     };
   });
+
+  const profileOnlineById = new Map(enrichedProfiles.map((profile) => [profile.id, profile.online] as const));
+  const profileOnlineBySlug = new Map(enrichedProfiles.filter((profile) => profile.businessSlug).map((profile) => [profile.businessSlug as string, profile.online] as const));
 
   const relevantContacts = contacts.map((contact) => ({
     id: contact.id,
@@ -92,11 +99,17 @@ export default async function B2bmPage() {
     businessLocation: contact.businessLocation,
     businessTagline: contact.businessTagline,
     role: contact.role,
+    online:
+      contact.contactKey.startsWith("user:")
+        ? profileOnlineById.get(contact.contactKey.slice(5)) ?? false
+        : contact.contactKey.startsWith("business:")
+          ? profileOnlineBySlug.get(contact.contactKey.slice(9)) ?? false
+          : false,
   }));
 
   return (
     <>
-      <section className="mx-auto w-full max-w-screen-2xl space-y-4 px-3 py-6 sm:px-4">
+      <section className="mx-auto w-full max-w-screen-2xl space-y-4 px-3 py-5 sm:px-4 sm:py-6">
         <B2bmDiscoveryPanel viewerRole={user.role} profiles={enrichedProfiles} />
       </section>
       <B2bmDirectory
