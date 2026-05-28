@@ -29,7 +29,7 @@ export default function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-[80] mx-auto w-[calc(100%-1.5rem)] max-w-3xl rounded-3xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4 shadow-2xl sm:inset-x-4 sm:bottom-4 sm:w-auto sm:p-5 pointer-events-auto">
+    <div className="fixed inset-x-3 bottom-3 z-[80] mx-auto w-[calc(100%-1.5rem)] max-w-3xl rounded-3xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-4 shadow-2xl sm:inset-x-4 sm:bottom-4 sm:w-auto sm:p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <p className="font-reddit text-xs font-extrabold tracking-figma-tight text-cyan-700">COOKIE PREFERENCES</p>
@@ -45,7 +45,7 @@ export default function CookieConsentBanner() {
               writeConsentCookie("essential");
               setVisible(false);
             }}
-            className="rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ni-text-strong)] pointer-events-auto"
+            className="rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ni-text-strong)]"
           >
             Essential only
           </button>
@@ -55,7 +55,7 @@ export default function CookieConsentBanner() {
               writeConsentCookie("analytics");
               setVisible(false);
             }}
-            className="rounded-full bg-[color:var(--ni-brand-cta)] px-4 py-2 text-sm font-semibold text-white pointer-events-auto"
+            className="rounded-full bg-[color:var(--ni-brand-cta)] px-4 py-2 text-sm font-semibold text-white"
           >
             Allow
           </button>
