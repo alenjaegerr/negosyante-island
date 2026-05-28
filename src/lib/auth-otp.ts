@@ -47,9 +47,8 @@ function formatOtpHtml(options: {
   `;
 }
 
-async function createOtpRecord(options: { email: string; userId?: string | null; purpose: AuthOtpPurpose }) {
-  const code = generateOtpCode();
-  const codeHash = hashOtpCode(code);
+async function createOtpRecord(options: { email: string; userId?: string | null; purpose: AuthOtpPurpose; code: string }) {
+  const codeHash = hashOtpCode(options.code);
   const expiresAt = expiryDate();
 
   await prisma.authOtp.deleteMany({
@@ -70,7 +69,7 @@ async function createOtpRecord(options: { email: string; userId?: string | null;
     },
   });
 
-  return { otp, code };
+  return { otp, code: options.code };
 }
 
 export async function issueAndSendOtpEmail(options: {
@@ -94,7 +93,7 @@ export async function issueAndSendOtpEmail(options: {
   });
   const text = `${options.headline}\n\n${options.body}\n\nYour code: ${code}\n\nThis code expires in ${OTP_TTL_MINUTES} minutes. Open ${ctaHref} to continue.`;
 
-  const { otp } = await createOtpRecord(options);
+  const { otp } = await createOtpRecord({ ...options, code });
 
   const delivery = await sendTransactionalEmail({
     to: options.email,
