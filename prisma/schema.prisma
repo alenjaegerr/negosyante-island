@@ -11,6 +11,10 @@ enum Role {
   user
   business_pending
   business_verified
+  marketing_pending
+  marketing_verified
+  publisher
+  publisher_verified
   admin
 }
 
@@ -20,7 +24,13 @@ enum VerificationStatus {
   rejected
 }
 
+enum AuthOtpPurpose {
+  email_verification
+  password_reset
+}
+
 enum DocumentType {
+  portfolio
   bir_tin
   mayor_permit
 }
@@ -42,10 +52,29 @@ model User {
   passwordHash          String
   role                  Role                  @default(user)
   businessName          String?
+  businessTagline       String?
+  businessCategory      String?
+  businessLocation      String?
   avatarUrl             String?
+  backgroundPhotoUrl    String?
+  failedLoginAttempts   Int                   @default(0)
+  loginCooldownUntil    DateTime?
+  loginThrottleStage    Int                   @default(0)
+  lastSeenAt            DateTime?
+  membershipCycle       String?
+  membershipStatus      String?               @default("trial")
+  membershipStartedAt   DateTime?
+  membershipEndsAt      DateTime?
+  billingProvider       String?               @default("gcash")
+  emailVerifiedAt       DateTime?
+  deletedAt             DateTime?
+  anonymizedAt          DateTime?
+  isDeleted             Boolean               @default(false)
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   posts                 Post[]
+  trendingPosts         TrendingPost[]
+  postComments          PostComment[]
   verificationRequests  VerificationRequest[] @relation("BusinessRequests")
   reviewedRequests      VerificationRequest[] @relation("ReviewedBy")
   businessFollows       BusinessFollow[]
@@ -53,11 +82,20 @@ model User {
   businessFeedLikes     BusinessFeedLike[]
   businessFeedComments  BusinessFeedComment[]
   notifications         Notification[]
+  forumThreads          ForumThread[]
+  forumComments         ForumComment[]
+  conversationParticipants ConversationParticipant[]
+  messagesSent          Message[]
+  contactsOwned         UserContact[]
+  authOtps              AuthOtp[]
 }
 
 model Post {
   id        String   @id @default(cuid())
   content   String
+  imageUrl  String?
+  gifUrl    String?
+  videoUrl  String?
   tags      String[]
   likes     Int      @default(0)
   comments  Int      @default(0)
@@ -67,6 +105,7 @@ model Post {
   updatedAt DateTime @updatedAt
   authorId  String
   author    User     @relation(fields: [authorId], references: [id])
+  postComments PostComment[]
 
   @@index([createdAt])
 }
@@ -76,6 +115,8 @@ model VerificationRequest {
   businessName  String
   documentType  DocumentType
   documentUrl   String
+  verificationType String          @default("business")
+  portfolioUrl  String?
   status        VerificationStatus @default(pending)
   createdAt     DateTime           @default(now())
   reviewedAt    DateTime?
@@ -99,22 +140,29 @@ model Trend {
 }
 
 model TrendingPost {
-  id             String        @id @default(cuid())
-  title          String
-  category       TrendCategory
-  snippet        String
-  content        String
-  imageUrl       String?
-  videoUrl       String?
-  videoLoopSeconds Int         @default(5)
-  isDraft        Boolean       @default(false)
-  isInsightReady Boolean       @default(true)
-  insightTitle   String?
-  insightBody    String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id               String        @id @default(cuid())
+  title            String
+  category         TrendCategory
+  snippet          String
+  content          String
+  imageUrl         String?
+  gifUrl           String?
+  videoUrl         String?
+  videoLoopSeconds Int           @default(5)
+  isDraft          Boolean       @default(false)
+  isInsightReady   Boolean       @default(true)
+  insightTitle     String?
+  insightBody      String?
+  insightStats     Json?
+  insightSignals   String[]      @default([])
+  insightUpdatedAt DateTime?
+  authorId         String?
+  author           User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@index([category, createdAt])
+  @@index([authorId])
 }
 
 model BusinessFollow {
@@ -179,4 +227,137 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId, isRead, createdAt])
+}
+
+model ForumThread {
+  id        String        @id @default(cuid())
+  title     String
+  body      String
+  mediaUrl  String?
+  mediaType String?
+  tags      String[]      @default([])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  authorId  String
+  author    User          @relation(fields: [authorId], references: [id])
+  comments  ForumComment[]
+
+  @@index([createdAt])
+}
+
+model ForumComment {
+  id        String      @id @default(cuid())
+  content   String
+  mediaUrl  String?
+  mediaType String?
+  createdAt DateTime    @default(now())
+  threadId  String
+  thread    ForumThread @relation(fields: [threadId], references: [id])
+  authorId  String
+  author    User        @relation(fields: [authorId], references: [id])
+
+  @@index([threadId, createdAt])
+}
+
+model Conversation {
+  id         String       @id @default(cuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  lastMessageAt DateTime?
+  participants ConversationParticipant[]
+  messages   Message[]
+
+  @@index([createdAt])
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  joinedAt       DateTime     @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model UserContact {
+  id                String   @id @default(cuid())
+  ownerUserId       String
+  ownerUser         User     @relation(fields: [ownerUserId], references: [id])
+  contactKey        String
+  profileType       String
+  displayName       String
+  avatarUrl         String?
+  role              String?
+  businessSlug      String?
+  businessCategory  String?
+  businessLocation  String?
+  businessTagline   String?
+  profileHref       String?
+  sourceConversationId String?
+  sourceBusinessMessageId String?
+  lastInteractionAt DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([ownerUserId, contactKey])
+  @@index([ownerUserId, lastInteractionAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  body           String
+  kind           String       @default("text")
+  mediaUrl       String?
+  mediaType      String?
+  appointmentAt  DateTime?
+  createdAt      DateTime     @default(now())
+  seenAt         DateTime?
+
+  @@index([conversationId, createdAt])
+}
+
+model PostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  parentId  String?
+  parent    PostComment? @relation("CommentParent", fields: [parentId], references: [id])
+  replies   PostComment[] @relation("CommentParent")
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([postId, createdAt])
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model AuthOtp {
+  id          String         @id @default(cuid())
+  email       String
+  userId      String?
+  purpose     AuthOtpPurpose
+  codeHash    String
+  attempts    Int            @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, purpose, expiresAt])
+  @@index([userId, purpose])
 }

@@ -3,6 +3,12 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+function addMonths(date: Date, months: number) {
+  const next = new Date(date);
+  next.setMonth(next.getMonth() + months);
+  return next;
+}
+
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -16,6 +22,7 @@ export async function POST(
   const formData = await request.formData();
   const decision = String(formData.get("decision") ?? "");
   const rejectionNote = String(formData.get("rejectionNote") ?? "");
+  const membershipCycle = String(formData.get("membershipCycle") ?? "").trim();
 
   const status = decision === "approved" ? VerificationStatus.approved : VerificationStatus.rejected;
   const requestRecord = await prisma.verificationRequest.update({
@@ -29,16 +36,26 @@ export async function POST(
   });
 
   if (status === VerificationStatus.approved) {
+    const verifiedRole = requestRecord.verificationType === "marketing" ? Role.marketing_verified : Role.business_verified;
     await prisma.user.update({
       where: { id: requestRecord.userId },
-      data: { role: Role.business_verified },
+      data: {
+        role: verifiedRole,
+        membershipCycle: membershipCycle || "annual",
+        membershipStatus: "trial",
+        membershipStartedAt: new Date(),
+        membershipEndsAt: addMonths(new Date(), 3),
+        billingProvider: "gcash",
+      },
     });
   }
 
   if (status === VerificationStatus.rejected) {
     await prisma.user.update({
       where: { id: requestRecord.userId },
-      data: { role: Role.business_pending },
+      data: {
+        role: requestRecord.verificationType === "marketing" ? Role.marketing_pending : Role.business_pending,
+      },
     });
   }
 

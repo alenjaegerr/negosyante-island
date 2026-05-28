@@ -1,7 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { buildBusinessMessageHref } from "@/lib/messaging";
+import { OnlineStatusBadge } from "@/components/online-status-badge";
+import RoleBadge from "@/components/role-badge";
 import type { LocalBusiness } from "@/lib/local-businesses";
 
 type LocalBusinessesPanelProps = {
@@ -31,10 +35,10 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
 
   return (
     <aside className="mt-4 rounded border-2 border-cyan-500/60 bg-[var(--ni-surface-1)]/95 p-2.5 md:mt-0 md:min-h-[720px] md:p-3">
-      <h3 className="font-reddit text-sm font-extrabold tracking-figma-tight text-[var(--ni-text-strong)] md:text-base">
-        LOCAL BUSINESSES ON NEGOSYANTE ISLAND
+      <h3 className="font-reddit text-sm font-extrabold uppercase tracking-figma-tight text-[var(--ni-text-strong)] md:text-base">
+        Local Businesses and Marketing Experts on Negosyante Island
       </h3>
-      <p className="mt-1 text-xs text-[var(--ni-text)]">Tap any card to open profile, or jump straight to feed.</p>
+      <p className="mt-1 text-xs tracking-[0.08em] text-[var(--ni-text)]">Tap any card to open profile or send a message.</p>
 
       <div className="mt-3 space-y-2">
         <input
@@ -70,44 +74,51 @@ export function LocalBusinessesPanel({ businesses }: LocalBusinessesPanelProps) 
 
       <div className="mt-3 space-y-2.5">
         {filtered.map((business) => (
-          <article key={business.slug} className="rounded border border-cyan-700/40 bg-[var(--ni-surface-2)] p-2.5 shadow-sm">
+          <article
+            key={business.slug}
+            className={`relative overflow-hidden rounded border border-cyan-700/40 p-2.5 shadow-sm ${business.backgroundPhotoUrl ? "business-photo-card" : "bg-[var(--ni-surface-2)]"}`}
+            style={business.backgroundPhotoUrl ? { backgroundImage: `url(${business.backgroundPhotoUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+          >
             <Link href={`/business/${business.slug}`} className="group block">
-              <div className="flex items-center gap-3">
-                <div className="relative shrink-0">
-                  <div className="font-reddit flex h-11 w-11 items-center justify-center rounded-full border-2 border-cyan-700 bg-cyan-100 text-sm font-extrabold text-cyan-900">
-                    {business.initials}
+              <div className="relative z-20 rounded-md p-2">
+                <div className="flex items-start gap-3">
+                  <div className="relative shrink-0">
+                    {business.avatarUrl ? (
+                      <Image src={business.avatarUrl} alt={`${business.name} avatar`} width={44} height={44} className="h-11 w-11 rounded-full border-2 border-cyan-700 object-cover" />
+                    ) : (
+                      <div className="font-reddit flex h-11 w-11 items-center justify-center rounded-full border-2 border-cyan-700 bg-cyan-100 text-sm font-extrabold text-cyan-900">
+                        {business.initials}
+                      </div>
+                    )}
+                    <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border border-[var(--ni-surface-1)] ${business.online ? "bg-emerald-500" : "bg-zinc-500"}`} aria-hidden />
                   </div>
-                  <span
-                    className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border border-[var(--ni-surface-1)] ${business.online ? "bg-emerald-500" : "bg-zinc-500"}`}
-                    aria-hidden
-                  />
+
+                  <div className="min-w-0 flex-1">
+                    <p className={`font-flex-bold truncate text-sm leading-none group-hover:text-[var(--ni-brand)] ${business.backgroundPhotoUrl ? "text-white" : "text-[var(--ni-text-strong)]"}`}>{business.name}</p>
+                    <div className="mt-0 flex items-center justify-between gap-2">
+                      {business.role ? <RoleBadge role={business.role} compact /> : <span />}
+                      <OnlineStatusBadge online={business.online} compact />
+                    </div>
+                    <p className={`mt-1 text-xs ${business.backgroundPhotoUrl ? "text-white/85" : "text-[var(--ni-muted)]"}`}>{business.category} • {business.location}</p>
+                  </div>
                 </div>
 
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="font-flex-bold truncate text-sm text-[var(--ni-text-strong)] group-hover:text-[var(--ni-brand)]">{business.name}</p>
-                    {business.verified ? <span className="text-xs" title="Verified business">✅</span> : null}
-                  </div>
-                  <p className="text-xs text-[var(--ni-muted)]">{business.category} • {business.location}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-[var(--ni-text)]">{business.online ? "Online now" : "Offline"}</p>
-                </div>
+                <p className={`mt-1.5 text-xs ${business.backgroundPhotoUrl ? "text-white/90" : "text-[var(--ni-text)]"}`}>{business.tagline}</p>
               </div>
-
-              <p className="mt-1.5 text-xs text-[var(--ni-text)]">{business.tagline}</p>
             </Link>
 
-            <div className="mt-2.5 flex items-center justify-between gap-2">
+            <div className="relative z-20 mt-2.5 flex items-center justify-between gap-2">
               <Link
                 href={`/business/${business.slug}`}
-                className="rounded border border-cyan-700 px-2 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/10"
+                className={`local-business-view-profile rounded border px-2 py-1 text-xs font-semibold transition-colors ${business.backgroundPhotoUrl ? "border-white/25 bg-white/10 text-white hover:border-white/40" : ""}`}
               >
-                View Profile
+                View profile
               </Link>
               <Link
-                href={`/business/${business.slug}/feed`}
+                href={buildBusinessMessageHref(business.slug)}
                 className="rounded bg-cyan-700 px-2 py-1 text-xs font-semibold text-white hover:bg-cyan-800"
               >
-                View Feed
+                Send message
               </Link>
             </div>
           </article>

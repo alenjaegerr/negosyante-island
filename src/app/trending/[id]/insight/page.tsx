@@ -1,71 +1,10 @@
-import Link from "next/link";
-import Image from "next/image";
-import { notFound, redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { buildTrendingMediaPreview } from "@/lib/trending-media";
+import { redirect } from "next/navigation";
 
-export default async function TrendingInsightPage(
-  props: { params: Promise<{ id: string }> },
-) {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
-
-  const { id } = await props.params;
-
-  const post = await prisma.trendingPost.findUnique({
-    where: { id },
-  });
-
-  if (!post || post.isDraft || !post.isInsightReady) {
-    notFound();
-  }
-
-  const media = post.videoUrl ? buildTrendingMediaPreview(post.videoUrl, post.videoLoopSeconds) : null;
-
-  return (
-    <section className="space-y-4">
-      <div className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Negosyante Insight</p>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-          {post.insightTitle?.trim() || post.title}
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">Category: {post.category.replaceAll("_", " ")}</p>
-      </div>
-
-      {media ? (
-        <div className={`relative overflow-hidden rounded-2xl border bg-white shadow-sm ${media.aspectClass}`}>
-          <iframe
-            src={media.embedUrl}
-            title={`${post.title} - ${media.label}`}
-            className="h-full w-full"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            loading="lazy"
-          />
-        </div>
-      ) : post.videoUrl ? (
-        <div className="rounded-2xl border bg-white p-4 text-sm text-slate-600 shadow-sm">
-          Video link saved, but this platform could not be embedded. Open it from the source link.
-        </div>
-      ) : post.imageUrl ? (
-        <div className="relative h-72 overflow-hidden rounded-2xl border bg-white shadow-sm">
-          <Image
-            src={post.imageUrl}
-            alt={post.title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
-      ) : null}
-
-      <article className="rounded-2xl border bg-white p-5 text-sm leading-relaxed text-slate-700 shadow-sm">
-        <p className="whitespace-pre-wrap">{post.insightBody?.trim() || post.content}</p>
-      </article>
-
-      <Link href="/trending" className="inline-flex rounded-full border px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
-        Back to Trending Feed
-      </Link>
-    </section>
-  );
+export default async function TrendingInsightRedirectPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  redirect(`/trending/${id}`);
 }

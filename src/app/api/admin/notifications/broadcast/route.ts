@@ -21,9 +21,13 @@ export async function POST(request: Request) {
 
   const where =
     audience === "verified_business"
-      ? { role: Role.business_verified }
+      ? { role: { in: [Role.business_verified, Role.marketing_verified] as Role[] } }
       : audience === "business_all"
-        ? { role: { in: [Role.business_pending, Role.business_verified] as Role[] } }
+        ? { role: { in: [Role.business_pending, Role.business_verified, Role.marketing_pending, Role.marketing_verified] as Role[] } }
+        : audience === "verified_pro"
+          ? { role: { in: [Role.business_verified, Role.marketing_verified] as Role[] } }
+          : audience === "pro_all"
+            ? { role: { in: [Role.business_pending, Role.business_verified, Role.marketing_pending, Role.marketing_verified] as Role[] } }
         : audience === "b2c"
           ? { role: Role.user }
           : {};

@@ -11,6 +11,9 @@ export type LocalBusiness = {
   category: string;
   location: string;
   tagline: string;
+  role?: string;
+  avatarUrl?: string | null;
+  backgroundPhotoUrl?: string | null;
   online: boolean;
   verified: boolean;
   followers: number;
@@ -26,6 +29,7 @@ export const localBusinesses: LocalBusiness[] = [
     category: "Coffee Shop",
     location: "Cebu City",
     tagline: "Small batch brews and community events for creators.",
+    role: "business_verified",
     online: true,
     verified: true,
     followers: 1842,
@@ -52,6 +56,7 @@ export const localBusinesses: LocalBusiness[] = [
     category: "Grocery",
     location: "Davao City",
     tagline: "Daily essentials with same-day barangay delivery.",
+    role: "business_verified",
     online: false,
     verified: true,
     followers: 965,
@@ -78,6 +83,7 @@ export const localBusinesses: LocalBusiness[] = [
     category: "Electronics",
     location: "Quezon City",
     tagline: "Affordable devices with after-sales support and repair.",
+    role: "business_pending",
     online: true,
     verified: false,
     followers: 2310,

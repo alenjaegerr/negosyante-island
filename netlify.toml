@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Optional: if you use Prisma Data Proxy, add PRISMA_DATA_PROXY_URL here in Netlify env settings.
+
+# Notes:
+# - Install the Netlify Next.js plugin in your CI or add it to dependencies:
+#   npm i -D @netlify/plugin-nextjs
+# - Ensure environment variables (DATABASE_URL, JWT_SECRET, SMTP_*) are set in Netlify UI.
+# - For App Router features and edge functions, consult Netlify docs for required configuration.

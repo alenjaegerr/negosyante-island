@@ -113,18 +113,18 @@ export function BusinessFeedList({ businessSlug, posts }: BusinessFeedListProps)
       {posts.map((post) => {
         const postState = state[post.id] ?? { likes: 0, isLiked: false, comments: [] };
         return (
-          <article key={post.id} className="rounded border border-slate-200 bg-slate-50 p-3">
+          <article key={post.id} className="rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] p-3">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-flex-bold text-base text-slate-900">{post.title}</h2>
-              <span className="text-xs text-slate-500">{post.postedAt}</span>
+              <h2 className="font-flex-bold text-base text-[color:var(--ni-text-strong)]">{post.title}</h2>
+              <span className="text-xs text-[color:var(--ni-muted)]">{post.postedAt}</span>
             </div>
-            <p className="mt-2 text-sm text-slate-700">{post.excerpt}</p>
+            <p className="mt-2 text-sm text-[color:var(--ni-text)]">{post.excerpt}</p>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => likePost(post.id, postState.isLiked)}
-                className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800"
+                className="rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-1 text-xs font-semibold text-[color:var(--ni-text-strong)] hover:bg-[color:var(--ni-surface-3)]"
               >
                 {postState.isLiked ? "✅ Liked" : "👍 React"} ({postState.likes})
               </button>
@@ -135,13 +135,13 @@ export function BusinessFeedList({ businessSlug, posts }: BusinessFeedListProps)
                 <input
                   value={drafts[post.id] ?? ""}
                   onChange={(event) => setDrafts((prev) => ({ ...prev, [post.id]: event.target.value }))}
-                  className="w-full rounded border border-slate-300 px-2 py-1.5 text-xs"
+                  className="w-full rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-1.5 text-xs text-[color:var(--ni-text-strong)] placeholder:text-[color:var(--ni-muted)]"
                   placeholder="Write a comment"
                 />
                 <button
                   type="button"
                   onClick={() => addComment(post.id)}
-                  className="rounded bg-cyan-700 px-2 py-1.5 text-xs font-semibold text-white"
+                  className="rounded bg-[color:var(--ni-brand-cta)] px-2 py-1.5 text-xs font-semibold text-white"
                 >
                   Comment
                 </button>
@@ -150,7 +150,7 @@ export function BusinessFeedList({ businessSlug, posts }: BusinessFeedListProps)
               {postState.comments.length > 0 ? (
                 <ul className="space-y-1">
                   {postState.comments.map((comment, index) => (
-                    <li key={`${post.id}-${index}`} className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700">
+                    <li key={`${post.id}-${index}`} className="rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-1 text-xs text-[color:var(--ni-text)]">
                       {comment}
                     </li>
                   ))}
