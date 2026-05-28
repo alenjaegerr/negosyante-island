@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { extractTags } from "@/lib/tags";
 import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 async function storePostMedia(file: File, kind: "image" | "gif" | "video") {
@@ -17,15 +16,19 @@ async function storePostMedia(file: File, kind: "image" | "gif" | "video") {
     throw new Error(`invalid_${kind}_type`);
   }
 
-  const folder = kind === "gif" ? ["public", "uploads", "posts", "gifs"] : kind === "video" ? ["public", "uploads", "posts", "videos"] : ["public", "uploads", "posts", "images"];
-  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), ...folder);
+  const uploadDir =
+    kind === "gif"
+      ? "public/uploads/posts/gifs"
+      : kind === "video"
+        ? "public/uploads/posts/videos"
+        : "public/uploads/posts/images";
   await mkdir(uploadDir, { recursive: true });
 
   const originalName = file.name || "upload";
   const extMatch = originalName.match(/\.([a-zA-Z0-9]+)$/);
   const extension = extMatch ? extMatch[1].toLowerCase() : kind === "video" ? "mp4" : kind === "gif" ? "gif" : "bin";
   const fileName = `${randomUUID()}.${extension}`;
-  const destination = path.join(uploadDir, fileName);
+  const destination = `${uploadDir}/${fileName}`;
 
   await writeFile(destination, Buffer.from(await file.arrayBuffer()));
   return `/uploads/posts/${kind === "gif" ? "gifs" : kind === "video" ? "videos" : "images"}/${fileName}`;
