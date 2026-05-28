@@ -6,10 +6,18 @@ function getSmtpTransportConfig() {
   const host = process.env.SMTP_HOST?.trim();
   const port = Number(process.env.SMTP_PORT?.trim() || "587");
   const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS?.trim();
+  const pass = process.env.SMTP_PASS?.replace(/\s+/g, "").trim();
   const from = process.env.SMTP_FROM?.trim();
 
   if (!host || !user || !pass || !from || Number.isNaN(port)) {
+    // Helpful debug: which keys are present (do NOT log values)
+    console.info("[mail:config] smtp present:", {
+      host: Boolean(host),
+      port: !Number.isNaN(port),
+      user: Boolean(user),
+      pass: Boolean(pass),
+      from: Boolean(from),
+    });
     return null;
   }
 
@@ -86,14 +94,19 @@ export async function sendTransactionalEmail(input: { to: string; subject: strin
     return { sent: false as const };
   }
 
-  const transport = transportInfo.transport;
-  await transport.sendMail({
-    from: transportInfo.from,
-    to: input.to,
-    subject: input.subject,
-    text: input.text,
-    html: input.html,
-  });
+  try {
+    const transport = transportInfo.transport;
+    await transport.sendMail({
+      from: transportInfo.from,
+      to: input.to,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+    });
+  } catch (error) {
+    console.error("SMTP send failed:", error);
+    return { sent: false as const };
+  }
 
   return { sent: true as const };
 }
