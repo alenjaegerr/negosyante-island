@@ -21,7 +21,9 @@ jobs:
 
       - name: Generate Prisma Client
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            PRISMA_DATA_PROXY_URL: ${{ secrets.PRISMA_DATA_PROXY_URL }}
+            # If PRISMA_DATA_PROXY_URL is set, Prisma will use the Data Proxy.
         run: npx prisma generate
 
       - name: Run migrations

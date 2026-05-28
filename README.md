@@ -31,27 +31,22 @@ This repository is part of the **Negosyante Island** project, which includes:
 
 - Email/password authentication with JWT cookie sessions
 - Role-based access control:
-  - `user`
-  - `business_pending`
-  - `business_verified`
   - `admin`
 - Social feed with post creation + like/comment/share/view counters
 - Trending Q page and Negosyante Insight indicators
-- Business verification workflow:
-  - submit BIR TIN or Mayor's Permit + business name
-  - admin approves/rejects request
-  - approved users become `business_verified`
-- Separate dashboards:
-  - User feed
-  - Business pending verification page
-  - Verified business analytics dashboard
-  - Admin verification panel
 - PostgreSQL Prisma schema + seed data for demo users and trends
 
-## Tech Stack
-
-- Frontend/Backend: Next.js App Router + Route Handlers
+- For serverless-friendly Prisma connections, consider Prisma Data Proxy or use Neon/Supabase which handle connections.
 - Styling: Tailwind CSS
+Prisma Data Proxy (recommended for Netlify)
+-----------------------------------------
+For serverless deployments (Netlify) we recommend using the Prisma Data Proxy to avoid connection limits. To enable:
+
+1. Create a Prisma Data Proxy in Prisma Cloud and copy the `PRISMA_DATA_PROXY_URL`.
+2. Add `PRISMA_DATA_PROXY_URL` to your Netlify environment variables and GitHub Secrets.
+3. The CI workflow and runtime will prefer the Data Proxy when `PRISMA_DATA_PROXY_URL` is present.
+
+If you prefer to stay within Supabase only, use the Supabase Session Pooler connection string as `DATABASE_URL` instead.
 - Database: PostgreSQL via Prisma ORM
 - Auth: JWT + HttpOnly cookie
 - Uploads: saved to `data/uploads` and served through an authenticated API route
