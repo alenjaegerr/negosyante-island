@@ -117,6 +117,15 @@ For production, make sure these environment variables are set:
 - `SMTP_PASS`
 - `SMTP_FROM`
 
+Recommended production changes for Netlify
+- Use a managed Postgres (Supabase, Neon, RDS) and set `DATABASE_URL` in Netlify.
+- Do not run `prisma migrate dev` on Netlify; instead add a CI job to run `npx prisma migrate deploy`.
+- Use a transactional email provider (SendGrid/Mailgun/Postmark) and set `SENDGRID_API_KEY` / `SENDGRID_FROM` in Netlify.
+- For serverless-friendly Prisma connections, consider Prisma Data Proxy or use Neon/Supabase which handle connections.
+
+CI (GitHub Actions)
+We include a sample workflow at `.github/workflows/prisma-migrate.yml` that runs migrations and builds on `main` — add `DATABASE_URL` and `NEXT_PUBLIC_APP_URL` as GitHub Secrets.
+
 If you use Gmail, create a Google App Password for `business.negosyanteisland@gmail.com` and use it for `SMTP_PASS`. Regular account passwords will not work for SMTP.
 
 The app will refuse to start in production without a `JWT_SECRET`, and Prisma needs a valid `DATABASE_URL`.

@@ -40,7 +40,46 @@ function getTransport() {
   return { transport: transportPromise, from: config.from };
 }
 
+async function sendWithSendGrid(input: { to: string; subject: string; text: string; html: string }) {
+  const key = process.env.SENDGRID_API_KEY?.trim();
+  const from = process.env.SENDGRID_FROM?.trim() || process.env.SMTP_FROM?.trim();
+  if (!key || !from) return null;
+
+  const body = {
+    personalizations: [{ to: [{ email: input.to }] }],
+    from: { email: from },
+    subject: input.subject,
+    content: [
+      { type: "text/plain", value: input.text },
+      { type: "text/html", value: input.html },
+    ],
+  };
+
+  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    console.error("SendGrid send failed:", res.status, txt);
+    return { sent: false as const };
+  }
+
+  return { sent: true as const };
+}
+
 export async function sendTransactionalEmail(input: { to: string; subject: string; text: string; html: string }) {
+  // Priority: SendGrid API if configured (recommended for serverless/Netlify)
+  try {
+    const sg = await sendWithSendGrid(input);
+    if (sg) return sg;
+  } catch (err) {
+    console.error("SendGrid error:", err);
+  }
+
+  // Fallback to SMTP via nodemailer
   const transportInfo = getTransport();
   if (!transportInfo) {
     console.info("[mail:dev]", { to: input.to, subject: input.subject, text: input.text, html: input.html, appUrl });

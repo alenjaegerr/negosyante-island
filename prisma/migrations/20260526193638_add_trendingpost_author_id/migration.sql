@@ -10,7 +10,7 @@ ALTER TYPE "Role" ADD VALUE 'publisher';
 ALTER TYPE "Role" ADD VALUE 'publisher_verified';
 
 -- DropIndex
-DROP INDEX "User_isDeleted_idx";
+DROP INDEX IF EXISTS "User_isDeleted_idx";
 
 -- AlterTable
 ALTER TABLE "TrendingPost" ADD COLUMN     "authorId" TEXT;
