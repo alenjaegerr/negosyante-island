@@ -7,74 +7,6 @@ const OTP_LENGTH = 6;
 const OTP_TTL_MINUTES = 15;
 const OTP_MAX_ATTEMPTS = 5;
 const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
-const TWILIO_PROVIDER_PREFIX = "twilio:";
-
-function getTwilioVerifyConfig() {
-  const serviceSid = process.env.TWILIO_VERIFY_SERVICE_SID?.trim();
-  const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim();
-  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
-
-  if (!serviceSid || !accountSid || !authToken) {
-    return null;
-  }
-
-  return { serviceSid, accountSid, authToken };
-}
-
-function getTwilioAuthHeader(accountSid: string, authToken: string) {
-  return `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`;
-}
-
-async function sendTwilioEmailVerification(email: string) {
-  const twilio = getTwilioVerifyConfig();
-  if (!twilio) return { sent: false as const };
-
-  const response = await fetch(`https://verify.twilio.com/v2/Services/${twilio.serviceSid}/Verifications`, {
-    method: "POST",
-    headers: {
-      Authorization: getTwilioAuthHeader(twilio.accountSid, twilio.authToken),
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({ To: email, Channel: "email" }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => "");
-    console.error("Twilio Verify send failed:", response.status, errorText);
-    return { sent: false as const };
-  }
-
-  return { sent: true as const };
-}
-
-async function checkTwilioEmailVerification(email: string, code: string) {
-  const twilio = getTwilioVerifyConfig();
-  if (!twilio) return { ok: false as const, error: "Verification service unavailable" };
-
-  const response = await fetch(`https://verify.twilio.com/v2/Services/${twilio.serviceSid}/VerificationCheck`, {
-    method: "POST",
-    headers: {
-      Authorization: getTwilioAuthHeader(twilio.accountSid, twilio.authToken),
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({ To: email, Code: code.trim() }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => "");
-    console.error("Twilio Verify check failed:", response.status, errorText);
-    return { ok: false as const, error: "Invalid or expired code" };
-  }
-
-  const result = (await response.json().catch(() => null)) as null | { status?: string; valid?: boolean };
-  const approved = result?.status === "approved" || result?.valid === true;
-
-  if (!approved) {
-    return { ok: false as const, error: "Invalid or expired code" };
-  }
-
-  return { ok: true as const };
-}
 
 export function generateOtpCode() {
   return String(crypto.randomInt(0, 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, "0");
@@ -115,8 +47,9 @@ function formatOtpHtml(options: {
   `;
 }
 
-async function createOtpRecord(options: { email: string; userId?: string | null; purpose: AuthOtpPurpose; codeHash: string }) {
+async function createOtpRecord(options: { email: string; userId?: string | null; purpose: AuthOtpPurpose }) {
   const code = generateOtpCode();
+  const codeHash = hashOtpCode(code);
   const expiresAt = expiryDate();
 
   await prisma.authOtp.deleteMany({
@@ -132,7 +65,7 @@ async function createOtpRecord(options: { email: string; userId?: string | null;
       email: options.email,
       userId: options.userId ?? null,
       purpose: options.purpose,
-      codeHash: options.codeHash,
+      codeHash,
       expiresAt,
     },
   });
@@ -150,7 +83,6 @@ export async function issueAndSendOtpEmail(options: {
   ctaLabel: string;
   ctaPath: string;
 }) {
-  const twilioConfig = getTwilioVerifyConfig();
   const code = generateOtpCode();
   const ctaHref = new URL(options.ctaPath, appUrl).toString();
   const html = formatOtpHtml({
@@ -162,24 +94,7 @@ export async function issueAndSendOtpEmail(options: {
   });
   const text = `${options.headline}\n\n${options.body}\n\nYour code: ${code}\n\nThis code expires in ${OTP_TTL_MINUTES} minutes. Open ${ctaHref} to continue.`;
 
-  const codeHash = twilioConfig ? `${TWILIO_PROVIDER_PREFIX}${crypto.randomUUID()}` : hashOtpCode(code);
-  const { otp } = await createOtpRecord({ ...options, codeHash });
-
-  if (twilioConfig) {
-    try {
-      const twilioSend = await sendTwilioEmailVerification(options.email);
-      if (twilioSend.sent) {
-        return otp;
-      }
-    } catch (error) {
-      console.error("Twilio Verify error:", error);
-    }
-
-    await prisma.authOtp.update({
-      where: { id: otp.id },
-      data: { codeHash: hashOtpCode(code) },
-    });
-  }
+  const { otp } = await createOtpRecord(options);
 
   await sendTransactionalEmail({
     to: options.email,
@@ -211,32 +126,6 @@ export async function verifyOtpCode(options: { email: string; purpose: AuthOtpPu
   const otp = await getActiveOtp(options.email, options.purpose);
   if (!otp) {
     return { ok: false as const, error: "Invalid or expired code" };
-  }
-
-  if (otp.codeHash.startsWith(TWILIO_PROVIDER_PREFIX)) {
-    const twilioCheck = await checkTwilioEmailVerification(options.email, options.code);
-    if (!twilioCheck.ok) {
-      const attempts = otp.attempts + 1;
-      await prisma.authOtp.update({
-        where: { id: otp.id },
-        data: {
-          attempts,
-          consumedAt: attempts >= OTP_MAX_ATTEMPTS ? new Date() : null,
-        },
-      });
-
-      return {
-        ok: false as const,
-        error: attempts >= OTP_MAX_ATTEMPTS ? "Code expired. Please request a new one." : twilioCheck.error,
-      };
-    }
-
-    await prisma.authOtp.update({
-      where: { id: otp.id },
-      data: { consumedAt: new Date() },
-    });
-
-    return { ok: true as const, otp };
   }
 
   const matches = otp.codeHash === hashOtpCode(options.code.trim());
