@@ -25,10 +25,10 @@ export default function ForgotPasswordPage() {
             <BrandLogo />
           </div>
           <h1 className="text-2xl font-semibold leading-[1] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            We’ll send a reset OTP to your email.
+            Start password recovery with your email.
           </h1>
           <p className="max-w-xl text-[13px] leading-relaxed text-cyan-50/85 sm:text-base">
-            Use the code on the reset page to choose a new password. SMTP must be configured to deliver the message.
+            The next page will let you request a reset code, then enter the code and choose a new password.
           </p>
         </div>
       </div>

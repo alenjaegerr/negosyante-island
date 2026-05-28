@@ -216,6 +216,7 @@ type EmailVerificationState = {
   error: string | null;
   loading: boolean;
   success: string | null;
+  codeRequested: boolean;
 };
 
 export function EmailVerificationForm() {
@@ -228,11 +229,10 @@ export function EmailVerificationForm() {
     error: null,
     loading: false,
     success: null,
+    codeRequested: false,
   });
 
-  const hasEmailFromLogin = initialEmail.trim().length > 0;
-
-  async function resendCode() {
+  async function requestCode() {
     if (!state.email.trim()) {
       setState((prev) => ({ ...prev, error: "Enter your email first." }));
       return;
@@ -246,7 +246,7 @@ export function EmailVerificationForm() {
         return;
       }
 
-      setState((prev) => ({ ...prev, loading: false, success: "A new verification code has been sent." }));
+      setState((prev) => ({ ...prev, loading: false, success: "A verification code has been sent.", codeRequested: true }));
     } catch {
       setState((prev) => ({ ...prev, loading: false, error: "Unable to reach the verification service. Please try again." }));
     }
@@ -254,6 +254,12 @@ export function EmailVerificationForm() {
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!state.codeRequested) {
+      await requestCode();
+      return;
+    }
+
     setState((prev) => ({ ...prev, loading: true, error: null, success: null }));
 
     try {
@@ -279,23 +285,25 @@ export function EmailVerificationForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-6 text-[var(--ni-text-strong)]">
       <h2 className="text-xl font-semibold text-[var(--ni-text-strong)]">One More Step</h2>
-      <p className="text-sm text-[color:var(--ni-text)]">We have sent a code to your email. Copy and paste the 6 digit code here.</p>
-      {hasEmailFromLogin ? (
-        <div className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-sm text-[color:var(--ni-text)]">
-          Code sent to <span className="font-semibold text-[color:var(--ni-text-strong)]">{state.email}</span>
-        </div>
-      ) : (
-        <input className={inputClassName} type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
-      )}
-      <input className={inputClassName} inputMode="numeric" pattern="[0-9]*" maxLength={6} required placeholder="6-digit code" value={state.code} onChange={(e) => setState((p) => ({ ...p, code: e.target.value }))} />
+      <p className="text-sm text-[color:var(--ni-text)]">
+        {state.codeRequested
+          ? "We have sent a code to your email. Copy and paste the 6 digit code here."
+          : "Enter your email and request a verification code first."}
+      </p>
+      <input className={inputClassName} type="email" required placeholder="Email" value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
+      {state.codeRequested ? (
+        <input className={inputClassName} inputMode="numeric" pattern="[0-9]*" maxLength={6} required placeholder="6-digit code" value={state.code} onChange={(e) => setState((p) => ({ ...p, code: e.target.value }))} />
+      ) : null}
       {state.success ? <p className="text-sm text-emerald-700">{state.success}</p> : null}
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
       <button disabled={state.loading} className="w-full rounded bg-[var(--ni-brand-cta)] p-2 text-white disabled:opacity-60" type="submit">
-        {state.loading ? "Verifying..." : "Verify email"}
+        {state.loading ? (state.codeRequested ? "Verifying..." : "Sending code...") : state.codeRequested ? "Verify email" : "Send verification code"}
       </button>
-      <button type="button" onClick={resendCode} disabled={state.loading || !state.email.trim()} className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] disabled:opacity-60">
-        Resend code
-      </button>
+      {state.codeRequested ? (
+        <button type="button" onClick={requestCode} disabled={state.loading || !state.email.trim()} className="w-full rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-[var(--ni-text-strong)] disabled:opacity-60">
+          Resend code
+        </button>
+      ) : null}
     </form>
   );
 }
@@ -307,6 +315,7 @@ type ResetPasswordState = {
   confirmPassword: string;
   error: string | null;
   loading: boolean;
+  codeRequested: boolean;
 };
 
 export function ForgotPasswordForm() {
@@ -321,13 +330,6 @@ export function ForgotPasswordForm() {
     setError(null);
 
     try {
-      const response = await postJson("/api/auth/request-password-reset", { email });
-      if (!response.ok) {
-        setError("Unable to request a reset code right now.");
-        setLoading(false);
-        return;
-      }
-
       router.push(`/reset-password?email=${encodeURIComponent(email)}`);
       router.refresh();
     } catch {
@@ -339,11 +341,11 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-6 text-[var(--ni-text-strong)]">
       <h2 className="text-xl font-semibold text-[var(--ni-text-strong)]">Forgot your password?</h2>
-      <p className="text-sm text-[color:var(--ni-text)]">We’ll send a reset code to your email address if the account exists.</p>
+      <p className="text-sm text-[color:var(--ni-text)]">Enter your email and continue to request a reset code.</p>
       <input className={inputClassName} type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button disabled={loading} className="w-full rounded bg-[var(--ni-brand-cta)] p-2 text-white disabled:opacity-60" type="submit">
-        {loading ? "Sending code..." : "Send reset code"}
+        {loading ? "Continuing..." : "Continue"}
       </button>
     </form>
   );
@@ -359,10 +361,37 @@ export function ResetPasswordForm() {
     confirmPassword: "",
     error: null,
     loading: false,
+    codeRequested: false,
   });
+
+  async function requestCode() {
+    if (!state.email.trim()) {
+      setState((prev) => ({ ...prev, error: "Enter your email first." }));
+      return;
+    }
+
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await postJson("/api/auth/request-password-reset", { email: state.email });
+      if (!response.ok) {
+        setState((prev) => ({ ...prev, loading: false, error: "Unable to request a reset code right now." }));
+        return;
+      }
+
+      setState((prev) => ({ ...prev, loading: false, codeRequested: true, error: null }));
+    } catch {
+      setState((prev) => ({ ...prev, loading: false, error: "Unable to reach the reset service. Please try again." }));
+    }
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!state.codeRequested) {
+      await requestCode();
+      return;
+    }
 
     if (state.password !== state.confirmPassword) {
       setState((prev) => ({ ...prev, error: "Passwords do not match", loading: false }));
@@ -396,14 +425,22 @@ export function ResetPasswordForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-[color:var(--ni-border)] bg-[var(--ni-surface-1)] p-6 text-[var(--ni-text-strong)]">
       <h2 className="text-xl font-semibold text-[var(--ni-text-strong)]">Reset your password</h2>
-      <p className="text-sm text-[color:var(--ni-text)]">Enter the code from your email and choose a new password.</p>
+      <p className="text-sm text-[color:var(--ni-text)]">
+        {state.codeRequested
+          ? "Enter the code from your email and choose a new password."
+          : "Enter your email and request a reset code first."}
+      </p>
       <input className={inputClassName} type="email" placeholder="Email" required value={state.email} onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))} />
-      <input className={inputClassName} inputMode="numeric" pattern="[0-9]*" maxLength={6} required placeholder="6-digit code" value={state.code} onChange={(e) => setState((p) => ({ ...p, code: e.target.value }))} />
-      <input className={inputClassName} type="password" placeholder="New password" required value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
-      <input className={inputClassName} type="password" placeholder="Confirm new password" required value={state.confirmPassword} onChange={(e) => setState((p) => ({ ...p, confirmPassword: e.target.value }))} />
+      {state.codeRequested ? (
+        <>
+          <input className={inputClassName} inputMode="numeric" pattern="[0-9]*" maxLength={6} required placeholder="6-digit code" value={state.code} onChange={(e) => setState((p) => ({ ...p, code: e.target.value }))} />
+          <input className={inputClassName} type="password" placeholder="New password" required value={state.password} onChange={(e) => setState((p) => ({ ...p, password: e.target.value }))} />
+          <input className={inputClassName} type="password" placeholder="Confirm new password" required value={state.confirmPassword} onChange={(e) => setState((p) => ({ ...p, confirmPassword: e.target.value }))} />
+        </>
+      ) : null}
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}
       <button disabled={state.loading} className="w-full rounded bg-[var(--ni-brand-cta)] p-2 text-white disabled:opacity-60" type="submit">
-        {state.loading ? "Resetting..." : "Reset password"}
+        {state.loading ? (state.codeRequested ? "Resetting..." : "Sending code...") : state.codeRequested ? "Reset password" : "Send reset code"}
       </button>
     </form>
   );

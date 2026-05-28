@@ -33,6 +33,9 @@ export default async function AccountPage() {
           <Link href="/account/edit" className="rounded border border-[color:var(--ni-border)] px-3 py-1.5 text-sm font-semibold text-[color:var(--ni-text-strong)]">
             Edit profile
           </Link>
+          <Link href={`/reset-password?email=${encodeURIComponent(user.email)}`} className="rounded border border-[color:var(--ni-border)] px-3 py-1.5 text-sm font-semibold text-[color:var(--ni-text-strong)]">
+            Change password
+          </Link>
           <Link href="/b2bm" className="rounded border border-[color:var(--ni-border)] px-3 py-1.5 text-sm font-semibold text-[color:var(--ni-text-strong)]">
             Open B2BM
           </Link>
