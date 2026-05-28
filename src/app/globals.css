@@ -84,6 +84,16 @@ body[data-shell-mode="message"] {
   overflow: hidden;
 }
 
+body[data-mobile-get-started="open"] {
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  body > .mobile-get-started-overlay ~ [data-nav-shell] {
+    display: none;
+  }
+}
+
 body[data-shell-mode="message"] main.page-enter {
   padding-top: 0.75rem;
   padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);

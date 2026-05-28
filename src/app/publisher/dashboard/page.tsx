@@ -72,6 +72,7 @@ export default async function PublisherDashboardPage() {
             action="/api/admin/trending-posts"
             method="post"
             encType="multipart/form-data"
+            data-media-upload-form="true"
             className="mt-4 grid gap-2 md:grid-cols-2"
           >
             <input name="title" required className="rounded border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] p-2 text-sm text-[var(--ni-text-strong)] placeholder:text-[var(--ni-muted)] md:col-span-2" placeholder="Article title" />

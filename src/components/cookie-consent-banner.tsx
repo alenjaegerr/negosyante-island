@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ConsentMode = "essential" | "analytics";
 const CONSENT_COOKIE = "ni-cookie-consent";
@@ -16,7 +16,6 @@ function readConsentCookie() {
 
 function writeConsentCookie(mode: ConsentMode) {
   document.cookie = `${CONSENT_COOKIE}=${encodeURIComponent(mode)}; path=/; max-age=${CONSENT_MAX_AGE}; samesite=lax`;
-  window.dispatchEvent(new Event("ni-cookie-consent-change"));
 }
 
 export function getCookieConsentMode() {
@@ -24,7 +23,11 @@ export function getCookieConsentMode() {
 }
 
 export default function CookieConsentBanner() {
-  const [visible, setVisible] = useState(() => !readConsentCookie());
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    setVisible(!readConsentCookie());
+  }, []);
 
   if (!visible) return null;
 
@@ -42,8 +45,9 @@ export default function CookieConsentBanner() {
           <button
             type="button"
             onClick={() => {
-              writeConsentCookie("essential");
               setVisible(false);
+              writeConsentCookie("essential");
+              window.location.reload();
             }}
             className="rounded-full border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ni-text-strong)]"
           >
@@ -52,8 +56,9 @@ export default function CookieConsentBanner() {
           <button
             type="button"
             onClick={() => {
-              writeConsentCookie("analytics");
               setVisible(false);
+              writeConsentCookie("analytics");
+              window.location.reload();
             }}
             className="rounded-full bg-[color:var(--ni-brand-cta)] px-4 py-2 text-sm font-semibold text-white"
           >

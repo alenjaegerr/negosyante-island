@@ -3,8 +3,10 @@ import { Roboto_Mono, Roboto_Slab, Inter, Source_Serif_4 } from "next/font/googl
 import { Reddit_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/nav-bar";
+import MobileGetStartedOverlay from "@/components/mobile-get-started-overlay";
 import CookieConsentBanner from "@/components/cookie-consent-banner";
 import AnalyticsConsentScripts from "@/components/analytics-consent";
+import SitewideMediaUploadEnhancer from "@/components/sitewide-media-upload-enhancer";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
 const metadataBase = new URL(siteUrl);
@@ -51,11 +53,20 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Negosyante Island",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Negosyante Island social preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Negosyante Island",
     description: "Social media + culture analytics platform",
+    images: ["/opengraph-image"],
   },
   icons: {
     icon: "/brand/favicon.png",
@@ -68,6 +79,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en" className={`${robotoMono.variable} ${redditMono.variable} ${robotoSlab.variable} ${inter.variable} ${articleSerif.variable} h-full antialiased`}>
       <body className="min-h-full bg-[var(--ni-bg)] text-[var(--ni-text-strong)] transition-colors duration-200">
+        <SitewideMediaUploadEnhancer />
+        <MobileGetStartedOverlay />
         <NavBar />
         <main className="page-enter mx-auto w-full max-w-screen-2xl px-3 py-4 pb-24 sm:px-4 sm:py-4 md:pb-4">{children}</main>
         <CookieConsentBanner />

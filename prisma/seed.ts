@@ -60,6 +60,24 @@ async function main() {
     },
   });
 
+  // Upsert AR Industries admin user for testing / admin purposes
+  await prisma.user.upsert({
+    where: { email: "business.alvinrodrigo@gmail.com" },
+    update: {
+      name: "AR Industries",
+      role: Role.admin,
+      businessName: "AR Industries",
+      passwordHash,
+    },
+    create: {
+      name: "AR Industries",
+      email: "business.alvinrodrigo@gmail.com",
+      passwordHash,
+      role: Role.admin,
+      businessName: "AR Industries",
+    },
+  });
+
   await prisma.post.createMany({
     data: [
       {

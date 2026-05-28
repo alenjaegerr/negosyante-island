@@ -275,7 +275,7 @@ export function NavShell({ isAuthenticated, role, displayName, businessName, ava
 
   if (isMessagingRoute) {
     return (
-      <>
+      <div data-nav-shell>
       <header className={`sticky top-0 z-30 border-b border-[color:var(--ni-border)] bg-[var(--ni-bg)] transition-transform duration-300 will-change-transform md:translate-y-0 ${isMobileHeaderHidden ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-2 py-1.5 sm:px-4 sm:py-2">
           <Link href={messagingBackHref} className="shrink-0">
@@ -395,12 +395,12 @@ export function NavShell({ isAuthenticated, role, displayName, businessName, ava
           )}
         </div>
       </aside>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div data-nav-shell>
       <header className={`sticky top-0 z-30 border-b border-[color:var(--ni-border)] bg-[var(--ni-bg)] transition-transform duration-300 will-change-transform md:translate-y-0 ${isMobileHeaderHidden ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="mx-auto hidden w-full max-w-screen-2xl grid-cols-[auto_minmax(14rem,34rem)_auto] items-center gap-3 px-2 py-1 sm:px-4 md:grid">
           <div className="flex items-center gap-2">
@@ -799,6 +799,6 @@ export function NavShell({ isAuthenticated, role, displayName, businessName, ava
           )}
         </div>
       </aside>
-    </>
+    </div>
   );
 }

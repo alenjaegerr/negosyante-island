@@ -35,7 +35,26 @@ export default async function BusinessHomePage({ searchParams }: BusinessHomePag
   const [posts, businesses, targetBusiness] = await Promise.all([
     prisma.post.findMany({
       orderBy: { createdAt: "desc" },
-      include: { author: true },
+      select: {
+        id: true,
+        content: true,
+        tags: true,
+        likes: true,
+        comments: true,
+        shares: true,
+        views: true,
+        createdAt: true,
+        authorId: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            businessName: true,
+            avatarUrl: true,
+            role: true,
+          },
+        },
+      },
       take: 25,
     }),
     getBusinesses(),

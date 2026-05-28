@@ -77,27 +77,50 @@ export default async function AdminPage({
     `);
   };
 
-  const [requests, users, trends, trendingPosts, siteSettings, postCount, messageCount, notificationCount, followsCount] = await Promise.all([
-    prisma.verificationRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { user: true },
-      take: 30,
-    }),
-    prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 40,
-    }),
-    prisma.trend.findMany({
-      orderBy: { growthPercent: "desc" },
-      take: 20,
-    }),
-    fetchTrendingPosts(),
-    getSiteSettings(),
-    prisma.post.count(),
-    prismaAny.businessMessage?.count ? prismaAny.businessMessage.count() : Promise.resolve(0),
-    prismaAny.notification?.count ? prismaAny.notification.count() : Promise.resolve(0),
-    prismaAny.businessFollow?.count ? prismaAny.businessFollow.count() : Promise.resolve(0),
-  ]);
+  const requests = await prisma.verificationRequest.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 30,
+    select: {
+      id: true,
+      businessName: true,
+      documentType: true,
+      verificationType: true,
+      portfolioUrl: true,
+      status: true,
+      user: {
+        select: {
+          email: true,
+        },
+      },
+    },
+  });
+
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 40,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      businessName: true,
+      membershipCycle: true,
+      membershipEndsAt: true,
+      membershipStatus: true,
+    },
+  });
+
+  const trends = await prisma.trend.findMany({
+    orderBy: { growthPercent: "desc" },
+    take: 20,
+  });
+
+  const trendingPosts = await fetchTrendingPosts();
+  const siteSettings = await getSiteSettings();
+  const postCount = await prisma.post.count();
+  const messageCount = prismaAny.businessMessage?.count ? await prismaAny.businessMessage.count() : 0;
+  const notificationCount = prismaAny.notification?.count ? await prismaAny.notification.count() : 0;
+  const followsCount = prismaAny.businessFollow?.count ? await prismaAny.businessFollow.count() : 0;
 
   const pendingRequests = requests.filter((request) => request.status === "pending").length;
   const verifiedBusinesses = users.filter((account) => account.role === Role.business_verified || account.role === Role.marketing_verified).length;
@@ -319,6 +342,7 @@ export default async function AdminPage({
           action="/api/admin/trending-posts"
           method="post"
           encType="multipart/form-data"
+          data-media-upload-form="true"
           className="mt-3 grid gap-2 md:grid-cols-2"
         >
           <input type="hidden" name="editId" defaultValue={editingPost?.id ?? ""} />

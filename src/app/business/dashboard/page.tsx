@@ -31,6 +31,11 @@ export default async function BusinessDashboardPage() {
   const posts = await prisma.post.findMany({
     where: { authorId: user.id },
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      likes: true,
+      views: true,
+    },
   });
 
   const totals = posts.reduce(

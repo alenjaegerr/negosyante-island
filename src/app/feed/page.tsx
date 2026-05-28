@@ -9,7 +9,6 @@ import { CreatePostForm } from "@/components/create-post-form";
 import { PostActions } from "@/components/post-actions";
 import PostComments from "@/components/post-comments";
 import RoleBadge from "@/components/role-badge";
-import { TrendingMediaBlock } from "@/components/trending-media-block";
 import { UserAvatar } from "@/components/user-avatar";
 import { AdPlacementCard } from "@/components/ad-placement-card";
 import { getAdPlacementConfig, getSiteSettingMap } from "@/lib/site-settings";
@@ -27,7 +26,26 @@ export default async function FeedPage() {
   const [posts, businesses, threads, siteSettings] = await Promise.all([
     prisma.post.findMany({
       orderBy: { createdAt: "desc" },
-      include: { author: true },
+      select: {
+        id: true,
+        content: true,
+        tags: true,
+        likes: true,
+        comments: true,
+        shares: true,
+        views: true,
+        createdAt: true,
+        authorId: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            businessName: true,
+            avatarUrl: true,
+            role: true,
+          },
+        },
+      },
       take: 25,
     }),
     getBusinesses(),
@@ -103,16 +121,6 @@ export default async function FeedPage() {
                   </Link>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-[color:var(--ni-text-strong)]">{post.content}</p>
-                <div className="mt-3">
-                  <TrendingMediaBlock
-                    title={post.content || "Negosyante Island post"}
-                    imageUrl={post.imageUrl}
-                    gifUrl={post.gifUrl}
-                    videoUrl={post.videoUrl}
-                    className="rounded-xl bg-[color:var(--ni-surface-2)]"
-                    mediaClassName="h-64"
-                  />
-                </div>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--ni-text)]">
                   {post.tags.map((tag) => (
                     <span key={tag} className="rounded bg-[color:var(--ni-surface-2)] px-2 py-1">#{tag}</span>

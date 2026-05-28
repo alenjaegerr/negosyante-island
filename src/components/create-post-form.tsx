@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { maybeCompressMedia } from "@/components/sitewide-media-upload-enhancer";
 
 export function CreatePostForm() {
   const router = useRouter();
@@ -12,12 +13,27 @@ export function CreatePostForm() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const hasImage = formData.get("imageFile") instanceof File && (formData.get("imageFile") as File).size > 0;
-    const hasGif = formData.get("gifFile") instanceof File && (formData.get("gifFile") as File).size > 0;
-    const hasVideo = formData.get("videoFile") instanceof File && (formData.get("videoFile") as File).size > 0;
+    const imageFile = formData.get("imageFile");
+    const gifFile = formData.get("gifFile");
+    const videoFile = formData.get("videoFile");
+    const hasImage = imageFile instanceof File && imageFile.size > 0;
+    const hasGif = gifFile instanceof File && gifFile.size > 0;
+    const hasVideo = videoFile instanceof File && videoFile.size > 0;
 
     if (!String(formData.get("content") ?? "").trim() && !hasImage && !hasGif && !hasVideo) {
       return;
+    }
+
+    if (imageFile instanceof File && imageFile.size > 0) {
+      formData.set("imageFile", await maybeCompressMedia(imageFile));
+    }
+
+    if (gifFile instanceof File && gifFile.size > 0) {
+      formData.set("gifFile", await maybeCompressMedia(gifFile));
+    }
+
+    if (videoFile instanceof File && videoFile.size > 0) {
+      formData.set("videoFile", await maybeCompressMedia(videoFile));
     }
 
     const response = await fetch("/api/posts", {
