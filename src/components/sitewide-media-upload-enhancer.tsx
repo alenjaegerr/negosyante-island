@@ -4,10 +4,8 @@ import { useEffect } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
-const MAX_IMAGE_DIMENSION = 1600;
-const MAX_COMPRESSED_BYTES = 4.5 * 1024 * 1024;
-const MAX_DIRECT_GIF_BYTES = 20 * 1024 * 1024;
-const MAX_DIRECT_VIDEO_BYTES = 25 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 1400;
+const MAX_SAFE_UPLOAD_BYTES = 3.5 * 1024 * 1024;
 const FFMPEG_VERSION = "0.12.10";
 
 let ffmpegPromise: Promise<FFmpeg> | null = null;
@@ -85,11 +83,15 @@ async function compressImage(file: File) {
   }
 
   const compressedBlob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob(resolve, "image/jpeg", 0.82);
+    canvas.toBlob(resolve, "image/jpeg", 0.78);
   });
 
-  if (!compressedBlob || compressedBlob.size >= file.size || compressedBlob.size > MAX_COMPRESSED_BYTES) {
+  if (!compressedBlob || compressedBlob.size >= file.size) {
     return file;
+  }
+
+  if (compressedBlob.size > MAX_SAFE_UPLOAD_BYTES) {
+    throw new Error("Image is still too large after compression. Please choose a smaller image.");
   }
 
   return new File([compressedBlob], `${file.name.replace(/\.[^.]+$/, "") || "upload"}.jpg`, {
@@ -98,17 +100,13 @@ async function compressImage(file: File) {
 }
 
 async function compressGif(file: File) {
-  if (file.size <= MAX_DIRECT_GIF_BYTES) {
-    return file;
-  }
-
   const ffmpeg = await getFfmpeg();
   await ffmpeg.writeFile("input.gif", await fetchFile(file));
   await ffmpeg.exec([
     "-i",
     "input.gif",
     "-vf",
-    "fps=12,scale='min(960,iw)':-2:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=64[p];[s1][p]paletteuse=dither=bayer",
+    "fps=10,scale='min(720,iw)':-2:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=32[p];[s1][p]paletteuse=dither=bayer",
     "-loop",
     "0",
     "output.gif",
@@ -118,31 +116,31 @@ async function compressGif(file: File) {
   const gifBytes = toBytes(data as Uint8Array | string);
   const gifCopy = new Uint8Array(gifBytes);
   const blob = new Blob([gifCopy.buffer], { type: "image/gif" });
-  if (blob.size >= file.size || blob.size > MAX_COMPRESSED_BYTES) {
+  if (blob.size >= file.size) {
     return file;
+  }
+
+  if (blob.size > MAX_SAFE_UPLOAD_BYTES) {
+    throw new Error("GIF is still too large after compression. Please trim the animation or upload a shorter GIF.");
   }
 
   return new File([blob], `${file.name.replace(/\.[^.]+$/, "") || "upload"}.gif`, { type: "image/gif" });
 }
 
 async function compressVideo(file: File) {
-  if (file.size <= MAX_DIRECT_VIDEO_BYTES) {
-    return file;
-  }
-
   const ffmpeg = await getFfmpeg();
   await ffmpeg.writeFile("input.mp4", await fetchFile(file));
   await ffmpeg.exec([
     "-i",
     "input.mp4",
     "-vf",
-    "scale='min(1280,iw)':-2:flags=lanczos",
+    "fps=24,scale='min(960,iw)':-2:flags=lanczos",
     "-c:v",
     "libx264",
     "-preset",
     "veryfast",
     "-crf",
-    "30",
+    "34",
     "-movflags",
     "+faststart",
     "-an",
@@ -153,8 +151,12 @@ async function compressVideo(file: File) {
   const videoBytes = toBytes(data as Uint8Array | string);
   const videoCopy = new Uint8Array(videoBytes);
   const blob = new Blob([videoCopy.buffer], { type: "video/mp4" });
-  if (blob.size >= file.size || blob.size > MAX_COMPRESSED_BYTES) {
+  if (blob.size >= file.size) {
     return file;
+  }
+
+  if (blob.size > MAX_SAFE_UPLOAD_BYTES) {
+    throw new Error("Video is still too large after compression. Please trim it or upload a shorter clip.");
   }
 
   return new File([blob], `${file.name.replace(/\.[^.]+$/, "") || "upload"}.mp4`, { type: "video/mp4" });
