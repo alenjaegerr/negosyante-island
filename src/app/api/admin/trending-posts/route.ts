@@ -1,12 +1,11 @@
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { Prisma, Role } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { defaultTrendingInsightSignals, defaultTrendingInsightStats } from "@/lib/trending-insight";
 import type { InsightStat } from "@/lib/site-settings";
+import { fileToDataUrl } from "@/lib/upload-media";
 
 const allowedCategories = new Set([
   "tiktok",
@@ -75,19 +74,7 @@ async function storeTrendingImage(file: File): Promise<string> {
     throw new Error("invalid_image_type");
   }
 
-  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "trending");
-  await mkdir(uploadDir, { recursive: true });
-
-  const originalName = file.name || "upload";
-  const extMatch = originalName.match(/\.([a-zA-Z0-9]+)$/);
-  const extension = extMatch ? extMatch[1].toLowerCase() : "bin";
-  const fileName = `${randomUUID()}.${extension}`;
-  const destination = path.join(uploadDir, fileName);
-
-  const arrayBuffer = await file.arrayBuffer();
-  await writeFile(destination, Buffer.from(arrayBuffer));
-
-  return `/uploads/trending/${fileName}`;
+  return fileToDataUrl(file);
 }
 
 async function storeTrendingGif(file: File): Promise<string> {
@@ -95,19 +82,7 @@ async function storeTrendingGif(file: File): Promise<string> {
     throw new Error("invalid_gif_type");
   }
 
-  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "trending", "gifs");
-  await mkdir(uploadDir, { recursive: true });
-
-  const originalName = file.name || "upload";
-  const extMatch = originalName.match(/\.([a-zA-Z0-9]+)$/);
-  const extension = extMatch ? extMatch[1].toLowerCase() : "gif";
-  const fileName = `${randomUUID()}.${extension}`;
-  const destination = path.join(uploadDir, fileName);
-
-  const arrayBuffer = await file.arrayBuffer();
-  await writeFile(destination, Buffer.from(arrayBuffer));
-
-  return `/uploads/trending/gifs/${fileName}`;
+  return fileToDataUrl(file);
 }
 
 async function storeTrendingVideo(file: File): Promise<string> {
@@ -115,19 +90,7 @@ async function storeTrendingVideo(file: File): Promise<string> {
     throw new Error("invalid_video_type");
   }
 
-  const uploadDir = path.join(/*turbopackIgnore: true*/ process.cwd(), "public", "uploads", "trending", "videos");
-  await mkdir(uploadDir, { recursive: true });
-
-  const originalName = file.name || "upload";
-  const extMatch = originalName.match(/\.([a-zA-Z0-9]+)$/);
-  const extension = extMatch ? extMatch[1].toLowerCase() : "mp4";
-  const fileName = `${randomUUID()}.${extension}`;
-  const destination = path.join(uploadDir, fileName);
-
-  const arrayBuffer = await file.arrayBuffer();
-  await writeFile(destination, Buffer.from(arrayBuffer));
-
-  return `/uploads/trending/videos/${fileName}`;
+  return fileToDataUrl(file);
 }
 
 export async function POST(request: Request) {

@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { extractTags } from "@/lib/tags";
-import { mkdir, writeFile } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
+import { fileToDataUrl } from "@/lib/upload-media";
 
 async function storePostMedia(file: File, kind: "image" | "gif" | "video") {
   const mimeChecks = {
@@ -16,22 +15,7 @@ async function storePostMedia(file: File, kind: "image" | "gif" | "video") {
     throw new Error(`invalid_${kind}_type`);
   }
 
-  const uploadDir =
-    kind === "gif"
-      ? "public/uploads/posts/gifs"
-      : kind === "video"
-        ? "public/uploads/posts/videos"
-        : "public/uploads/posts/images";
-  await mkdir(uploadDir, { recursive: true });
-
-  const originalName = file.name || "upload";
-  const extMatch = originalName.match(/\.([a-zA-Z0-9]+)$/);
-  const extension = extMatch ? extMatch[1].toLowerCase() : kind === "video" ? "mp4" : kind === "gif" ? "gif" : "bin";
-  const fileName = `${randomUUID()}.${extension}`;
-  const destination = `${uploadDir}/${fileName}`;
-
-  await writeFile(destination, Buffer.from(await file.arrayBuffer()));
-  return `/uploads/posts/${kind === "gif" ? "gifs" : kind === "video" ? "videos" : "images"}/${fileName}`;
+  return fileToDataUrl(file);
 }
 
 export async function GET() {
