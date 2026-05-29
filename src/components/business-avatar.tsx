@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
+import { compressMediaFile, setUploadOverlay } from "@/components/sitewide-media-upload-enhancer";
 
 type BusinessAvatarProps = {
   slug: string;
@@ -41,22 +42,29 @@ export function BusinessAvatar({ slug, initials, online, canUpload, avatarUrl }:
     if (!file) return;
 
     setUploadError(null);
-    const formData = new FormData();
-    formData.set("avatar", file);
+    setUploadOverlay({ title: "Compressing avatar", detail: "Optimizing image before upload", fileName: file.name || "avatar" });
 
-    const response = await fetch("/api/me/avatar", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const compressedFile = await compressMediaFile(file);
+      const formData = new FormData();
+      formData.set("avatar", compressedFile);
 
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({ error: "Upload failed" }));
-      setUploadError(data.error ?? "Upload failed");
-      return;
+      const response = await fetch("/api/me/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({ error: "Upload failed" }));
+        setUploadError(data.error ?? "Upload failed");
+        return;
+      }
+
+      const data = await response.json();
+      setImageSrc(data.avatarUrl ?? null);
+    } finally {
+      setUploadOverlay(null);
     }
-
-    const data = await response.json();
-    setImageSrc(data.avatarUrl ?? null);
   }
 
   return (
@@ -82,7 +90,7 @@ export function BusinessAvatar({ slug, initials, online, canUpload, avatarUrl }:
         <div>
           <label className="mt-2 block cursor-pointer rounded border border-slate-300 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700">
             Upload photo
-            <input className="hidden" type="file" accept="image/*" onChange={onUpload} />
+            <input className="hidden" type="file" accept="image/*" data-skip-global-media-compress="true" onChange={onUpload} />
           </label>
           {uploadError ? <p className="mt-1 text-[11px] text-rose-700">{uploadError}</p> : null}
         </div>

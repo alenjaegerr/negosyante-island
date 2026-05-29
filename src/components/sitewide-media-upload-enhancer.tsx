@@ -1,17 +1,40 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 const MAX_IMAGE_DIMENSION = 1400;
 const MAX_SAFE_UPLOAD_BYTES = 3.5 * 1024 * 1024;
 const FFMPEG_VERSION = "0.12.10";
+const UPLOAD_STATUS_EVENT = "ni-upload-status";
+
+type UploadStatus = {
+  title: string;
+  detail: string;
+  fileName?: string;
+};
 
 let ffmpegPromise: Promise<FFmpeg> | null = null;
 
 function toBytes(data: Uint8Array | string) {
   return typeof data === "string" ? new TextEncoder().encode(data) : data;
+}
+
+function isCompressibleFile(file: File) {
+  return file.type.startsWith("image/") || file.type === "video/mp4";
+}
+
+function describeFile(file: File) {
+  if (file.type === "video/mp4") return "Optimizing video before upload";
+  if (file.type === "image/gif") return "Optimizing GIF before upload";
+  if (file.type.startsWith("image/")) return "Optimizing image before upload";
+  return "Preparing upload";
+}
+
+export function setUploadOverlay(status: UploadStatus | null) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<UploadStatus | null>(UPLOAD_STATUS_EVENT, { detail: status }));
 }
 
 async function getFfmpeg() {
@@ -86,17 +109,12 @@ async function compressImage(file: File) {
     canvas.toBlob(resolve, "image/jpeg", 0.78);
   });
 
-  if (!compressedBlob || compressedBlob.size >= file.size) {
-    return file;
-  }
-
+  if (!compressedBlob || compressedBlob.size >= file.size) return file;
   if (compressedBlob.size > MAX_SAFE_UPLOAD_BYTES) {
     throw new Error("Image is still too large after compression. Please choose a smaller image.");
   }
 
-  return new File([compressedBlob], `${file.name.replace(/\.[^.]+$/, "") || "upload"}.jpg`, {
-    type: "image/jpeg",
-  });
+  return new File([compressedBlob], `${file.name.replace(/\.[^.]+$/, "") || "upload"}.jpg`, { type: "image/jpeg" });
 }
 
 async function compressGif(file: File) {
@@ -113,13 +131,10 @@ async function compressGif(file: File) {
   ]);
 
   const data = await ffmpeg.readFile("output.gif");
-  const gifBytes = toBytes(data as Uint8Array | string);
-  const gifCopy = new Uint8Array(gifBytes);
-  const blob = new Blob([gifCopy.buffer], { type: "image/gif" });
-  if (blob.size >= file.size) {
-    return file;
-  }
+  const gifBytes = new Uint8Array(toBytes(data as Uint8Array | string));
+  const blob = new Blob([new Uint8Array(gifBytes)], { type: "image/gif" });
 
+  if (blob.size >= file.size) return file;
   if (blob.size > MAX_SAFE_UPLOAD_BYTES) {
     throw new Error("GIF is still too large after compression. Please trim the animation or upload a shorter GIF.");
   }
@@ -148,13 +163,10 @@ async function compressVideo(file: File) {
   ]);
 
   const data = await ffmpeg.readFile("output.mp4");
-  const videoBytes = toBytes(data as Uint8Array | string);
-  const videoCopy = new Uint8Array(videoBytes);
-  const blob = new Blob([videoCopy.buffer], { type: "video/mp4" });
-  if (blob.size >= file.size) {
-    return file;
-  }
+  const videoBytes = new Uint8Array(toBytes(data as Uint8Array | string));
+  const blob = new Blob([new Uint8Array(videoBytes)], { type: "video/mp4" });
 
+  if (blob.size >= file.size) return file;
   if (blob.size > MAX_SAFE_UPLOAD_BYTES) {
     throw new Error("Video is still too large after compression. Please trim it or upload a shorter clip.");
   }
@@ -162,9 +174,9 @@ async function compressVideo(file: File) {
   return new File([blob], `${file.name.replace(/\.[^.]+$/, "") || "upload"}.mp4`, { type: "video/mp4" });
 }
 
-export async function maybeCompressMedia(file: File) {
-  if (file.type.startsWith("image/") && file.type !== "image/gif") {
-    return compressImage(file);
+export async function compressMediaFile(file: File) {
+  if (file.type === "image/svg+xml") {
+    return file;
   }
 
   if (file.type === "image/gif") {
@@ -175,88 +187,107 @@ export async function maybeCompressMedia(file: File) {
     return compressVideo(file);
   }
 
+  if (file.type.startsWith("image/")) {
+    return compressImage(file);
+  }
+
   return file;
 }
 
-function getUploadFormTargets(form: HTMLFormElement) {
-  return {
-    imageInput: form.querySelector<HTMLInputElement>('input[name="imageFile"]'),
-    gifInput: form.querySelector<HTMLInputElement>('input[name="gifFile"]'),
-    videoInput: form.querySelector<HTMLInputElement>('input[name="videoFile"]'),
-  };
+export async function compressMediaFileToInput(input: HTMLInputElement, file: File, setStatus?: (status: UploadStatus | null) => void) {
+  const status = {
+    title: "Compressing upload",
+    detail: describeFile(file),
+    fileName: file.name || "upload",
+  } satisfies UploadStatus;
+
+  setStatus?.(status);
+  setUploadOverlay(status);
+
+  const compressed = await compressMediaFile(file);
+  if (input.isConnected) {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(compressed);
+    input.files = dataTransfer.files;
+  }
+
+  return compressed;
 }
 
 export default function SitewideMediaUploadEnhancer() {
+  const [status, setStatus] = useState<UploadStatus | null>(null);
+
   useEffect(() => {
-    const forms = Array.from(document.querySelectorAll<HTMLFormElement>('form[data-media-upload-form="true"]'));
-    if (!forms.length) return;
+    const onOverlayUpdate = (event: Event) => {
+      setStatus((event as CustomEvent<UploadStatus | null>).detail ?? null);
+    };
 
-    const cleanups = forms.map((form) => {
-      const { imageInput, gifInput, videoInput } = getUploadFormTargets(form);
-      if (!imageInput && !gifInput && !videoInput) return () => undefined;
+    window.addEventListener(UPLOAD_STATUS_EVENT, onOverlayUpdate as EventListener);
+    return () => window.removeEventListener(UPLOAD_STATUS_EVENT, onOverlayUpdate as EventListener);
+  }, []);
 
-      const onSubmit = async (event: Event) => {
-        if (form.dataset.mediaUploadPending === "1") return;
-        event.preventDefault();
+  useEffect(() => {
+    const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[type="file"]'));
+    if (!inputs.length) return;
 
-        const formData = new FormData(form);
-        const imageFile = formData.get("imageFile");
-        const gifFile = formData.get("gifFile");
-        const videoFile = formData.get("videoFile");
+    const onChangeByInput = new WeakMap<HTMLInputElement, number>();
 
-        try {
-          form.dataset.mediaUploadPending = "1";
+    const onChange = async (event: Event) => {
+      const input = event.currentTarget as HTMLInputElement;
+      const file = input.files?.[0];
+      if (!file || !isCompressibleFile(file) || input.dataset.skipGlobalMediaCompress === "true") return;
 
-          if (imageFile instanceof File && imageFile.size > 0) {
-            formData.set("imageFile", await maybeCompressMedia(imageFile));
-          }
+      const token = (onChangeByInput.get(input) ?? 0) + 1;
+      onChangeByInput.set(input, token);
 
-          if (gifFile instanceof File && gifFile.size > 0) {
-            formData.set("gifFile", await maybeCompressMedia(gifFile));
-          }
-
-          if (videoFile instanceof File && videoFile.size > 0) {
-            formData.set("videoFile", await maybeCompressMedia(videoFile));
-          }
-
-          const response = await fetch(form.action, {
-            method: form.method || "post",
-            body: formData,
-            redirect: "follow",
-          });
-
-          if (!response.ok && !response.redirected) {
-            const errorText = await response.text().catch(() => "");
-            throw new Error(errorText || "Upload failed. Please try again.");
-          }
-
-          if (response.redirected) {
-            window.location.assign(response.url);
-            return;
-          }
-
-          if (form.dataset.refreshOnSuccess === "true") {
-            window.location.reload();
-            return;
-          }
-
-          window.location.assign(form.action);
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "Upload failed. Please try again.";
-          window.alert(message);
-        } finally {
-          form.dataset.mediaUploadPending = "0";
+      try {
+        input.dataset.mediaBusy = "1";
+        await compressMediaFileToInput(input, file, setStatus);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Upload compression failed. Please try again.";
+        window.alert(message);
+        if (input.isConnected) input.value = "";
+      } finally {
+        if (onChangeByInput.get(input) === token) {
+          input.dataset.mediaBusy = "0";
+          setStatus(null);
+          setUploadOverlay(null);
         }
-      };
+      }
+    };
 
-      form.addEventListener("submit", onSubmit);
-      return () => form.removeEventListener("submit", onSubmit);
+    inputs.forEach((input) => {
+      input.addEventListener("change", onChange);
     });
 
     return () => {
-      cleanups.forEach((cleanup) => cleanup());
+      inputs.forEach((input) => {
+        input.removeEventListener("change", onChange);
+      });
     };
   }, []);
 
-  return null;
+  const overlay = useMemo(() => {
+    if (!status) return null;
+
+    return (
+      <div className="fixed inset-0 z-[250] flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-md">
+        <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] p-6 text-white shadow-2xl shadow-black/40">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(0,132,209,0.45),rgba(15,23,42,0.9))]">
+              <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-200/80">{status.title}</p>
+              <p className="mt-1 text-sm text-slate-200">{status.detail}</p>
+              {status.fileName ? <p className="mt-2 truncate text-xs text-slate-400">{status.fileName}</p> : null}
+            </div>
+          </div>
+          <p className="mt-4 text-xs uppercase tracking-[0.25em] text-slate-400">Preparing file before upload</p>
+        </div>
+      </div>
+    );
+  }, [status]);
+
+  return overlay;
 }

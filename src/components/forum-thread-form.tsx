@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { compressMediaFileToInput, setUploadOverlay } from "@/components/sitewide-media-upload-enhancer";
 
 type ForumThreadFormProps = {
   onCreated?: () => void;
@@ -16,13 +17,17 @@ export default function ForumThreadForm({ onCreated }: ForumThreadFormProps) {
   const router = useRouter();
 
   async function onAttachmentChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
+
+    await compressMediaFileToInput(input, file);
+    setUploadOverlay(null);
 
     const reader = new FileReader();
     reader.onload = () => {
       setMediaUrl(typeof reader.result === "string" ? reader.result : null);
-      setMediaType(file.type || "image/*");
+      setMediaType((input.files?.[0]?.type || file.type) || "image/*");
     };
     reader.readAsDataURL(file);
   }
@@ -74,7 +79,7 @@ export default function ForumThreadForm({ onCreated }: ForumThreadFormProps) {
         />
         <label className="block rounded border border-dashed border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)] px-3 py-2 text-sm text-[color:var(--ni-text)]">
           <span className="font-semibold text-[color:var(--ni-text-strong)]">Add image / GIF</span>
-          <input type="file" accept="image/*,.gif" className="mt-2 block w-full text-xs" onChange={onAttachmentChange} />
+          <input type="file" accept="image/*,.gif" data-skip-global-media-compress="true" className="mt-2 block w-full text-xs" onChange={onAttachmentChange} />
         </label>
         {mediaUrl ? (
           <div className="overflow-hidden rounded border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-2)]">

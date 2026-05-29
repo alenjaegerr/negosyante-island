@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { maybeCompressMedia } from "@/components/sitewide-media-upload-enhancer";
+import { compressMediaFileToInput, setUploadOverlay } from "@/components/sitewide-media-upload-enhancer";
 
 export function CreatePostForm() {
   const router = useRouter();
@@ -22,18 +22,6 @@ export function CreatePostForm() {
 
     if (!String(formData.get("content") ?? "").trim() && !hasImage && !hasGif && !hasVideo) {
       return;
-    }
-
-    if (imageFile instanceof File && imageFile.size > 0) {
-      formData.set("imageFile", await maybeCompressMedia(imageFile));
-    }
-
-    if (gifFile instanceof File && gifFile.size > 0) {
-      formData.set("gifFile", await maybeCompressMedia(gifFile));
-    }
-
-    if (videoFile instanceof File && videoFile.size > 0) {
-      formData.set("videoFile", await maybeCompressMedia(videoFile));
     }
 
     const response = await fetch("/api/posts", {
@@ -62,15 +50,33 @@ export function CreatePostForm() {
       <div className="grid gap-2 text-sm md:grid-cols-3">
         <label className="rounded-lg border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-[var(--ni-text-strong)]">
           <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ni-muted)]">Image</span>
-          <input name="imageFile" type="file" accept="image/*" className="mt-2 block w-full text-xs text-[var(--ni-text-strong)]" />
+          <input name="imageFile" type="file" accept="image/*" data-skip-global-media-compress="true" onChange={async (event) => {
+            const input = event.currentTarget;
+            const file = input.files?.[0];
+            if (!file) return;
+            await compressMediaFileToInput(input, file);
+            setUploadOverlay(null);
+          }} className="mt-2 block w-full text-xs text-[var(--ni-text-strong)]" />
         </label>
         <label className="rounded-lg border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-[var(--ni-text-strong)]">
           <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ni-muted)]">GIF</span>
-          <input name="gifFile" type="file" accept="image/gif" className="mt-2 block w-full text-xs text-[var(--ni-text-strong)]" />
+          <input name="gifFile" type="file" accept="image/gif" data-skip-global-media-compress="true" onChange={async (event) => {
+            const input = event.currentTarget;
+            const file = input.files?.[0];
+            if (!file) return;
+            await compressMediaFileToInput(input, file);
+            setUploadOverlay(null);
+          }} className="mt-2 block w-full text-xs text-[var(--ni-text-strong)]" />
         </label>
         <label className="rounded-lg border border-[color:var(--ni-border)] bg-[var(--ni-surface-2)] px-3 py-2 text-[var(--ni-text-strong)]">
           <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ni-muted)]">Video</span>
-          <input name="videoFile" type="file" accept="video/mp4" className="mt-2 block w-full text-xs text-[var(--ni-text-strong)]" />
+          <input name="videoFile" type="file" accept="video/mp4" data-skip-global-media-compress="true" onChange={async (event) => {
+            const input = event.currentTarget;
+            const file = input.files?.[0];
+            if (!file) return;
+            await compressMediaFileToInput(input, file);
+            setUploadOverlay(null);
+          }} className="mt-2 block w-full text-xs text-[var(--ni-text-strong)]" />
         </label>
       </div>
 

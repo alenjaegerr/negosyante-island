@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserAvatar } from "@/components/user-avatar";
+import { compressMediaFileToInput, setUploadOverlay } from "@/components/sitewide-media-upload-enhancer";
 
 type Viewer = {
   id: string;
@@ -222,7 +223,8 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
   }, [messages]);
 
   async function handleAttachmentChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
@@ -231,10 +233,13 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
       return;
     }
 
+    await compressMediaFileToInput(input, file);
+    setUploadOverlay(null);
+
     const reader = new FileReader();
     reader.onload = () => {
       setSelectedAttachment(typeof reader.result === "string" ? reader.result : null);
-      setSelectedAttachmentType(file.type);
+      setSelectedAttachmentType((input.files?.[0]?.type || file.type));
       setComposerMode(file.type.includes("gif") ? "gif" : "image");
     };
     reader.readAsDataURL(file);
@@ -425,7 +430,7 @@ export default function BusinessMessagePlatform({ viewer, businessContext, initi
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold sm:gap-2">
                       <label className="cursor-pointer rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-0.5 text-[color:var(--ni-text-strong)]">
                         Attach image / GIF
-                        <input type="file" accept="image/*,.gif" className="hidden" onChange={handleAttachmentChange} />
+                        <input type="file" accept="image/*,.gif" data-skip-global-media-compress="true" className="hidden" onChange={handleAttachmentChange} />
                       </label>
                       <label className="rounded-full border border-[color:var(--ni-border)] bg-[color:var(--ni-surface-1)] px-2 py-0.5 text-[color:var(--ni-text-strong)]">
                         Appointment time
