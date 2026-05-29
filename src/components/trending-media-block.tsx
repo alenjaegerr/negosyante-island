@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { isDirectVideoUrl } from "@/lib/trending-media";
 
 type TrendingMediaBlockProps = {
   title: string;
@@ -23,20 +24,14 @@ export function TrendingMediaBlock({
 }: TrendingMediaBlockProps) {
   const hasImage = Boolean(imageUrl);
   const hasGif = Boolean(gifUrl);
-  const videoSrc = videoUrl && /\.mp4(\?|#|$)/i.test(videoUrl) ? videoUrl : null;
+  const videoSrc = videoUrl && isDirectVideoUrl(videoUrl) ? videoUrl : null;
   const hasVideo = Boolean(videoSrc);
   const showThumbnail = hasImage && (hasGif || hasVideo);
+
   const mediaNode = (() => {
     if (hasVideo && videoSrc) {
       return (
-        <video
-          src={videoSrc}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="h-full w-full object-cover"
-        />
+        <video src={videoSrc} autoPlay muted loop playsInline controls className="h-full w-full object-cover" />
       );
     }
 

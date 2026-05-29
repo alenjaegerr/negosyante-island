@@ -18,8 +18,33 @@ const normalizeUrl = (value: string) => {
 
 const getPathSegment = (url: URL, index: number) => url.pathname.split("/").filter(Boolean)[index] ?? "";
 
+export function isDirectVideoUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+
+  if (trimmed.startsWith("data:video/")) {
+    return true;
+  }
+
+  const url = normalizeUrl(trimmed);
+  if (!url) return false;
+
+  return /\.(mp4|webm|mov)(\?|#|$)/i.test(url.pathname);
+}
+
 export function buildTrendingMediaPreview(videoUrl: string, loopSeconds = 5): TrendingMediaPreview | null {
-  const url = normalizeUrl(videoUrl.trim());
+  const trimmed = videoUrl.trim();
+  if (isDirectVideoUrl(trimmed)) {
+    return {
+      provider: "direct",
+      embedUrl: trimmed,
+      aspectClass: "aspect-video",
+      label: "Direct video",
+      supportsLoop: true,
+    };
+  }
+
+  const url = normalizeUrl(trimmed);
   if (!url) return null;
 
   const seconds = clampLoopSeconds(loopSeconds);
@@ -81,16 +106,6 @@ export function buildTrendingMediaPreview(videoUrl: string, loopSeconds = 5): Tr
       aspectClass: "aspect-[4/5]",
       label: "X preview",
       supportsLoop: false,
-    };
-  }
-
-  if (url.pathname.match(/\.(mp4|webm|mov)$/i)) {
-    return {
-      provider: "direct",
-      embedUrl: videoUrl,
-      aspectClass: "aspect-video",
-      label: "Direct video",
-      supportsLoop: true,
     };
   }
 
