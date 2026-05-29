@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
     "dev:all": "docker compose up -d db && npm run dev",
+    "postinstall": "node scripts/copy-ffmpeg-core.mjs",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
     "lint": "eslint",
@@ -14,6 +15,7 @@
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/core": "^0.12.10",
     "@ffmpeg/util": "^0.12.2",
     "bcryptjs": "^3.0.2",
     "jose": "^6.1.0",

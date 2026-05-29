@@ -6,7 +6,7 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 const MAX_IMAGE_DIMENSION = 1400;
 const MAX_SAFE_UPLOAD_BYTES = 3.5 * 1024 * 1024;
-const FFMPEG_VERSION = "0.12.10";
+const FFMPEG_BASE_URL = "/ffmpeg";
 const UPLOAD_STATUS_EVENT = "ni-upload-status";
 
 type UploadStatus = {
@@ -41,12 +41,11 @@ async function getFfmpeg() {
   if (!ffmpegPromise) {
     ffmpegPromise = (async () => {
       const ffmpeg = new FFmpeg();
-      const baseUrl = `https://unpkg.com/@ffmpeg/core@${FFMPEG_VERSION}/dist/umd`;
+      const baseUrl = `${FFMPEG_BASE_URL}`;
 
       await ffmpeg.load({
         coreURL: await toBlobURL(`${baseUrl}/ffmpeg-core.js`, "text/javascript"),
         wasmURL: await toBlobURL(`${baseUrl}/ffmpeg-core.wasm`, "application/wasm"),
-        workerURL: await toBlobURL(`${baseUrl}/ffmpeg-core.worker.js`, "text/javascript"),
       });
 
       return ffmpeg;
