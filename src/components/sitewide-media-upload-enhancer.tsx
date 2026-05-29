@@ -227,18 +227,11 @@ export default function SitewideMediaUploadEnhancer() {
   }, []);
 
   useEffect(() => {
-    const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[type="file"]'));
-    if (!inputs.length) return;
-
-    const onChangeByInput = new WeakMap<HTMLInputElement, number>();
-
     const onChange = async (event: Event) => {
-      const input = event.currentTarget as HTMLInputElement;
+      const input = event.target instanceof HTMLInputElement ? event.target : null;
+      if (!input) return;
       const file = input.files?.[0];
       if (!file || !isCompressibleFile(file) || input.dataset.skipGlobalMediaCompress === "true") return;
-
-      const token = (onChangeByInput.get(input) ?? 0) + 1;
-      onChangeByInput.set(input, token);
 
       try {
         input.dataset.mediaBusy = "1";
@@ -248,22 +241,16 @@ export default function SitewideMediaUploadEnhancer() {
         window.alert(message);
         if (input.isConnected) input.value = "";
       } finally {
-        if (onChangeByInput.get(input) === token) {
-          input.dataset.mediaBusy = "0";
-          setStatus(null);
-          setUploadOverlay(null);
-        }
+        input.dataset.mediaBusy = "0";
+        setStatus(null);
+        setUploadOverlay(null);
       }
     };
 
-    inputs.forEach((input) => {
-      input.addEventListener("change", onChange);
-    });
+    document.addEventListener("change", onChange, true);
 
     return () => {
-      inputs.forEach((input) => {
-        input.removeEventListener("change", onChange);
-      });
+      document.removeEventListener("change", onChange, true);
     };
   }, []);
 
